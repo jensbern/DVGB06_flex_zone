@@ -116,3 +116,7 @@ dmypy.json
 # Sass files
 *.scss
 *.css.map
+
+# DB
+create_data.py
+database.sqlite3
