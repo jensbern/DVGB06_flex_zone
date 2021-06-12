@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet/normalize.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet/style.css') }}" />
+    <script src="{{ url_for('static', filename='js/components/components.js') }}" type="module"></script>
+    <title>{% block title %}{% endblock %} - Flex Zone</title>
+    {% endblock %}
+</head>
+<body>
+    <header>
+        <h1>Flex Zone</h1>
+    </header>
+    <main>{% block content %}{% endblock %}</main>
+    <footer>
+    </footer>
+</body>
+</html>
