@@ -1,5 +1,7 @@
-// import { Champion } from "./champion.js"
-// import { Item } from "./item.js"
+import {User} from "./user.js"
+import {Skills} from "./skills.js"
+import {Experiences} from "./experiences.js"
 
-// customElements.define("champion-selector", Champion)
-// customElements.define("item-selector", Item)
+customElements.define("experiences-element", Experiences)
+customElements.define("skills-element", Skills)
+customElements.define("user-element", User)

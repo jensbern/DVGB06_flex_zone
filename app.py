@@ -14,6 +14,10 @@ app.debug = True
 def index():
     return render_template("index.html")
 
+@app.route("/user/<int:id>")
+def user(id=None):
+    print(id)
+    return render_template("user.html", username="Pelle", userid=id)
 
 app.add_url_rule(
     '/graphql',
@@ -26,3 +30,7 @@ app.add_url_rule(
 @app.teardown_appcontext
 def shutdown_session(exception=None):
   db_session.remove()
+
+
+#start (Powershell):
+# . .\env\Scripts\activate

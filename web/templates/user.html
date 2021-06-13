@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{username}}{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+<section>
+  <user-element username="{{username}}" userid="{{userid}}">
+  </user-element>
+</section> 
+<article id="user_page">
+  <section>
+    <h2>Experiences</h2>
+    <experiences-element userid="{{userid}}"></experiences-element>
+  </section>
+  <section>
+    <h2>Skills</h2>
+    <skills-element userid="{{userid}}"></skills-element>
+  </section>
+</article>
+{% endblock %}
