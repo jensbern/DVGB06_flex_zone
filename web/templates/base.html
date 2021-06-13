@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     {% block head %}
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet/normalize.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet/style.css') }}" />
     <script src="{{ url_for('static', filename='js/components/components.js') }}" type="module"></script>
