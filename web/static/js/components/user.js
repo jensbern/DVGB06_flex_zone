@@ -47,10 +47,8 @@ export class User extends HTMLElement {
         font-size: 1.2em;
 
       }
-     
     `
     const userid = this.getAttribute("userid");
-    console.log(userid);
     this.shadowRoot.append(STYLE);
   }
   

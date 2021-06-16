@@ -118,7 +118,6 @@ export class Experiences extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log(data.data.allStaff.edges[0].node.experiences.edges);
     this.displayExperiences(data.data.allStaff.edges[0].node.experiences.edges);
   }
 
