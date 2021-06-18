@@ -11,6 +11,7 @@ import { baseTemplate } from "./template.js";
 //             node {
 //               type
 //               description
+//               at
 //               reference
 //               start
 //               end
@@ -34,8 +35,9 @@ const data = {
                   "node": {
                     "type": "Analyst",
                     "description": "good at good atmosphere within the team",
+                    "at": "Pepega Gaming",
                     "reference": "Pelles telefon",
-                    "start": "2021-06-18T00:00:00",
+                    "start": "2021-06-18T16:44:12.972150",
                     "end": null
                   }
                 }
@@ -100,13 +102,17 @@ export class Experiences extends HTMLElement {
       const H3_name = document.createElement("h3");
       H3_name.innerText = experiences[i].node.type;
       ARTIClE.append(H3_name);
+
+      const P_at = document.createElement("p");
+      P_at.innerText = experiences[i].node.at;
+      ARTIClE.append(P_at)
       
       const P_description = document.createElement("p");
       P_description.innerText = experiences[i].node.description;
       ARTIClE.append(P_description);
       
       const P_duration = document.createElement("p");
-      P_duration.innerText = `${experiences[i].node.start} - ${experiences[i].node.end ? experiences[i].node.end: ""}`
+      P_duration.innerText = `${experiences[i].node.start} - ${experiences[i].node.end ? experiences[i].node.end: "Now"}`
       ARTIClE.append(P_duration);
       
       const A_reference = document.createElement("a");

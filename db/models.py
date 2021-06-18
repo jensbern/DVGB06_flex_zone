@@ -28,6 +28,7 @@ class Experience(Base):
     staffid = Column(Integer, ForeignKey('staff.id'))
     type=Column(String)
     description=Column(String)
+    at=Column(String)
     reference = Column(String)
     start = Column(DateTime)
     end = Column(DateTime)
