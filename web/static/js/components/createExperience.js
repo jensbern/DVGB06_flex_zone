@@ -72,6 +72,8 @@ export class CreateExperience extends HTMLElement {
     SELECT_type.setAttribute("id", "experience_type");
     SELECT_type.required = true;
 
+    
+    
     var OPTION_type = document.createElement("option");
     OPTION_type.innerText = "Select Type";
     OPTION_type.setAttribute("value", "");
@@ -92,6 +94,19 @@ export class CreateExperience extends HTMLElement {
 
     P_type.append(LABEL_type, SELECT_type, "*");
     FORM_createExperience.append(P_type);
+
+    const P_at = document.createElement("p");
+    const LABEL_at = document.createElement("label");
+    LABEL_at.innerText = "at";
+    LABEL_at.setAttribute("for", "experience_at");
+    LABEL_at.style = "display:none;";
+    const INPUT_at = document.createElement("input");
+    INPUT_at.setAttribute("type", "text");
+    INPUT_at.setAttribute("id", "experience_at");
+    INPUT_at.setAttribute("placeholder", "At (team, company, ... )")
+    INPUT_at.required = true;
+    P_at.append(LABEL_at, INPUT_at, "*");
+    FORM_createExperience.append(P_at);
 
     const P_description = document.createElement("p");
     const LABEL_description = document.createElement("label");
