@@ -7,6 +7,7 @@ import { baseTemplate } from "./template.js";
 //       node {
 //         name
 //         contactInfo
+//         contactType
 //       }
 //     }
 //   }
@@ -18,13 +19,15 @@ const data = {
         {
           "node": {
             "name": "Pelle",
-            "contactInfo": "pelle#1234"
+            "contactInfo": "pelle#1234",
+            "contactType": "discord"
           }
         },
         {
           "node": {
             "name": "Lisa",
-            "contactInfo": "lisa.s@gmail.com"
+            "contactInfo": "lisa.s@gmail.com",
+            "contactType": "email"
           }
         }
       ]
@@ -45,7 +48,12 @@ export class User extends HTMLElement {
       }
       p {
         font-size: 1.2em;
-
+        margin-top: 8px;
+        margin-bottom: 16px;
+      }
+      .contact_type{
+        margin-left: 8px;
+        font-size: 0.9em;
       }
     `
     const userid = this.getAttribute("userid");
@@ -59,6 +67,10 @@ export class User extends HTMLElement {
   
     const P_contactInfo = document.createElement("p");
     P_contactInfo.innerText = userData.contactInfo;
+    const SPAN_contactType = document.createElement("span");
+    SPAN_contactType.innerText = `[${userData.contactType}]`;
+    SPAN_contactType.setAttribute("class", "contact_type");
+    P_contactInfo.append(SPAN_contactType);
     this.shadowRoot.append(P_contactInfo);
     
   }

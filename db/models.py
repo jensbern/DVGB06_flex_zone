@@ -18,6 +18,7 @@ class Staff(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     contact_info = Column(String)
+    contact_type= Column(String)
     type = Column(String)
 
 
@@ -25,7 +26,7 @@ class Experience(Base):
     __tablename__ = "experience"
     id=Column(Integer, primary_key=True)
     staffid = Column(Integer, ForeignKey('staff.id'))
-    name=Column(String)
+    type=Column(String)
     description=Column(String)
     reference = Column(String)
     start = Column(DateTime)
