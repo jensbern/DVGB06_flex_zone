@@ -9,7 +9,7 @@ import { baseTemplate } from "./template.js";
 //         experiences {
 //           edges {
 //             node {
-//               name
+//               type
 //               description
 //               reference
 //               start
@@ -32,11 +32,12 @@ const data = {
               "edges": [
                 {
                   "node": {
-                    "name": "Good Atmosphere",
+                    "type": "Analyst",
                     "description": "good at good atmosphere within the team",
                     "reference": "Pelles telefon",
-                    "start": "2021-06-12",
-                    "end": null                  }
+                    "start": "2021-06-18T00:00:00",
+                    "end": null
+                  }
                 }
               ]
             }
@@ -97,7 +98,7 @@ export class Experiences extends HTMLElement {
       const ARTIClE = document.createElement("article");
       
       const H3_name = document.createElement("h3");
-      H3_name.innerText = experiences[i].node.name;
+      H3_name.innerText = experiences[i].node.type;
       ARTIClE.append(H3_name);
       
       const P_description = document.createElement("p");

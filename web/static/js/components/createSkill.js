@@ -105,8 +105,15 @@ export class CreateSkill extends HTMLElement {
   };
 
   handleCreateSkill = (e) => {
-    e.preventDefault();
-    console.log("TODO: Create Skill");
+    var isValid = true;
+    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll("[required]");
+    for(let i = 0; i < REQUIRED_ELEMENTS.length; i++){
+      isValid = isValid && !!REQUIRED_ELEMENTS[i].value;
+    }
+    if (isValid) {
+      e.preventDefault();
+      console.log("TODO: Create Experience");
+    } 
   };
 
   concealCreateSkill = () => {
