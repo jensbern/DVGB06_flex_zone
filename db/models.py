@@ -18,7 +18,7 @@ class Staff(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     contact_info = Column(String)
-    contact_type= Column(String)
+    contact_type = Column(String)
     type = Column(String)
 
 
