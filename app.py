@@ -19,6 +19,10 @@ def user(id=None):
     print(id)
     return render_template("user.html", username="Pelle", userid=id)
 
+@app.route("/createuser")
+def createuser():
+    return render_template("createUser.html")
+
 app.add_url_rule(
     '/graphql',
     view_func=GraphQLView.as_view(

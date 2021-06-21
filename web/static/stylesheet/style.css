@@ -29,12 +29,14 @@ h3 {
   display: grid;
   -ms-grid-columns: 1fr 1fr;
       grid-template-columns: 1fr 1fr;
-  -webkit-column-gap: 16px;
-          column-gap: 16px;
+  /* -webkit-column-gap: 8px;
+          column-gap: 8px; */
 }
 
 #user_page section {
   background-color: #f8f7f7;
   padding: 8px;
+  margin: 8px;
+  border: 1px solid lightgrey;
 }
 /*# sourceMappingURL=style.css.map */

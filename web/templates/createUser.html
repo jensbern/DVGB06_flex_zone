@@ -1,12 +1,25 @@
-<!-- {% extends "base.html" %}
-{% block title %}{{username}}{% endblock %}
+{% extends "base.html" %}
+{% block title %}Create user{% endblock %}
 {% block head %}
     {{ super() }}
 {% endblock %}
-{% block content %} -->
+{% block content %}
 <section>
+  <h2>Create user</h2>
   <script src="./../static/js/components/components.js" type="module"></script>
   <createuser-element userid="{{userid}}">
   </createuser-element>
+  <article id="user_page">
+  <section>
+    <h2>Experiences</h2>
+    <experiences-element userid="{{userid}}"></experiences-element>
+    <createexperience-element userid="{{userid}}"></createexperience-element>
+  </section>
+  <section>
+    <h2>Skills</h2>
+    <skills-element userid="{{userid}}"></skills-element>
+    <createskill-element userid="{{userid}}"></createskill-element>
+  </section>
+</article>
 </section> 
-<!-- {% endblock %} -->
+{% endblock %}
