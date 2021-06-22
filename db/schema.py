@@ -61,22 +61,18 @@ class Query(graphene.ObjectType):
   def resolve_staff(self, info, **args):
     name = args.get("name")
     staff_id = args.get("id")
-    # print(staff_id)
     staff_query = Staff.get_query(info)
-    # StaffModel.name.contains(name) | StaffModel.id.contains(staff_id)
     if staff_id:
       staff = staff_query.filter(StaffModel.id.contains(staff_id)).all()
       return staff
     
     if name:
       staff = staff_query.filter(StaffModel.name.contains(name)).all()
-      # print(staff[0].id)
       return staff
     
   def resolve_skills(self, info, **args):
     name = args.get("name")
     skill_query = Skill.get_query(info)
-    print(name)
     skills = skill_query.filter(SkillModel.name.contains(name)).all()
     return skills
   
