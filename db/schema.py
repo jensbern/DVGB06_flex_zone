@@ -1,3 +1,4 @@
+from sqlalchemy import or_
 from sqlalchemy.engine import interfaces
 import graphene
 from graphene import relay
@@ -8,6 +9,7 @@ class Staff(SQLAlchemyObjectType):
   class Meta:
     model = StaffModel
     interfaces = (relay.Node, )
+  
 
 class Experience(SQLAlchemyObjectType):
   class Meta:
@@ -19,12 +21,55 @@ class Skill(SQLAlchemyObjectType):
     model = SkillModel
     interfaces = (relay.Node, )
 
+class SearchResult(graphene.Union):
+  class Meta:
+    types = (Staff, Experience, Skill)
+
 class Query(graphene.ObjectType):
   node = relay.Node.Field()
+  search = graphene.List(SearchResult, q=graphene.String())
+  staff = graphene.Field(Staff, name=graphene.String(), id=graphene.Int())
   # Allows sorting over multiple columns, by default over the primary key
   all_staff = SQLAlchemyConnectionField(Staff.connection)
   all_experience = SQLAlchemyConnectionField(Experience.connection)
   # Disable sorting over this field
   all_skills = SQLAlchemyConnectionField(Skill.connection)
 
-schema = graphene.Schema(query=Query)
+
+  """
+  {
+  search(q: "Pelle") {
+    __typename
+    ... on Staff {
+      name
+      id
+      contactInfo
+    }
+  }
+}
+
+  """
+  def resolve_search(self, info, **args):
+    q = args.get("q")
+    staff_query = Staff.get_query(info)
+    
+    staff = staff_query.filter(StaffModel.name.contains(q)).all()
+    
+    return staff
+  
+  def resolve_staff(self, info, **args):
+    name = args.get("name")
+    staff_id = args.get("id")
+    # print(staff_id)
+    staff_query = Staff.get_query(info)
+    # StaffModel.name.contains(name) | StaffModel.id.contains(staff_id)
+    if staff_id:
+      staff = staff_query.filter(StaffModel.id.contains(staff_id)).first()
+      return staff
+    
+    if name:
+      staff = staff_query.filter(StaffModel.name.contains(name)).first()
+      # print(staff[0].id)
+      return staff
+
+schema = graphene.Schema(query=Query, types=[Staff, Experience, Skill, SearchResult])
