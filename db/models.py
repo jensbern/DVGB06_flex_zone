@@ -19,7 +19,6 @@ class Staff(Base):
     name = Column(String)
     contact_info = Column(String)
     contact_type = Column(String)
-    type = Column(String)
 
 
 class Experience(Base):
