@@ -26,7 +26,6 @@ export class User extends HTMLElement {
   }
 
   displayUserData = (userData) => {
-    console.log(userData);
     const H3_name = document.createElement("h3");
     H3_name.innerText = userData.name;
     this.shadowRoot.append(H3_name);
