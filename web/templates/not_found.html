@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{username}}{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+<section>
+  <h2>User not found</h2>
+  <a href="/">Back to start page</a>
+</section> 
+{% endblock %}
