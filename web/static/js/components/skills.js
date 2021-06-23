@@ -1,74 +1,16 @@
 import { baseTemplate } from "./template.js";
-// GraphQL Query
-// {
-//   allStaff {
-//     edges {
-//       node {
-//         name
-//         skills {
-//           edges {
-//             node {
-//               name
-//               description
-//               reference
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
-const data = {
-  "data": {
-    "allStaff": {
-      "edges": [
-        {
-          "node": {
-            "name": "Pelle",
-            "skills": {
-              "edges": [
-                {
-                  "node": {
-                    "name": "Pick ban",
-                    "description": "good at planning pick ban against specific opponents",
-                    "reference": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                  }
-                }
-              ]
-            }
-          }
-        },
-        {
-          "node": {
-            "name": "Lisa",
-            "skills": {
-              "edges": [
-                {
-                  "node": {
-                    "name": "Top lane matchups",
-                    "description": "good at analyzing toplane matchups",
-                    "reference": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                  }
-                }
-              ]
-            }
-          }
-        }
-      ]
-    }
-  }
-}
 
 export class Skills extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({mode: "open"})
+    this.attachShadow({ mode: "open" });
     this.shadowRoot.append(baseTemplate.content.cloneNode(true));
     const STYLE = document.createElement("style");
     STYLE.innerText = `
       article {
         border: 1px solid darkgrey;
         padding: 16px;
+        margin-bottom: 8px;
         background-color: #fff;
       }
 
@@ -85,22 +27,18 @@ export class Skills extends HTMLElement {
       a {
         font-size: 1.1em;
       }
-    `
-    this.shadowRoot.append(STYLE)
+    `;
+    this.shadowRoot.append(STYLE);
 
-    
     // <article>
     //   <h3>name</h3>
     //   <p>Description</p>
     //   <a>reference</a>
     // </article>
-    
-    
-    
   }
-  
-  displaySkills (skills) {
-    for(var i = 0; i < skills.length; i++){
+
+  displaySkills(skills) {
+    for (var i = 0; i < skills.length; i++) {
       const ARTIClE = document.createElement("article");
       const H3_name = document.createElement("h3");
       H3_name.innerText = skills[i].node.name;
@@ -117,11 +55,47 @@ export class Skills extends HTMLElement {
     }
   }
 
+  getSkillsData = (userid, callback) => {
+    fetch("/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+        query ($userid:Int){
+          staff(id: $userid) {
+            skills {
+              edges {
+                node {
+                  name
+                  description
+                  reference
+                }
+              }
+            }
+          }
+        }
+        `,
+        variables: {
+          userid: userid,
+        },
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        callback(data);
+      });
+  };
+
   connectedCallback() {
-    this.displaySkills(data.data.allStaff.edges[0].node.skills.edges);
+    const userid = this.getAttribute("userid");
+    this.getSkillsData(userid, data => {
+      this.displaySkills(data.data.staff[0].skills.edges);
+    })
   }
 
-  disconnectedCallback() {
-
-  }
+  disconnectedCallback() {}
 }

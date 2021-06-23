@@ -14,14 +14,20 @@ app.debug = True
 def index():
     return render_template("index.html")
 
-@app.route("/user/<int:id>")
-def user(id=None):
-    print(id)
-    return render_template("user.html", username="Pelle", userid=id)
+
+@app.route("/user/<int:userid>")
+def user(userid=None):
+    query_string = "{{ staff(id:{0}) {{name}} }}".format(userid)
+    result = schema.execute(query_string)
+    if len(result.data["staff"]) > 0:
+        name = result.data["staff"][0]["name"]
+        return render_template("user.html", username=name, userid=userid)
+    return render_template("not_found.html")
 
 @app.route("/createuser")
 def createuser():
     return render_template("createUser.html")
+
 
 app.add_url_rule(
     '/graphql',
@@ -31,10 +37,11 @@ app.add_url_rule(
         graphiql=True
     ))
 
+
 @app.teardown_appcontext
 def shutdown_session(exception=None):
-  db_session.remove()
+    db_session.remove()
 
 
-#start (Powershell):
+# start (Powershell):
 # . .\env\Scripts\activate
