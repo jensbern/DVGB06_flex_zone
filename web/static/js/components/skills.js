@@ -92,9 +92,11 @@ export class Skills extends HTMLElement {
 
   connectedCallback() {
     const userid = this.getAttribute("userid");
-    this.getSkillsData(userid, data => {
-      this.displaySkills(data.data.staff[0].skills.edges);
-    })
+    if(userid){
+      this.getSkillsData(userid, data => {
+        this.displaySkills(data.data.staff[0].skills.edges);
+      })
+    }
   }
 
   disconnectedCallback() {}

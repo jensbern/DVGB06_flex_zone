@@ -112,12 +112,14 @@ export class Experiences extends HTMLElement {
   };
 
   connectedCallback() {
-    const userid = this.getAttribute("userid")
-    this.getExperienceData(userid, data => {
-      this.displayExperiences(data.data.staff[0].experiences.edges);
-      // (data.data.allStaff.edges[0].node.experiences.edges);
-
-    })
+    const userid = this.getAttribute("userid");
+    if(userid){
+      this.getExperienceData(userid, data => {
+        this.displayExperiences(data.data.staff[0].experiences.edges);
+        // (data.data.allStaff.edges[0].node.experiences.edges);
+  
+      })
+    }
   }
 
   disconnectedCallback() {}

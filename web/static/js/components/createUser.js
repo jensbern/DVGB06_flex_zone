@@ -4,7 +4,7 @@ export class CreateUser extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
-    // this.shadowRoot.append(baseTemplate.content.cloneNode(true));
+    this.shadowRoot.append(baseTemplate.content.cloneNode(true));
     const STYLE = document.createElement("style");
     STYLE.innerText = `
     form {
