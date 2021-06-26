@@ -73,7 +73,6 @@ export class CreateExperience extends HTMLElement {
     SELECT_type.setAttribute("name", "experience_type");
     SELECT_type.required = true;
 
-    
     var OPTION_type = document.createElement("option");
     OPTION_type.innerText = "Select Type";
     OPTION_type.setAttribute("value", "");
@@ -104,7 +103,7 @@ export class CreateExperience extends HTMLElement {
     INPUT_at.setAttribute("type", "text");
     INPUT_at.setAttribute("id", "experience_at");
     INPUT_at.setAttribute("name", "experience_at");
-    INPUT_at.setAttribute("placeholder", "At (team, company, ... )")
+    INPUT_at.setAttribute("placeholder", "At (team, company, ... )");
     INPUT_at.required = true;
     P_at.append(LABEL_at, INPUT_at, "*");
     FORM_createExperience.append(P_at);
@@ -174,18 +173,29 @@ export class CreateExperience extends HTMLElement {
   handleCreateExperience = (e) => {
     var isValid = true;
     const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll("[required]");
-    for(let i = 0; i < REQUIRED_ELEMENTS.length; i++){
+    for (let i = 0; i < REQUIRED_ELEMENTS.length; i++) {
       isValid = isValid && !!REQUIRED_ELEMENTS[i].value;
     }
     if (isValid) {
       e.preventDefault();
+      this.handleSubmit();
       console.log("TODO: Create Experience");
-    } 
+    }
   };
 
   concealCreateExperience = () => {
     this.shadowRoot.querySelector("#add_Experience").disabled = false;
     this.shadowRoot.querySelector("form").remove();
+  };
+
+  handleSubmit = () => {
+    // console.log("TODO: Create Experience");
+    const FORM = this.shadowRoot.querySelector("form");
+    console.log(FORM);
+    var formData = new FormData(FORM);
+    for (var [key, val] of formData.entries()) {
+      console.log(key, val);
+    }
   };
 
   connectedCallback() {}
