@@ -19,7 +19,17 @@ class Staff(Base):
     name = Column(String)
     contact_info = Column(String)
     contact_type = Column(String)
+    username = Column(String, unique=True)
 
+class Staff_password(Base):
+    __tablename__ = "staff_password"
+    id = Column(Integer, primary_key=True)
+    staffid = Column(Integer, ForeignKey("staff.id"))
+    password = Column(LargeBinary)
+    staff = relationship (
+        Staff,
+        backref=backref("password", cascade="delete,all")
+    )
 
 class Experience(Base):
     __tablename__ = "experience"
