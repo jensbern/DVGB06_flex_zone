@@ -70,9 +70,9 @@ export class CreateExperience extends HTMLElement {
     const SELECT_type = document.createElement("select");
     SELECT_type.setAttribute("type", "text");
     SELECT_type.setAttribute("id", "experience_type");
+    SELECT_type.setAttribute("name", "experience_type");
     SELECT_type.required = true;
 
-    
     
     var OPTION_type = document.createElement("option");
     OPTION_type.innerText = "Select Type";
@@ -103,6 +103,7 @@ export class CreateExperience extends HTMLElement {
     const INPUT_at = document.createElement("input");
     INPUT_at.setAttribute("type", "text");
     INPUT_at.setAttribute("id", "experience_at");
+    INPUT_at.setAttribute("name", "experience_at");
     INPUT_at.setAttribute("placeholder", "At (team, company, ... )")
     INPUT_at.required = true;
     P_at.append(LABEL_at, INPUT_at, "*");
@@ -116,6 +117,7 @@ export class CreateExperience extends HTMLElement {
     const TEXTAREA_description = document.createElement("textarea");
     TEXTAREA_description.style = "resize: none;";
     TEXTAREA_description.setAttribute("id", "experience_description");
+    TEXTAREA_description.setAttribute("name", "experience_description");
     TEXTAREA_description.setAttribute("placeholder", "Description ...");
     P_description.append(LABEL_description, TEXTAREA_description);
     FORM_createExperience.append(P_description);
@@ -127,6 +129,7 @@ export class CreateExperience extends HTMLElement {
     const INPUT_from = document.createElement("input");
     INPUT_from.setAttribute("type", "date");
     INPUT_from.setAttribute("id", "experience_from");
+    INPUT_from.setAttribute("name", "experience_from");
     INPUT_from.required = true;
     const LABEL_to = document.createElement("label");
     LABEL_to.innerText = "To";
@@ -134,6 +137,7 @@ export class CreateExperience extends HTMLElement {
     const INPUT_to = document.createElement("input");
     INPUT_to.setAttribute("type", "date");
     INPUT_to.setAttribute("id", "experience_to");
+    INPUT_to.setAttribute("name", "experience_to");
     P_from_to.append(LABEL_from, INPUT_from, "*", LABEL_to, INPUT_to);
     FORM_createExperience.append(P_from_to);
 
@@ -145,6 +149,7 @@ export class CreateExperience extends HTMLElement {
     const INPUT_reference = document.createElement("input");
     INPUT_reference.setAttribute("type", "url");
     INPUT_reference.setAttribute("id", "experience_reference");
+    INPUT_reference.setAttribute("name", "experience_reference");
     INPUT_reference.setAttribute(
       "placeholder",
       "Reference URL (e.g. video, article, ...)"

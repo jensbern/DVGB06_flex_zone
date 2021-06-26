@@ -43,7 +43,6 @@ export class CreateUser extends HTMLElement {
     }
     `;
     this.shadowRoot.append(STYLE);
-    this.displayCreateUser();
   }
 
   displayCreateUser = () => {
@@ -56,6 +55,7 @@ export class CreateUser extends HTMLElement {
     const INPUT_name = document.createElement("input");
     INPUT_name.setAttribute("type", "text");
     INPUT_name.setAttribute("id", "user_name");
+    INPUT_name.setAttribute("name", "user_name");
     INPUT_name.setAttribute("placeholder", "Name");
     INPUT_name.required = true;
     P_name.append(LABEL_name, INPUT_name, "*");
@@ -69,6 +69,7 @@ export class CreateUser extends HTMLElement {
     const INPUT_username = document.createElement("input");
     INPUT_username.setAttribute("type", "text");
     INPUT_username.setAttribute("id", "username");
+    INPUT_username.setAttribute("name", "username");
     INPUT_username.setAttribute("placeholder", "Username");
     INPUT_username.required = true;
     P_usernname.append(LABEL_username, INPUT_username, "*");
@@ -82,6 +83,7 @@ export class CreateUser extends HTMLElement {
     const INPUT_password = document.createElement("input");
     INPUT_password.setAttribute("type", "password");
     INPUT_password.setAttribute("id", "password");
+    INPUT_password.setAttribute("name", "password");
     INPUT_password.setAttribute("placeholder", "Password");
     INPUT_password.required = true;
     P_password.append(LABEL_password, INPUT_password, "*");
@@ -95,6 +97,7 @@ export class CreateUser extends HTMLElement {
     const INPUT_contact_address = document.createElement("input");
     INPUT_contact_address.setAttribute("type", "text");
     INPUT_contact_address.setAttribute("id", "contact_address");
+    INPUT_contact_address.setAttribute("name", "contact_address");
     INPUT_contact_address.setAttribute(
       "placeholder",
       "Contact address (email, discord, phone ...)"
@@ -108,6 +111,7 @@ export class CreateUser extends HTMLElement {
     const SELECT_contact_type = document.createElement("select");
     SELECT_contact_type.setAttribute("type", "text");
     SELECT_contact_type.setAttribute("id", "contact_type");
+    SELECT_contact_type.setAttribute("name", "contact_type");
     SELECT_contact_type.required = true;
     SELECT_contact_type.addEventListener(
       "change",
@@ -136,7 +140,7 @@ export class CreateUser extends HTMLElement {
     FORM_createUser.append(P_contact);
 
     const P_contact_description = document.createElement("p");
-    P_contact_description.setAttribute("id", "contact_description_container")
+    P_contact_description.setAttribute("id", "contact_description_container");
     P_contact_description.style.display = "none";
     const LABEL_description = document.createElement("label");
     LABEL_description.innerText = "Description";
@@ -145,6 +149,7 @@ export class CreateUser extends HTMLElement {
     const TEXTAREA_description = document.createElement("textarea");
     TEXTAREA_description.style = "resize: none;";
     TEXTAREA_description.setAttribute("id", "contact_description");
+    TEXTAREA_description.setAttribute("name", "contact_description");
     TEXTAREA_description.setAttribute("placeholder", "Contact description ...");
     P_contact_description.append(LABEL_description, TEXTAREA_description);
     FORM_createUser.append(P_contact_description);
@@ -175,15 +180,13 @@ export class CreateUser extends HTMLElement {
     }
     if (isValid) {
       e.preventDefault();
-      console.log("TODO: Create Experience");
+      this.handleSubmit();
     }
   };
 
   handleContactTypeChange = (e) => {
-    console.log(e.target.value);
-    const INPUT_contact_address = this.shadowRoot.querySelector(
-      "#contact_address"
-    );
+    const INPUT_contact_address =
+      this.shadowRoot.querySelector("#contact_address");
     const P_contact_description = this.shadowRoot.querySelector(
       "#contact_description_container"
     );
@@ -191,7 +194,7 @@ export class CreateUser extends HTMLElement {
       case "email":
         INPUT_contact_address.setAttribute("type", "email");
         P_contact_description.style.display = "none";
-        break;  
+        break;
 
       case "phone":
         INPUT_contact_address.setAttribute("type", "tel");
@@ -210,7 +213,20 @@ export class CreateUser extends HTMLElement {
     }
   };
 
-  connectedCallback() {}
+  handleSubmit = () => {
+    // console.log("TODO: Create Experience");
+    const FORM = this.shadowRoot.querySelector("form");
+    console.log(FORM);
+    var formData = new FormData(FORM);
+    for (var [key, val] of formData.entries()){
+      console.log(key, val);
+    }
+
+  }
+
+  connectedCallback() {
+    this.displayCreateUser();
+  }
 
   disconnectedCallback() {
     this.shadowRoot

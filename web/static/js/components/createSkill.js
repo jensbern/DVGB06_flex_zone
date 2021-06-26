@@ -58,6 +58,7 @@ export class CreateSkill extends HTMLElement {
     const INPUT_title = document.createElement("input");
     INPUT_title.setAttribute("type", "text");
     INPUT_title.setAttribute("id", "skill_title");
+    INPUT_title.setAttribute("name", "skill_title");
     INPUT_title.setAttribute("placeholder", "Title ...");
     INPUT_title.required = true;
     P_title.append(LABEL_title, INPUT_title, "*");
@@ -71,6 +72,7 @@ export class CreateSkill extends HTMLElement {
     const TEXTAREA_description = document.createElement("textarea");
     TEXTAREA_description.style = "resize: none;";
     TEXTAREA_description.setAttribute("id", "skill_description");
+    TEXTAREA_description.setAttribute("name", "skill_description");
     TEXTAREA_description.setAttribute("placeholder", "Description ...");
     P_description.append(LABEL_description, TEXTAREA_description);
     FORM_createSkill.append(P_description);
