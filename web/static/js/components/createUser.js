@@ -13,7 +13,7 @@ export class CreateUser extends HTMLElement {
       background-color: rgb(252, 252, 252);
       border: 1px solid lightgrey;
     }
-    input[type="text"], input[type="url"], textarea, select{
+    input[type="text"], input[type="password"], input[type="url"], textarea, select{
       width: 90%;
       margin: 8px;
       padding: 8px;
@@ -60,6 +60,32 @@ export class CreateUser extends HTMLElement {
     INPUT_name.required = true;
     P_name.append(LABEL_name, INPUT_name, "*");
     FORM_createUser.append(P_name);
+
+    const P_usernname = document.createElement("p");
+    const LABEL_username = document.createElement("label");
+    LABEL_username.innerText = "Username";
+    LABEL_username.setAttribute("for", "username");
+    LABEL_username.style = "display:none;";
+    const INPUT_username = document.createElement("input");
+    INPUT_username.setAttribute("type", "text");
+    INPUT_username.setAttribute("id", "username");
+    INPUT_username.setAttribute("placeholder", "Username");
+    INPUT_username.required = true;
+    P_usernname.append(LABEL_username, INPUT_username, "*");
+    FORM_createUser.append(P_usernname);
+
+    const P_password = document.createElement("p");
+    const LABEL_password = document.createElement("label");
+    LABEL_password.innerText = "Password";
+    LABEL_password.setAttribute("for", "password");
+    LABEL_password.style = "display:none;";
+    const INPUT_password = document.createElement("input");
+    INPUT_password.setAttribute("type", "password");
+    INPUT_password.setAttribute("id", "password");
+    INPUT_password.setAttribute("placeholder", "Password");
+    INPUT_password.required = true;
+    P_password.append(LABEL_password, INPUT_password, "*");
+    FORM_createUser.append(P_password);
 
     const P_contact = document.createElement("p");
     const LABEL_contact_address = document.createElement("label");
