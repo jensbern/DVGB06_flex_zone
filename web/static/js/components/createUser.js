@@ -55,7 +55,7 @@ export class CreateUser extends HTMLElement {
     const INPUT_name = document.createElement("input");
     INPUT_name.setAttribute("type", "text");
     INPUT_name.setAttribute("id", "user_name");
-    INPUT_name.setAttribute("name", "user_name");
+    INPUT_name.setAttribute("name", "name");
     INPUT_name.setAttribute("placeholder", "Name");
     INPUT_name.required = true;
     P_name.append(LABEL_name, INPUT_name, "*");
@@ -216,12 +216,21 @@ export class CreateUser extends HTMLElement {
   handleSubmit = () => {
     // console.log("TODO: Create Experience");
     const FORM = this.shadowRoot.querySelector("form");
-    console.log(FORM);
     var formData = new FormData(FORM);
-    for (var [key, val] of formData.entries()){
-      console.log(key, val);
-    }
-
+    fetch("/api/createuser", {
+      method: "POST",
+      body: formData
+    }).then(response => {
+      if (response.ok){
+        return response.json()
+      } else{
+        throw new Error("Username already exists")
+      }
+    }).then(data => {
+      window.location = `/user/${data.id}`
+    }).catch(err => {
+      console.log(err)
+    })
   }
 
   connectedCallback() {
