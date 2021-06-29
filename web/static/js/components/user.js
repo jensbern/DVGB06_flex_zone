@@ -21,7 +21,7 @@ export class User extends HTMLElement {
         font-size: 0.9em;
       }
     `;
-    
+
     this.shadowRoot.append(STYLE);
   }
 
@@ -37,9 +37,9 @@ export class User extends HTMLElement {
     SPAN_contactType.setAttribute("class", "contact_type");
     P_contactInfo.append(SPAN_contactType);
     this.shadowRoot.append(P_contactInfo);
-  }
+  };
 
-  getUserData = (userid, callback) => {
+  getUserData = (username, callback) => {
     fetch("/graphql", {
       method: "POST",
       headers: {
@@ -47,9 +47,9 @@ export class User extends HTMLElement {
       },
       body: JSON.stringify({
         query: `
-        query ($userid:Int)
+        query ($username:String)
           {
-            staff(id: $userid) {
+            staff(username: $username) {
               name
               contactInfo
               contactType
@@ -57,8 +57,8 @@ export class User extends HTMLElement {
           }
         `,
         variables: {
-          "userid": userid
-        }
+          username: username,
+        },
       }),
     })
       .then((res) => {
@@ -70,9 +70,9 @@ export class User extends HTMLElement {
   };
 
   connectedCallback() {
-    const userid = this.getAttribute("userid");
-    this.getUserData(userid, data => {
-      this.displayUserData(data.data.staff[0])
+    const username = this.getAttribute("username");
+    this.getUserData(username, (data) => {
+      this.displayUserData(data.data.staff[0]);
     });
   }
 

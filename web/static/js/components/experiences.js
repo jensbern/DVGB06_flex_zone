@@ -55,12 +55,11 @@ export class Experiences extends HTMLElement {
       const start = experiences[i].node.start.split("T")[0];
       var end = experiences[i].node.end;
       if (end) {
-        end = experiences[i].node.end.split("T")[0]
+        end = experiences[i].node.end.split("T")[0];
+      } else {
+        end = "Now";
       }
-      else{
-        end = "Now"
-      }
-        P_duration.innerText = `${start} - ${end}`;
+      P_duration.innerText = `${start} - ${end}`;
       ARTIClE.append(P_duration);
 
       const A_reference = document.createElement("a");
@@ -72,7 +71,7 @@ export class Experiences extends HTMLElement {
     }
   }
 
-  getExperienceData = (userid, callback) => {
+  getExperienceData = (username, callback) => {
     fetch("/graphql", {
       method: "POST",
       headers: {
@@ -80,9 +79,9 @@ export class Experiences extends HTMLElement {
       },
       body: JSON.stringify({
         query: `
-        query ($userid:Int)  
+        query ($username:String)  
           {
-            staff(id: $userid) {
+            staff(username: $username) {
               experiences {
                 edges {
                   node {
@@ -99,7 +98,7 @@ export class Experiences extends HTMLElement {
           }
         `,
         variables: {
-          "userid": userid,
+          username: username,
         },
       }),
     })
@@ -112,13 +111,12 @@ export class Experiences extends HTMLElement {
   };
 
   connectedCallback() {
-    const userid = this.getAttribute("userid");
-    if(userid){
-      this.getExperienceData(userid, data => {
+    const username = this.getAttribute("username");
+    if (username) {
+      this.getExperienceData(username, (data) => {
         this.displayExperiences(data.data.staff[0].experiences.edges);
         // (data.data.allStaff.edges[0].node.experiences.edges);
-  
-      })
+      });
     }
   }
 

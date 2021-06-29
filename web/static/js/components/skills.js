@@ -55,7 +55,7 @@ export class Skills extends HTMLElement {
     }
   }
 
-  getSkillsData = (userid, callback) => {
+  getSkillsData = (username, callback) => {
     fetch("/graphql", {
       method: "POST",
       headers: {
@@ -63,8 +63,8 @@ export class Skills extends HTMLElement {
       },
       body: JSON.stringify({
         query: `
-        query ($userid:Int){
-          staff(id: $userid) {
+        query ($username:String){
+          staff(username: $username) {
             skills {
               edges {
                 node {
@@ -78,7 +78,7 @@ export class Skills extends HTMLElement {
         }
         `,
         variables: {
-          userid: userid,
+          username: username,
         },
       }),
     })
@@ -91,11 +91,11 @@ export class Skills extends HTMLElement {
   };
 
   connectedCallback() {
-    const userid = this.getAttribute("userid");
-    if(userid){
-      this.getSkillsData(userid, data => {
+    const username = this.getAttribute("username");
+    if (username) {
+      this.getSkillsData(username, (data) => {
         this.displaySkills(data.data.staff[0].skills.edges);
-      })
+      });
     }
   }
 
