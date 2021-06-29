@@ -85,6 +85,7 @@ export class CreateSkill extends HTMLElement {
     const INPUT_reference = document.createElement("input");
     INPUT_reference.setAttribute("type", "url");
     INPUT_reference.setAttribute("id", "skill_reference");
+    INPUT_reference.setAttribute("name", "skill_reference");
     INPUT_reference.setAttribute(
       "placeholder",
       "Reference URL (e.g. video, article, ...)"
@@ -127,7 +128,6 @@ export class CreateSkill extends HTMLElement {
   handleSubmit = () => {
     // console.log("TODO: Create Experience");
     const FORM = this.shadowRoot.querySelector("form");
-    console.log(FORM);
     var formData = new FormData(FORM);
     for (var [key, val] of formData.entries()) {
       console.log(key, val);

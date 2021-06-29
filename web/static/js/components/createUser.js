@@ -217,20 +217,46 @@ export class CreateUser extends HTMLElement {
     // console.log("TODO: Create Experience");
     const FORM = this.shadowRoot.querySelector("form");
     var formData = new FormData(FORM);
-    fetch("/api/createuser", {
+    fetch("/graphql", {
       method: "POST",
-      body: formData
-    }).then(response => {
-      if (response.ok){
-        return response.json()
-      } else{
-        throw new Error("Username already exists")
-      }
-    }).then(data => {
-      window.location = `/user/${data.id}`
-    }).catch(err => {
-      console.log(err)
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+          mutation CreateStaff($contact_info: String, $contact_type: String, $password: String, $username: String, $name: String) {
+            createStaff(contactInfo: $contact_info, contactType: $contact_type, password: $password, username: $username, name: $name) {
+              ok
+              staff {
+                username
+              }
+            }
+          }
+          `,
+        variables: {
+          username: formData.get("username"),
+          name: formData.get("name"),
+          password: formData.get("password"),
+          contact_info: formData.get("contact_address"),
+          contact_type: formData.get("contact_type"),
+        },
+      }),
     })
+      .then((response) => {
+        if (response.ok){
+        return response.json();
+        } else{
+          throw new Error("Username already exists")
+        }
+      })
+      .then((data) => {
+        console.log(data);
+        if(data.errors){
+          // TODO: Lägg till feedback till användare
+          console.log("Username already exists");
+        }
+        window.location = `/user/${data.data.createStaff.staff.username}`;
+      });
   }
 
   connectedCallback() {

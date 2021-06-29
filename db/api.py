@@ -27,14 +27,11 @@ def check_username(username):
 # name, username, password, contact_type, contact_address, contact_description(optional),
 
 
-def create_staff(data):
-    staff = Staff(name=data["name"], username=data["username"],
-                  contact_type=data["contact_type"], contact_info=data["contact_address"])
-    
-    psw_hash = hashpw(data["password"].encode(), gensalt())
-    password = Staff_password(password=psw_hash, staff=staff)
+def create_staff(staff, staff_password):
     db_session.add(staff)
-    db_session.add(password)
     db_session.commit()
-    staff_id = Staff.query.filter(Staff.username == data["username"]).first().id
-    return staff_id
+    db_session.add(staff_password)    
+    db_session.commit()
+
+def create_skill(data):
+    print(data)

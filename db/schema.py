@@ -2,13 +2,20 @@ from sqlalchemy.engine import interfaces
 import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
-from .models import db_session, Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel
+from .models import db_session, Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel
+from .api import create_staff
+from bcrypt import gensalt, hashpw
+
 
 class Staff(SQLAlchemyObjectType):
   class Meta:
     model = StaffModel
     interfaces = (relay.Node, )
-  
+
+class Staff_password(SQLAlchemyObjectType):
+  class Meta:
+    model = Staff_passwordModel
+    interfaces = (relay.Node, ) 
 
 class Experience(SQLAlchemyObjectType):
   class Meta:
@@ -30,14 +37,19 @@ class CreateStaff(graphene.Mutation):
     contact_info = graphene.String()
     contact_type = graphene.String()
     username = graphene.String()
+    password = graphene.String()
   
   ok = graphene.Boolean()
   staff = graphene.Field(lambda: Staff)
 
-  def mutate(root, info, name, contact_info, contact_type, username):
+  def mutate(root, info, name, contact_info, contact_type, username, password):
     staff = Staff(name=name, contact_info=contact_info, contact_type=contact_type, username=username)
-    
-    
+    staff_db = StaffModel(name=name, contact_info=contact_info,
+                  contact_type=contact_type, username=username)
+
+    psw_hash = hashpw(password.encode(), gensalt())
+    staff_password_db = Staff_passwordModel(password=psw_hash, staff=staff_db)
+    create_staff(staff_db, staff_password_db)
 
     ok = True
     return CreateStaff(staff=staff, ok=ok)
