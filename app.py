@@ -16,27 +16,26 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/user/<int:userid>")
-def user(userid=None):
-    query_string = "{{ staff(id:{0}) {{name}} }}".format(userid)
-    result = schema.execute(query_string)
+@app.route("/user/<string:username>")
+def user(username=None):
+    query_string = """query($username:String)
+    { 
+        staff(username:$username) 
+            {
+                name
+            } 
+        }"""
+    result = schema.execute(query_string, variables={"username": username})
     if len(result.data["staff"]) > 0:
         name = result.data["staff"][0]["name"]
-        return render_template("user.html", username=name, userid=userid)
+        return render_template("user.html", name=name, username=username)
     return render_template("not_found.html")
 
 @app.route("/createuser")
 def createuser():
     return render_template("createUser.html")
 
-@app.route("/api/createuser", methods=["POST"])
-def api_createuser():
-    valid_username = check_username(request.form["username"])
-    if valid_username:
-        staff_id = create_staff(request.form)
-        return {"id": staff_id}, 201
-    else:
-        return {"message":"Username already exists"}, 400
+
 
 @app.route("/login", methods=["POST"])
 def login():
