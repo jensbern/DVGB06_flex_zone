@@ -1,4 +1,4 @@
-from db.models import engine, db_session, Base, Staff, Staff_password, Skill
+from db.models import engine, db_session, Base, Staff, Staff_password, Skill, Experience
 
 from bcrypt import gensalt, hashpw, checkpw
 
@@ -43,6 +43,13 @@ def create_skill(staff_username, name, description, reference):
     staff = Staff.query.filter(Staff.username == staff_username).first()
     skill = Skill(name=name, description=description, reference=reference, staff=staff)
     db_session.add(skill)
+    db_session.commit()
+    return staff
+
+def create_experience(staff_username, exp_type, description, at, reference, start, end):
+    staff = Staff.query.filter(Staff.username == staff_username).first()
+    experience = Experience(type=exp_type, description=description, at=at, reference=reference, start=start, end=end, staff=staff)
+    db_session.add(experience)
     db_session.commit()
     return staff
 

@@ -47,6 +47,9 @@ export class CreateExperience extends HTMLElement {
     `;
     this.shadowRoot.append(STYLE);
 
+  }
+  
+  addCreateExperienceButton = () => {    
     const BUTTON_addExperience = document.createElement("button");
     BUTTON_addExperience.innerText = "Add Experience";
     BUTTON_addExperience.setAttribute("id", "add_Experience");
@@ -54,7 +57,7 @@ export class CreateExperience extends HTMLElement {
       "click",
       this.displayCreateExperience
     );
-
+  
     this.shadowRoot.append(BUTTON_addExperience);
   }
 
@@ -191,11 +194,55 @@ export class CreateExperience extends HTMLElement {
   handleSubmit = () => {
     // console.log("TODO: Create Experience");
     const FORM = this.shadowRoot.querySelector("form");
+    const username = this.getAttribute("username");
     console.log(FORM);
     var formData = new FormData(FORM);
     for (var [key, val] of formData.entries()) {
       console.log(key, val);
     }
+    fetch("/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+        mutation CreateExperience($staff_username: String, $type: String, $description: String, $at: String, $reference: String, $start: Date, $end: Date) {
+          createExperience(staffUsername: $staff_username, expType: $type, description: $description, at: $at, reference: $reference, start: $start, end: $end) {
+            ok
+            experience {
+              type
+              at
+              start
+              end
+              description
+              reference
+            }
+          }
+        }
+        `,
+        variables: {
+          staff_username: username,
+          type: formData.get("experience_type"),
+          description: formData.get("experience_description"),
+          at: formData.get("experience_at"),
+          reference: formData.get("experience_reference"),
+          start: formData.get("experience_from"),
+          end: formData.get("experience_to"),
+        },
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Error");
+        }
+      })
+      .then((data) => {
+        console.log(data.data.createExperience.experience);
+      });
+
   };
 
   connectedCallback() {}

@@ -3,7 +3,7 @@ import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from .models import db_session, Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel
-from .api import create_staff, create_skill
+from .api import create_staff, create_skill, create_experience
 
 
 class Staff(SQLAlchemyObjectType):
@@ -65,9 +65,30 @@ class CreateSkill(graphene.Mutation):
     ok = True
     return CreateSkill(skill=skill, ok=ok)
 
+class CreateExperience(graphene.Mutation):
+  class Arguments:
+    staff_username = graphene.String()
+    exp_type = graphene.String()
+    at = graphene.String()
+    description = graphene.String()
+    reference = graphene.String()
+    start = graphene.Date()
+    end = graphene.Date()
+  
+  ok = graphene.Boolean()
+  experience = graphene.Field(lambda: Experience)
+
+  def mutate(root, info, staff_username, exp_type, at, description, reference, start, end):
+    staff = create_experience(staff_username, exp_type, description, at, reference, start, end)
+    experience = Experience(type=exp_type, description=description, at=at, reference=reference, start=start, end=end, staff=staff)
+
+    ok = True
+    return CreateExperience(experience=experience, ok=ok)
+
 class Mutations(graphene.ObjectType):
   create_staff=CreateStaff.Field()
   create_skill=CreateSkill.Field()
+  create_experience=CreateExperience.Field()
 
 class Query(graphene.ObjectType):
   node = relay.Node.Field()
