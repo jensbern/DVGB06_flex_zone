@@ -254,8 +254,9 @@ export class CreateUser extends HTMLElement {
         if(data.errors){
           // TODO: Lägg till feedback till användare
           console.log("Username already exists");
+        }else{
+          window.location = `/user/${data.data.createStaff.staff.username}`;
         }
-        window.location = `/user/${data.data.createStaff.staff.username}`;
       });
   }
 
