@@ -128,10 +128,46 @@ export class CreateSkill extends HTMLElement {
   handleSubmit = () => {
     // console.log("TODO: Create Experience");
     const FORM = this.shadowRoot.querySelector("form");
+    const username = this.getAttribute("username");
     var formData = new FormData(FORM);
     for (var [key, val] of formData.entries()) {
       console.log(key, val);
     }
+    fetch("/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+          mutation CreateSkill($name:String, $description:String, $staff_username:String, $reference:String) {
+            createSkill(description: $description, name: $name, staffUsername: $staff_username, reference: $reference) {
+              ok
+              skill {
+                description
+                name
+                reference
+              }
+            }
+          }
+        `,
+         variables: {
+           name: formData.get("skill_title"),
+           description: formData.get("skill_description"),
+           reference: formData.get("skill_reference"),
+           staff_username: username
+         }
+      }),
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Username already exists");
+      }
+    }).then(data => {
+      console.log(data);
+    })
+    ;
   };
 
   connectedCallback() {}

@@ -3,8 +3,7 @@ import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from .models import db_session, Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel
-from .api import create_staff
-from bcrypt import gensalt, hashpw
+from .api import create_staff, create_skill
 
 
 class Staff(SQLAlchemyObjectType):
@@ -44,18 +43,31 @@ class CreateStaff(graphene.Mutation):
 
   def mutate(root, info, name, contact_info, contact_type, username, password):
     staff = Staff(name=name, contact_info=contact_info, contact_type=contact_type, username=username)
-    staff_db = StaffModel(name=name, contact_info=contact_info,
-                  contact_type=contact_type, username=username)
-
-    psw_hash = hashpw(password.encode(), gensalt())
-    staff_password_db = Staff_passwordModel(password=psw_hash, staff=staff_db)
-    create_staff(staff_db, staff_password_db)
+    create_staff(name, contact_info, contact_type, username, password)
 
     ok = True
     return CreateStaff(staff=staff, ok=ok)
 
+class CreateSkill(graphene.Mutation):
+  class Arguments:
+    staff_username = graphene.String()
+    name = graphene.String()
+    description = graphene.String()
+    reference = graphene.String()
+  
+  ok = graphene.Boolean()
+  skill = graphene.Field(lambda: Skill)
+
+  def mutate(root, info, staff_username, name, description, reference):
+    staff = create_skill(staff_username, name, description, reference)
+    skill = Skill(name=name, description=description, reference=reference, staff=staff)
+    
+    ok = True
+    return CreateSkill(skill=skill, ok=ok)
+
 class Mutations(graphene.ObjectType):
   create_staff=CreateStaff.Field()
+  create_skill=CreateSkill.Field()
 
 class Query(graphene.ObjectType):
   node = relay.Node.Field()

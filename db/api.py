@@ -1,4 +1,4 @@
-from db.models import engine, db_session, Base, Staff, Staff_password
+from db.models import engine, db_session, Base, Staff, Staff_password, Skill
 
 from bcrypt import gensalt, hashpw, checkpw
 
@@ -27,11 +27,22 @@ def check_username(username):
 # name, username, password, contact_type, contact_address, contact_description(optional),
 
 
-def create_staff(staff, staff_password):
+def create_staff(name, contact_info, contact_type, username, password):
+    staff = Staff(name=name, contact_info=contact_info,
+                       contact_type=contact_type, username=username)
+    psw_hash = hashpw(password.encode(), gensalt())
+    staff_password = Staff_passwordModel(password=psw_hash, staff=staff)
+    
     db_session.add(staff)
     db_session.commit()
     db_session.add(staff_password)    
     db_session.commit()
 
-def create_skill(data):
-    print(data)
+
+def create_skill(staff_username, name, description, reference):
+    staff = Staff.query.filter(Staff.username == staff_username).first()
+    skill = Skill(name=name, description=description, reference=reference, staff=staff)
+    db_session.add(skill)
+    db_session.commit()
+    return staff
+
