@@ -7,33 +7,53 @@ export class HeaderLogin extends HTMLElement {
     this.shadowRoot.append(baseTemplate.content.cloneNode(true));
     const STYLE = document.createElement("style");
     STYLE.innerText = `
-      .hidden{
-        display:none;
-      }
 
-      ul {
-        background-color: rgb(250,250,250);
-        padding: 8px;
-      }
-      
-      li{
-        font-size: 1.1em;
-        background-color: rgb(254,254,254);
-        padding: 8px;
-        margin: 8px;
-      }
+    button{
+      margin: 8px;
+      padding: 8px 16px;
+      font-family: Georgia, "Times New Roman", Times, serif;
+      font-size: 1.2em;
+      justify-self: right;
+    }
+    
+    ul {
+      background-color: rgb(250,250,250);
+      padding: 8px;
+      position: absolute;
+      border: 1px solid gray;
+      width: 350px;
+      margin: 8px;
+      margin-top: 72px;
+    }
+    
+    li{
+      font-size: 1.1em;
+      background-color: rgb(254,254,254);
+      padding: 8px;
+      margin: 8px;
+      border: 1px solid lightgray;
+    }
+    
+    a{
+      color: inherit;
+      text-decoration:none;
+    }
 
-      a{
-        color: inherit;
-        text-decoration:none;
-      }
+    a:hover li {
+      background-color: rgb(250,250,250);
+      border: 1px solid gray;
+    }
+
+    .hidden{
+      display:none;
+    }
     `;
     this.shadowRoot.append(STYLE);
   }
 
   createDropdownButton = () => {
     const BUTTON = document.createElement("button");
-    BUTTON.innerHTML = "=";
+    BUTTON.innerHTML = "Log in | Create account";
     BUTTON.addEventListener("click", () => {
       const UL_dropdown = this.shadowRoot.querySelector("ul");
       UL_dropdown.classList.toggle("hidden");
@@ -49,10 +69,10 @@ export class HeaderLogin extends HTMLElement {
       var LI_option = document.createElement("li");
       var A_option = document.createElement("a");
 
-      A_option.innerText = options[i];
+      LI_option.innerText = options[i];
       A_option.setAttribute("href", links[i]);
-      LI_option.append(A_option);
-      UL_dropdown.append(LI_option);
+      A_option.append(LI_option);
+      UL_dropdown.append(A_option);
     }
     UL_dropdown.classList.add("hidden");
     this.shadowRoot.append(UL_dropdown);
@@ -63,7 +83,7 @@ export class HeaderLogin extends HTMLElement {
     this.createDropdown();
     const UL_dropdown = this.shadowRoot.querySelector("ul");
     const BUTTON_dropdown = this.shadowRoot.querySelector("button");
-    this.dropdownEvent = document.body.addEventListener("click", (e) => {
+    this.dropdownEvent = window.addEventListener("click", (e) => {
       if (!(e.path.includes(UL_dropdown) || e.path.includes(BUTTON_dropdown))) {
         UL_dropdown.classList.add("hidden");
       }
@@ -71,6 +91,6 @@ export class HeaderLogin extends HTMLElement {
   }
 
   disconnectedCallback() {
-    document.body.removeEventListener("click", this.dropdownEvent);
+    window.removeEventListener("click", this.dropdownEvent);
   }
 }
