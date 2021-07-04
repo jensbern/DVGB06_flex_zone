@@ -31,7 +31,7 @@ def create_staff(name, contact_info, contact_type, username, password):
     staff = Staff(name=name, contact_info=contact_info,
                        contact_type=contact_type, username=username)
     psw_hash = hashpw(password.encode(), gensalt())
-    staff_password = Staff_passwordModel(password=psw_hash, staff=staff)
+    staff_password = Staff_password(password=psw_hash, staff=staff)
     
     db_session.add(staff)
     db_session.commit()
