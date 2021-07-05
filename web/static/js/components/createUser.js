@@ -14,12 +14,13 @@ export class CreateUser extends HTMLElement {
       border: 1px solid lightgrey;
     }
     input[type="text"], input[type="password"], input[type="url"], textarea, select{
-      width: 90%;
+      width: 71%;
       margin: 8px;
       padding: 8px;
       border: 1px solid darkgrey;
       font-size: 1.1em;
       font-family: Georgia, 'Times New Roman', Times, serif;
+      box-sizing: border-box;
       }
     input, button {
       border: 1px solid darkgrey;
@@ -36,10 +37,16 @@ export class CreateUser extends HTMLElement {
       background-color: white;
     }
     #contact_address {
-      width: 60%;
+      width: 30%;
     }
     #contact_type {
-      width: 30%;
+      width: 40%;
+    }
+    
+    .error:focus {
+      border: 2px solid red !important;
+      outline-color: red;
+      background-color: lightred !important;
     }
     `;
     this.shadowRoot.append(STYLE);
@@ -213,9 +220,34 @@ export class CreateUser extends HTMLElement {
     }
   };
 
+  addToolTip = (DOM, text) => {
+    const TOOLTIP = document.createElement("div");
+    const DOM_rect = DOM.getBoundingClientRect();
+    console.log(DOM_rect, DOM_rect.x, DOM_rect.y);
+    TOOLTIP.innerText = text;
+    TOOLTIP.style = `
+      background-color: #fd6b6b;
+      display: inline-block;
+      border: 1px solid red;
+      position: absolute;
+      padding: 8px;
+      top: ${DOM_rect.y}px;
+      left: ${DOM_rect.x + DOM_rect.width + 32}px;
+    `;
+    DOM.parentElement.append(TOOLTIP);
+    const keyup_func = (e) => {
+      TOOLTIP.remove();
+      DOM.removeEventListener("keyup", keyup_func);
+    };
+    DOM.addEventListener("keyup", keyup_func);
+  };
+
   handleSubmit = () => {
     // console.log("TODO: Create Experience");
     const FORM = this.shadowRoot.querySelector("form");
+    const INPUT_username = this.shadowRoot.querySelector("#username");
+    INPUT_username.classList.remove("error");
+
     var formData = new FormData(FORM);
     fetch("/graphql", {
       method: "POST",
@@ -243,22 +275,25 @@ export class CreateUser extends HTMLElement {
       }),
     })
       .then((response) => {
-        if (response.ok){
-        return response.json();
-        } else{
-          throw new Error("Username already exists")
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Username already exists");
         }
       })
       .then((data) => {
         console.log(data);
-        if(data.errors){
+        if (data.errors) {
           // TODO: Lägg till feedback till användare
-          console.log("Username already exists");
-        }else{
+
+          INPUT_username.classList.add("error");
+          INPUT_username.focus();
+          this.addToolTip(INPUT_username, "Username already taken");
+        } else {
           window.location = `/user/${data.data.createStaff.staff.username}`;
         }
       });
-  }
+  };
 
   connectedCallback() {
     this.displayCreateUser();
