@@ -113,9 +113,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Sass files
-*.scss
-*.css.map
 
 # DB
 create_data.py

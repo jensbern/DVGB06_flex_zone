@@ -1,0 +1,47 @@
+main {
+  padding: 32px;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+header{
+  display: grid;
+  grid-template-columns: auto 350px;
+  background-color: rgb(247, 247, 247);
+}
+
+h1 {
+  padding: 16px 32px;
+  font-size: 2em;
+  span {
+    display: inline-block;
+    transform: scale(-1, 1);
+  }
+}
+
+h2 {
+  font-size: 1.4em;
+  margin: 16px 0;
+}
+
+h3 {
+  font-size: 1.2em;
+}
+
+headerlogin-element{
+  display: flex;
+  justify-content: flex-end;
+}
+
+#user_page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  // column-gap: 16px;
+
+  section {
+    // border: 1px solid darkgray;
+    background-color: #f8f7f7;
+    padding: 8px;
+    margin: 8px;
+    border: 1px solid lightgrey;
+  }
+}
