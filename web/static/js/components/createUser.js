@@ -176,7 +176,7 @@ export class CreateUser extends HTMLElement {
 
   handleCancel = (e) => {
     e.preventDefault();
-    console.log("TODO: Go back to start-page");
+    window.location = "/";
   };
 
   handleCreateUser = (e) => {
@@ -223,7 +223,6 @@ export class CreateUser extends HTMLElement {
   addToolTip = (DOM, text) => {
     const TOOLTIP = document.createElement("div");
     const DOM_rect = DOM.getBoundingClientRect();
-    console.log(DOM_rect, DOM_rect.x, DOM_rect.y);
     TOOLTIP.innerText = text;
     TOOLTIP.style = `
       background-color: #fd6b6b;
@@ -243,7 +242,6 @@ export class CreateUser extends HTMLElement {
   };
 
   handleSubmit = () => {
-    // console.log("TODO: Create Experience");
     const FORM = this.shadowRoot.querySelector("form");
     const INPUT_username = this.shadowRoot.querySelector("#username");
     INPUT_username.classList.remove("error");
@@ -282,7 +280,6 @@ export class CreateUser extends HTMLElement {
         }
       })
       .then((data) => {
-        console.log(data);
         if (data.errors) {
           // TODO: Lägg till feedback till användare
 
