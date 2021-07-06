@@ -1,4 +1,4 @@
-from db.models import engine, db_session, Base, Staff, Staff_password, Skill, Experience
+from db.models import db_session, Staff, Staff_password, Skill, Experience
 
 from bcrypt import gensalt, hashpw, checkpw
 
@@ -53,3 +53,7 @@ def create_experience(staff_username, exp_type, description, at, reference, star
     db_session.commit()
     return staff
 
+def delete_staff(username):
+    staff = Staff.query.filter(Staff.username == username).first()
+    db_session.delete(staff)
+    db_session.commit()
