@@ -28,10 +28,10 @@ h1 {
       color: inherit;
     }
     &:hover .left{
-      transform:rotate(40deg) translateY(-4px);
+      transform:rotate(40deg) translateY(-6px) scale(1.2);
     }
     &:hover .right{
-      transform:rotate(-40deg) translateY(-4px) scale(-1, 1);
+      transform:rotate(-40deg) translateY(-6px) scale(-1.2, 1.2);
     }
   }
 }
