@@ -16,10 +16,41 @@ h1 {
   font-size: 2em;
 }
 
-h1 span {
+h1 a {
+  text-decoration: none;
+  color: inherit;
+}
+
+h1 a .right {
   display: inline-block;
   -webkit-transform: scale(-1, 1);
           transform: scale(-1, 1);
+  -webkit-transition: -webkit-transform 100ms ease-in-out;
+  transition: -webkit-transform 100ms ease-in-out;
+  transition: transform 100ms ease-in-out;
+  transition: transform 100ms ease-in-out, -webkit-transform 100ms ease-in-out;
+}
+
+h1 a .left {
+  display: inline-block;
+  -webkit-transition: -webkit-transform 100ms ease-in-out;
+  transition: -webkit-transform 100ms ease-in-out;
+  transition: transform 100ms ease-in-out;
+  transition: transform 100ms ease-in-out, -webkit-transform 100ms ease-in-out;
+}
+
+h1 a:visited {
+  color: inherit;
+}
+
+h1 a:hover .left {
+  -webkit-transform: rotate(40deg) translateY(-4px);
+          transform: rotate(40deg) translateY(-4px);
+}
+
+h1 a:hover .right {
+  -webkit-transform: rotate(-40deg) translateY(-4px) scale(-1, 1);
+          transform: rotate(-40deg) translateY(-4px) scale(-1, 1);
 }
 
 h2 {
