@@ -85,8 +85,9 @@ export class HeaderLogin extends HTMLElement {
       A_option.append(LI_option);
       UL_dropdown.append(A_option);
     }
-
-    UL_dropdown.append(this.addDeleteAccountLI(username));
+    if(username){ 
+      UL_dropdown.append(this.addDeleteAccountLI(username));
+    }
     UL_dropdown.classList.add("hidden");
     this.shadowRoot.append(UL_dropdown);
   };
