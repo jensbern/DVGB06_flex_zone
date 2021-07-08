@@ -64,3 +64,8 @@ def delete_experience(experience_id):
     
     db_session.delete(experience)
     db_session.commit()
+
+def delete_skill(skill_id):
+    skill = Skill.query.filter(Skill.uuid == skill_id).first()
+    db_session.delete(skill)
+    db_session.commit()

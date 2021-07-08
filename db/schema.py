@@ -106,6 +106,15 @@ class DeleteExperience(graphene.Mutation):
     delete_experience(experience_id)
     ok = True
     return DeleteExperience(ok=ok)
+  
+class DeleteSkill(graphene.Mutation):
+  class Arguments:
+    skill_id = graphene.ID()
+  ok = graphene.Boolean()
+  def mutate(root, info, skill_id):
+    #delete_skill(skill_id)
+    ok = True
+    return DeleteSkill(ok=ok)
 
 class Mutations(graphene.ObjectType):
   create_staff=CreateStaff.Field()
@@ -113,6 +122,7 @@ class Mutations(graphene.ObjectType):
   create_experience=CreateExperience.Field()
   delete_staff=DeleteStaff.Field()
   delete_experience=DeleteExperience.Field()
+  delete_skill=DeleteSkill.Field()
 
 class Query(graphene.ObjectType):
   node = relay.Node.Field()
