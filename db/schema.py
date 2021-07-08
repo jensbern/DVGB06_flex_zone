@@ -3,7 +3,7 @@ import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from .models import db_session, Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel
-from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience, delete_skill
+from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience, delete_skill, update_staff
 
 
 class Staff(SQLAlchemyObjectType):
@@ -116,6 +116,32 @@ class DeleteSkill(graphene.Mutation):
     ok = True
     return DeleteSkill(ok=ok)
 
+class UpdateStaff(graphene.Mutation):
+  class Arguments:
+    current_username = graphene.String(required=True)
+    name = graphene.String(required=False)
+    new_username = graphene.String(required=False)
+    contact_info = graphene.String(required=False)
+    contact_type = graphene.String(required=False)
+  
+  ok = graphene.Boolean()
+  staff = graphene.Field(lambda: Staff)
+
+  def mutate(root, info, current_username, name=None, new_username=None, contact_info=None, contact_type=None):
+    staff = update_staff(current_username, name, new_username, contact_type, contact_info)
+    ok = True
+    return UpdateStaff(ok=ok, staff=staff)
+"""
+mutation UpdateStaff {
+  updateStaff(currentUsername: "pelle123", name:"Pelle P", contactInfo:"pelle#123") {
+    staff {
+      name
+      contactInfo
+    }
+  }
+}
+"""
+
 class Mutations(graphene.ObjectType):
   create_staff=CreateStaff.Field()
   create_skill=CreateSkill.Field()
@@ -123,6 +149,7 @@ class Mutations(graphene.ObjectType):
   delete_staff=DeleteStaff.Field()
   delete_experience=DeleteExperience.Field()
   delete_skill=DeleteSkill.Field()
+  update_staff=UpdateStaff.Field()
 
 class Query(graphene.ObjectType):
   node = relay.Node.Field()

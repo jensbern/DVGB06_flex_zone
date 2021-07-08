@@ -70,3 +70,19 @@ def delete_skill(skill_id):
     skill = Skill.query.filter(Skill.uuid == skill_id).first()
     db_session.delete(skill)
     db_session.commit()
+
+def update_staff(current_username, name, new_username, contact_type, contact_info):
+    staff_update = {}
+    if name != None:
+        staff_update[Staff.name] = name
+    if new_username != None:
+        staff_update[Staff.username] = new_username
+    if contact_type != None:
+        staff_update[Staff.contact_type] = contact_type
+    if contact_info != None:
+        staff_update[Staff.contact_info] = contact_info
+    staff_db = Staff.query.filter(Staff.username == current_username)
+    staff = staff_db.first()
+    staff_db.update(staff_update,synchronize_session = "fetch")
+    db_session.commit()
+    return staff
