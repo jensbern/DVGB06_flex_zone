@@ -1,4 +1,4 @@
-import { baseTemplate } from "./template.js";
+import { baseTemplate, confirmPopup } from "./template.js";
 
 export class Skills extends HTMLElement {
   constructor() {
@@ -12,6 +12,7 @@ export class Skills extends HTMLElement {
         padding: 16px;
         margin-bottom: 8px;
         background-color: #fff;
+        position: relative;
       }
 
       h3 {
@@ -66,6 +67,8 @@ export class Skills extends HTMLElement {
   }
   addSkill = (skill) => {
     const ARTIClE = document.createElement("article");
+    this.deleteSkillButton(ARTIClE, skill.uuid);
+    ARTIClE.setAttribute("id", `skill${skill.uuid}`)
     const H3_name = document.createElement("h3");
     H3_name.innerText = skill.name;
     ARTIClE.append(H3_name);
@@ -86,6 +89,9 @@ export class Skills extends HTMLElement {
   displaySkills(skills) {
     for (var i = 0; i < skills.length; i++) {
       const ARTIClE = document.createElement("article");
+      this.deleteSkillButton(ARTIClE, skills[i].node.uuid)
+      
+      ARTIClE.setAttribute("id", `skill${skills[i].node.uuid}`)
       const H3_name = document.createElement("h3");
       H3_name.innerText = skills[i].node.name;
       ARTIClE.append(H3_name);
@@ -99,6 +105,58 @@ export class Skills extends HTMLElement {
       ARTIClE.append(A_reference);
       this.shadowRoot.append(ARTIClE);
     }
+  }
+
+  deleteSkillButton = (root, skill_id) => {
+    const SPAN = document.createElement("span");
+    SPAN.innerText = "X";
+    SPAN.style = `
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 16px;
+    `
+
+    SPAN.addEventListener("click", e => {
+     this.deleteSkill( skill_id); 
+    });
+    root.append(SPAN)
+  }
+
+  deleteSkill = (skill_id) => {
+    confirmPopup(document.body, "Delete Skill?", choice => {
+      if(choice){
+        this.submitDeleteSkill(skill_id);
+      }
+    })
+  }
+
+  submitDeleteSkill = (skill_id) => {
+    fetch("/graphql", {
+      method:"POST", 
+      headers: {
+        "Content-Type": "application/json"
+      }, 
+      body: JSON.stringify({
+        query: `
+          mutation DeleteSkill($skill_id: ID) {
+            deleteSkill(skillId: $skill_id) {
+              ok
+            }
+          }
+        `, variables: {
+          "skill_id": skill_id 
+        }
+      })
+    }).then(response => {
+      return response.json()
+    }).then(data => {
+      if(data.errors){
+        console.log(data);
+        throw new Error("Error removing skill")
+      }
+      this.shadowRoot.querySelector(`#skill${skill_id}`).remove()
+    })
   }
 
   getSkillsData = (username, callback) => {
@@ -115,6 +173,7 @@ export class Skills extends HTMLElement {
               edges {
                 node {
                   name
+                  uuid
                   description
                   reference
                 }
@@ -243,6 +302,7 @@ export class Skills extends HTMLElement {
               skill {
                 description
                 name
+                uuid
                 reference
               }
             }

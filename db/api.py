@@ -44,7 +44,8 @@ def create_skill(staff_username, name, description, reference):
     skill = Skill(name=name, description=description, reference=reference, staff=staff)
     db_session.add(skill)
     db_session.commit()
-    return staff
+    db_session.refresh(skill)
+    return skill.uuid, staff
 
 def create_experience(staff_username, exp_type, description, at, reference, start, end):
     staff = Staff.query.filter(Staff.username == staff_username).first()

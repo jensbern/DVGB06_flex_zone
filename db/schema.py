@@ -3,7 +3,7 @@ import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from .models import db_session, Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel
-from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience
+from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience, delete_skill
 
 
 class Staff(SQLAlchemyObjectType):
@@ -59,9 +59,9 @@ class CreateSkill(graphene.Mutation):
   skill = graphene.Field(lambda: Skill)
 
   def mutate(root, info, staff_username, name, description, reference):
-    staff = create_skill(staff_username, name, description, reference)
+    skill_id, staff = create_skill(staff_username, name, description, reference)
     skill = Skill(name=name, description=description, reference=reference, staff=staff)
-    
+    skill.uuid = skill_id
     ok = True
     return CreateSkill(skill=skill, ok=ok)
 
@@ -112,7 +112,7 @@ class DeleteSkill(graphene.Mutation):
     skill_id = graphene.ID()
   ok = graphene.Boolean()
   def mutate(root, info, skill_id):
-    #delete_skill(skill_id)
+    delete_skill(skill_id)
     ok = True
     return DeleteSkill(ok=ok)
 
