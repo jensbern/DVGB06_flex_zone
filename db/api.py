@@ -86,3 +86,23 @@ def update_staff(current_username, name, new_username, contact_type, contact_inf
     staff_db.update(staff_update,synchronize_session = "fetch")
     db_session.commit()
     return staff
+
+def update_experience(experience_id, type, description, at, reference, start, end):
+    experience_update = {}
+    if type != None:
+        experience_update[Experience.type] = type
+    if description != None:
+        experience_update[Experience.description] = description
+    if at != None:
+        experience_update[Experience.at] = at
+    if reference != None:
+        experience_update[Experience.reference] = reference
+    if start != None:
+        experience_update[Experience.start] = start
+    if end != None:
+        experience_update[Experience.end] = end
+    experience_db = Experience.query.filter(Experience.uuid == experience_id)
+    experience = experience_db.first()
+    experience_db.update(experience_update, synchronize_session="fetch")
+    db_session.commit()
+    return experience    

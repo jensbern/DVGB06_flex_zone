@@ -2,8 +2,8 @@ from sqlalchemy.engine import interfaces
 import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
-from .models import db_session, Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel
-from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience, delete_skill, update_staff
+from .models import Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel
+from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience, delete_skill, update_staff, update_experience
 
 
 class Staff(SQLAlchemyObjectType):
@@ -142,6 +142,34 @@ mutation UpdateStaff {
 }
 """
 
+class UpdateExperience(graphene.Mutation):
+  class Arguments: 
+    experience_id=graphene.ID(required=True)
+    type=graphene.String()
+    description=graphene.String()
+    at=graphene.String()
+    reference=graphene.String()
+    start=graphene.Date()
+    end=graphene.Date()
+  
+  ok=graphene.Boolean()
+  experience=graphene.Field(lambda:Experience)
+  def mutate(root, info, experience_id, type=None, description=None, at=None, reference=None, start=None, end=None):
+    experience = update_experience(experience_id, type, description, at, reference, start, end)
+    ok=True
+    return UpdateExperience(ok=ok, experience=experience)
+
+"""
+mutation UpdateExperience {
+  updateExperience(experienceId: 3, at: "Pepega Gaming") {
+    experience {
+      type
+      at
+    }
+  }
+}
+"""
+
 class Mutations(graphene.ObjectType):
   create_staff=CreateStaff.Field()
   create_skill=CreateSkill.Field()
@@ -150,6 +178,7 @@ class Mutations(graphene.ObjectType):
   delete_experience=DeleteExperience.Field()
   delete_skill=DeleteSkill.Field()
   update_staff=UpdateStaff.Field()
+  update_experience=UpdateExperience.Field()
 
 class Query(graphene.ObjectType):
   node = relay.Node.Field()
