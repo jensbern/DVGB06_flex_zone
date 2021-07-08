@@ -1,4 +1,4 @@
-import { baseTemplate } from "./template.js";
+import { baseTemplate, confirmPopup } from "./template.js";
 
 export class Experiences extends HTMLElement {
   constructor() {
@@ -12,6 +12,7 @@ export class Experiences extends HTMLElement {
         padding: 16px;
         margin-bottom: 8px;
         background-color: #fff;
+        position:relative;
       }
       h3 {
         padding-top: 8px;
@@ -84,7 +85,10 @@ export class Experiences extends HTMLElement {
   };
 
   addExperience = (experience) => {
+    
     const ARTIClE = document.createElement("article");
+    ARTIClE.setAttribute("id", `experience${experience.uuid}`);
+    this.deleteExperienceButton(ARTIClE, experience.uuid)
 
     const H3_name = document.createElement("h3");
     H3_name.innerText = experience.type;
@@ -115,13 +119,66 @@ export class Experiences extends HTMLElement {
     A_reference.innerText = "Reference";
     ARTIClE.append(A_reference);
     this.shadowRoot.insertBefore(ARTIClE, this.shadowRoot.querySelector("#add_experience"));
-    
+  }
+
+  deleteExperienceButton = (root, experience_id) => {
+    const SPAN = document.createElement("span");
+    SPAN.innerText = "X";
+    SPAN.style = `
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 16px;
+    `
+
+    SPAN.addEventListener("click", e => {
+     this.deleteExperience( experience_id); 
+    });
+    root.append(SPAN)
+  }
+
+  deleteExperience = (experience_id) => {
+    confirmPopup(document.body, "Delete Experience?", choice => {
+      if(choice){
+        this.submitDeleteExperience(experience_id);
+      }
+    })
+  }
+
+  submitDeleteExperience = (experience_id) => {
+    console.log(experience_id);
+    fetch("/graphql", {
+      method:"POST", 
+      headers: {
+        "Content-Type": "application/json"
+      }, 
+      body: JSON.stringify({
+        query: `
+          mutation DeleteExperience($experience_id:ID){
+            deleteExperience(experienceId:$experience_id) {
+              ok
+            }
+          }
+        `, variables: {
+          "experience_id": experience_id 
+        }
+      })
+    }).then(response => {
+      return response.json()
+    }).then(data => {
+      if(data.errors){
+        console.log(data);
+        throw new Error("Error removing experience")
+      }
+      this.shadowRoot.querySelector(`#experience${experience_id}`).remove()
+    })
   }
 
   displayExperiences(experiences) {
     for (var i = 0; i < experiences.length; i++) {
       const ARTIClE = document.createElement("article");
-
+      this.deleteExperienceButton(ARTIClE, experiences[i].node.uuid)
+      ARTIClE.setAttribute("id", `experience${experiences[i].node.uuid}`);
       const H3_name = document.createElement("h3");
       H3_name.innerText = experiences[i].node.type;
       ARTIClE.append(H3_name);
@@ -169,6 +226,7 @@ export class Experiences extends HTMLElement {
                 edges {
                   node {
                     type
+                    uuid
                     description
                     at
                     reference
@@ -343,6 +401,7 @@ export class Experiences extends HTMLElement {
           createExperience(staffUsername: $staff_username, expType: $type, description: $description, at: $at, reference: $reference, start: $start, end: $end) {
             ok
             experience {
+              uuid
               type
               at
               start
