@@ -51,9 +51,16 @@ def create_experience(staff_username, exp_type, description, at, reference, star
     experience = Experience(type=exp_type, description=description, at=at, reference=reference, start=start, end=end, staff=staff)
     db_session.add(experience)
     db_session.commit()
-    return staff
+    db_session.refresh(experience)
+    return experience.uuid, staff
 
 def delete_staff(username):
     staff = Staff.query.filter(Staff.username == username).first()
     db_session.delete(staff)
+    db_session.commit()
+
+def delete_experience(experience_id):
+    experience = Experience.query.filter(Experience.uuid == experience_id).first()
+    
+    db_session.delete(experience)
     db_session.commit()
