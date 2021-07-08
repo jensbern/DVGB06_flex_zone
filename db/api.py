@@ -106,3 +106,17 @@ def update_experience(experience_id, type, description, at, reference, start, en
     experience_db.update(experience_update, synchronize_session="fetch")
     db_session.commit()
     return experience    
+
+def update_skill(skill_id, name, description, reference):
+    skill_update={}
+    if name != None:
+        skill_update[Skill.name] = name
+    if description != None:
+        skill_update[Skill.description] = description
+    if reference != None:
+        skill_update[Skill.reference] = reference
+    skill_db = Skill.query.filter(Skill.uuid == skill_id)
+    skill = skill_db.first()
+    skill_db.update(skill_update, synchronize_session="fetch")
+    db_session.commit()
+    return skill

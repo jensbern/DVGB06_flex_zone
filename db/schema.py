@@ -3,7 +3,7 @@ import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from .models import Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel
-from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience, delete_skill, update_staff, update_experience
+from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience, delete_skill, update_staff, update_experience, update_skill
 
 
 class Staff(SQLAlchemyObjectType):
@@ -131,7 +131,7 @@ class UpdateStaff(graphene.Mutation):
     staff = update_staff(current_username, name, new_username, contact_type, contact_info)
     ok = True
     return UpdateStaff(ok=ok, staff=staff)
-"""
+""" e.g.
 mutation UpdateStaff {
   updateStaff(currentUsername: "pelle123", name:"Pelle P", contactInfo:"pelle#123") {
     staff {
@@ -159,7 +159,7 @@ class UpdateExperience(graphene.Mutation):
     ok=True
     return UpdateExperience(ok=ok, experience=experience)
 
-"""
+""" e.g.
 mutation UpdateExperience {
   updateExperience(experienceId: 3, at: "Pepega Gaming") {
     experience {
@@ -170,6 +170,31 @@ mutation UpdateExperience {
 }
 """
 
+class UpdateSkill(graphene.Mutation):
+  class Arguments:
+    skill_id=graphene.ID(required=True)
+    name=graphene.String()
+    description=graphene.String()
+    reference=graphene.String()
+  
+  ok=graphene.Boolean()
+  skill=graphene.Field(lambda:Skill)
+
+  def mutate(root, info, skill_id, name=None, description=None, reference=None):
+    skill = update_skill(skill_id, name, description, reference)
+    ok=True
+    return UpdateSkill(ok=ok, skill=skill)
+"""
+mutation UpdateSkill {
+  updateSkill(skillId: 4, name: "Test") {
+    ok
+    skill {
+      name
+      description
+    }
+  }
+}
+"""
 class Mutations(graphene.ObjectType):
   create_staff=CreateStaff.Field()
   create_skill=CreateSkill.Field()
@@ -179,6 +204,7 @@ class Mutations(graphene.ObjectType):
   delete_skill=DeleteSkill.Field()
   update_staff=UpdateStaff.Field()
   update_experience=UpdateExperience.Field()
+  update_skill=UpdateSkill.Field()
 
 class Query(graphene.ObjectType):
   node = relay.Node.Field()
