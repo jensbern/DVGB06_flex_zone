@@ -56,6 +56,27 @@ export class Skills extends HTMLElement {
         font-size: 1.05em;
         background-color: white;
       }
+      span ul{
+        display:none;
+        text-align: right;
+        position: absolute;
+        right: 0;
+        padding: 16px 0;
+        z-index:1;
+
+      }
+
+      span:hover ul, span ul:hover{
+        display:block;
+      }
+
+      span ul li{
+        margin-bottom: 8px;
+        background-color: rgb(250, 250, 250);
+        border: 1px solid gray;
+        padding: 8px;
+        cursor: pointer;
+      }
     `;
     this.shadowRoot.append(STYLE);
 
@@ -65,10 +86,41 @@ export class Skills extends HTMLElement {
     //   <a>reference</a>
     // </article>
   }
-  addSkill = (skill) => {
+
+  settingsButton = (root, skill) => {
+    const SPAN = document.createElement("span");
+    SPAN.innerText = "...";
+    SPAN.style = `
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 16px;
+      border: 1px solid gray;
+      padding: 4px 8px 8px 8px;
+      border-radius: 4px;
+    `;
+    const UL = document.createElement("ul");
+    const LI_edit = document.createElement("li");
+    LI_edit.innerText = "Edit";
+    LI_edit.addEventListener("click", (e) => {
+      this.editSkill(skill);
+    });
+    const LI_delete = document.createElement("li");
+    LI_delete.innerText = "Delete";
+    LI_delete.addEventListener("click", (e) => {
+      this.deleteSkill(skill.uuid);
+    });
+    UL.append(LI_edit, LI_delete);
+    SPAN.append(UL);
+
+    root.append(SPAN);
+  };
+
+  addSkill = (skill, root) => {
+    const SECTION = document.createElement("section");
     const ARTIClE = document.createElement("article");
-    this.deleteSkillButton(ARTIClE, skill.uuid);
-    ARTIClE.setAttribute("id", `skill${skill.uuid}`)
+    this.settingsButton(ARTIClE, skill)
+    SECTION.setAttribute("id", `skill${skill.uuid}`)
     const H3_name = document.createElement("h3");
     H3_name.innerText = skill.name;
     ARTIClE.append(H3_name);
@@ -80,18 +132,25 @@ export class Skills extends HTMLElement {
     A_reference.setAttribute("target", "_blank");
     A_reference.innerText = "Reference";
     ARTIClE.append(A_reference);
-    this.shadowRoot.insertBefore(
-      ARTIClE,
-      this.shadowRoot.querySelector("#add_skill")
-    );
+    SECTION.append(ARTIClE)
+    if(!root){
+      this.shadowRoot.insertBefore(
+        SECTION,
+        this.shadowRoot.querySelector("#add_skill")
+      );
+    }else{
+      root.querySelector("article").remove()
+      root.append(ARTIClE);
+    }
   }
 
   displaySkills(skills) {
     for (var i = 0; i < skills.length; i++) {
+      const SECTION = document.createElement("section");
       const ARTIClE = document.createElement("article");
-      this.deleteSkillButton(ARTIClE, skills[i].node.uuid)
+      this.settingsButton(ARTIClE, skills[i].node)
       
-      ARTIClE.setAttribute("id", `skill${skills[i].node.uuid}`)
+      SECTION.setAttribute("id", `skill${skills[i].node.uuid}`)
       const H3_name = document.createElement("h3");
       H3_name.innerText = skills[i].node.name;
       ARTIClE.append(H3_name);
@@ -103,8 +162,91 @@ export class Skills extends HTMLElement {
       A_reference.setAttribute("target", "_blank");
       A_reference.innerText = "Reference";
       ARTIClE.append(A_reference);
-      this.shadowRoot.append(ARTIClE);
+      SECTION.append(ARTIClE)
+      this.shadowRoot.append(SECTION);
     }
+  }
+
+  editSkill = (skill) => {
+    const SECTION = this.shadowRoot.querySelector(
+      `#skill${skill.uuid}`
+    );
+    SECTION.querySelector("article").style = "display:none;";
+    this.displayCreateSkill(
+      SECTION,
+      null,
+      e => {
+        this.checkEditSkill(e, skill.uuid)
+      },
+      e => {
+        this.cancelEditSkill(skill.uuid)
+      },
+      skill.name,
+      skill.description,
+      skill.reference
+    );
+  };
+
+  checkEditSkill = (e, skill_id) => {
+    var isValid = true;
+    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll(`#skill${skill_id} [required]`);
+    for (let i = 0; i < REQUIRED_ELEMENTS.length; i++) {
+      isValid = isValid && !!REQUIRED_ELEMENTS[i].value;
+    }
+    if (isValid) {
+      e.preventDefault();
+      this.submitEditSkill(skill_id);
+    }
+  }
+
+  submitEditSkill = (skill_id) => {
+    const SECTION = this.shadowRoot.querySelector(`#skill${skill_id}`);
+    const FORM = SECTION.querySelector("form");
+    var formData = new FormData(FORM);
+    fetch("/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+        mutation UpdateSkill($skill_id:ID!, $name: String, $description: String, $reference: String) {
+          updateSkill(skillId: $skill_id, name: $name, description: $description, reference: $reference) {
+            ok
+            skill {
+              uuid
+              name
+              description
+              reference
+            }
+          }
+        }
+        `,
+        variables: {
+          skill_id: skill_id,
+          name: formData.get("skill_title"),
+          description: formData.get("skill_description"),
+          reference: formData.get("skill_reference"),
+        },
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Error");
+        }
+      })
+      .then((data) => {
+        this.cancelEditSkill(skill_id);
+        this.addSkill(data.data.updateSkill.skill, SECTION);
+      });
+  }
+
+  cancelEditSkill = (skill_id) => {
+    const SELECT = this.shadowRoot.querySelector(`#skill${skill_id}`);
+    SELECT.querySelector("form").remove();
+    SELECT.querySelector("article").style = "display:block";
   }
 
   deleteSkillButton = (root, skill_id) => {
@@ -152,7 +294,6 @@ export class Skills extends HTMLElement {
       return response.json()
     }).then(data => {
       if(data.errors){
-        console.log(data);
         throw new Error("Error removing skill")
       }
       this.shadowRoot.querySelector(`#skill${skill_id}`).remove()
@@ -200,22 +341,20 @@ export class Skills extends HTMLElement {
     this.shadowRoot.querySelector("form").remove();
   };
 
-  handleCreateSkill = (e) => {
+  handleCreateSkill = (e, skill_id) => {
     var isValid = true;
-    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll("[required]");
+    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll(`[required]`);
     for (let i = 0; i < REQUIRED_ELEMENTS.length; i++) {
       isValid = isValid && !!REQUIRED_ELEMENTS[i].value;
     }
     if (isValid) {
       e.preventDefault();
-      console.log("TODO: Create Experience");
       this.handleSubmit();
     }
   };
 
-  displayCreateSkill = () => {
-    const BUTTON_add_skill = this.shadowRoot.querySelector("#add_skill");
-    BUTTON_add_skill.disabled = true;
+  displayCreateSkill = (root, BUTTON, onSubmit, onCancel, title, description, reference) => {
+    const BUTTON_add_skill = BUTTON; //BUTTON
 
     const FORM_createSkill = document.createElement("form");
     const P_title = document.createElement("p");
@@ -229,6 +368,8 @@ export class Skills extends HTMLElement {
     INPUT_title.setAttribute("name", "skill_title");
     INPUT_title.setAttribute("placeholder", "Title ...");
     INPUT_title.required = true;
+    INPUT_title.value = title ? title: "";
+
     P_title.append(LABEL_title, INPUT_title, "*");
     FORM_createSkill.append(P_title);
 
@@ -242,6 +383,8 @@ export class Skills extends HTMLElement {
     TEXTAREA_description.setAttribute("id", "skill_description");
     TEXTAREA_description.setAttribute("name", "skill_description");
     TEXTAREA_description.setAttribute("placeholder", "Description ...");
+    TEXTAREA_description.value = description ? description : "";
+
     P_description.append(LABEL_description, TEXTAREA_description);
     FORM_createSkill.append(P_description);
 
@@ -258,6 +401,7 @@ export class Skills extends HTMLElement {
       "placeholder",
       "Reference URL (e.g. video, article, ...)"
     );
+    INPUT_reference.value = reference ? reference : "";
     P_reference.append(LABEL_reference, INPUT_reference);
     FORM_createSkill.append(P_reference);
 
@@ -265,21 +409,28 @@ export class Skills extends HTMLElement {
     const INPUT_submit = document.createElement("input");
     INPUT_submit.setAttribute("type", "submit");
     INPUT_submit.setAttribute("value", "Create Skill");
-    INPUT_submit.addEventListener("click", this.handleCreateSkill);
+    INPUT_submit.addEventListener("click", onSubmit); // onSubmit
     const BUTTON_cancel = document.createElement("button");
     BUTTON_cancel.innerText = "Cancel";
-    BUTTON_cancel.addEventListener("click", this.concealCreateSkill);
+    BUTTON_cancel.addEventListener("click", onCancel); // onCancel
     P_submit.append(BUTTON_cancel, INPUT_submit);
     FORM_createSkill.append(P_submit);
-
-    this.shadowRoot.insertBefore(FORM_createSkill, BUTTON_add_skill);
+    
+    if(BUTTON != null){
+      BUTTON_add_skill.disabled = true;
+      root.insertBefore(FORM_createSkill, BUTTON_add_skill); // Root
+    } else {
+      root.append(FORM_createSkill);
+    }
   };
 
   addCreateSkillButton = () => {
     const BUTTON_addSkill = document.createElement("button");
     BUTTON_addSkill.innerText = "Add skill";
     BUTTON_addSkill.setAttribute("id", "add_skill");
-    BUTTON_addSkill.addEventListener("click", this.displayCreateSkill);
+    BUTTON_addSkill.addEventListener("click", () => {
+      this.displayCreateSkill(this.shadowRoot, BUTTON_addSkill, this.handleCreateSkill, this.concealCreateSkill)
+    });
 
     this.shadowRoot.append(BUTTON_addSkill);
   };
