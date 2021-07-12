@@ -36,7 +36,18 @@ def createuser():
 
 @app.route("/edituser/<string:username>")
 def edituser(username=None):
-    return render_template("createUser.html", username=username)
+    query_string = """query($username:String)
+    { 
+        staff(username:$username) 
+            {
+                name
+            } 
+        }"""
+    result = schema.execute(query_string, variables={"username": username})
+    print(result)
+    if len(result.data["staff"]) > 0:
+        return render_template("createUser.html", username=username)
+    return render_template("not_found.html")
 
 app.add_url_rule(
     '/graphql',
