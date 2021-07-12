@@ -74,19 +74,29 @@ export class HeaderLogin extends HTMLElement {
   createDropdown = () => {
     const username = this.getAttribute("username");
     const UL_dropdown = document.createElement("ul");
-    const options = ["Login", "Create account"];
-    const links = ["/login", "/createuser"];
-    for (let i = 0; i < options.length; i++) {
+    
+    if(username){
       var LI_option = document.createElement("li");
       var A_option = document.createElement("a");
 
-      LI_option.innerText = options[i];
-      A_option.setAttribute("href", links[i]);
+      LI_option.innerText = "Edit account";
+      A_option.setAttribute("href", `/edituser/${username}`);
       A_option.append(LI_option);
-      UL_dropdown.append(A_option);
-    }
-    if(username){ 
+      UL_dropdown.append(A_option); 
       UL_dropdown.append(this.addDeleteAccountLI(username));
+    } else {
+      const options = ["Login", "Create account"];
+      const links = ["/login", "/createuser"];
+      for (let i = 0; i < options.length; i++) {
+  
+        var LI_option = document.createElement("li");
+        var A_option = document.createElement("a");
+        
+        LI_option.innerText = options[i];
+        A_option.setAttribute("href", links[i]);
+        A_option.append(LI_option);
+        UL_dropdown.append(A_option);
+      }
     }
     UL_dropdown.classList.add("hidden");
     this.shadowRoot.append(UL_dropdown);
@@ -105,7 +115,7 @@ export class HeaderLogin extends HTMLElement {
     });
     return LI;
   };
-
+  
   deleteAccount = (username) => {
     fetch("/graphql", {
       method: "POST",
@@ -114,7 +124,7 @@ export class HeaderLogin extends HTMLElement {
       },
       body: JSON.stringify({
         query: `
-        mutation DeleteStaff($username:String){
+        mutation DeleteStaff($username:String!){
           deleteStaff(username:$username){ok}
         }
         `,
