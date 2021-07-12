@@ -3,7 +3,7 @@ import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from .models import Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel
-from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience, delete_skill, update_staff, update_experience, update_skill
+from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience, delete_skill, update_staff, update_experience, update_skill, update_staff_password, check_password
 
 
 class Staff(SQLAlchemyObjectType):
@@ -131,13 +131,38 @@ class UpdateStaff(graphene.Mutation):
     staff = update_staff(current_username, name, new_username, contact_type, contact_info)
     ok = True
     return UpdateStaff(ok=ok, staff=staff)
+
 """ e.g.
-mutation UpdateStaff {
+mutation UpdateStaff($current_username:String!, $name:String, $new_username:String, $contact_info:String, $contact_type:String) {
   updateStaff(currentUsername: "pelle123", name:"Pelle P", contactInfo:"pelle#123") {
     staff {
       name
       contactInfo
     }
+  }
+}
+"""
+class UpdateStaffPassword(graphene.Mutation):
+  class Arguments:
+    staff_uuid = graphene.ID(required=True)
+    old_password = graphene.String(required=True)
+    new_password = graphene.String(required=True)
+    confirm_password = graphene.String(required=True)
+
+  ok = graphene.Boolean()
+
+  def mutate(root, info, staff_uuid, old_password, new_password, confirm_password):
+    ok = False
+    if new_password == confirm_password:
+      if(check_password(staff_uuid, old_password)):
+        
+        update_staff_password(staff_uuid, new_password)
+        ok = True
+    return UpdateStaffPassword(ok=ok)
+"""
+mutation UpdatePassword($staff_id: ID!, $old_password: String!, $confirm_password: String!, $new_password: String!) {
+  updatePassword(staffUuid: $staff_id, oldPassword: $old_password, confirmPassword: $confirm_password, newPassword: $new_password) {
+    ok
   }
 }
 """
@@ -205,6 +230,7 @@ class Mutations(graphene.ObjectType):
   update_staff=UpdateStaff.Field()
   update_experience=UpdateExperience.Field()
   update_skill=UpdateSkill.Field()
+  update_password = UpdateStaffPassword.Field()
 
 class Query(graphene.ObjectType):
   node = relay.Node.Field()

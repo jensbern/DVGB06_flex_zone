@@ -3,15 +3,15 @@ from db.models import db_session, Staff, Staff_password, Skill, Experience
 from bcrypt import gensalt, hashpw, checkpw
 
 
-def check_login(username, password) -> bool:
+def check_password(staff_uuid, password) -> bool:
     # print(username)
     # query = Staff_passwordSchema.get_query(info)
-    s = Staff.query.filter(Staff.username == username).first()
-    if s == None:
-        return False
-    s_pw = Staff_password.query.filter(Staff_password.staffid == s.id).first()
+    # s = Staff.query.filter(Staff.uuid == staff_uuid).first()
+    # if s == None:
+    #     return False
+    s_pw = Staff_password.query.filter(Staff_password.staffid == staff_uuid).first()
     # print(s.username, s_pw.password)
-    if checkpw(password, s_pw.password):
+    if checkpw(password.encode(), s_pw.password):
         return True
     else:
         return False
@@ -86,6 +86,12 @@ def update_staff(current_username, name, new_username, contact_type, contact_inf
     staff_db.update(staff_update,synchronize_session = "fetch")
     db_session.commit()
     return staff
+
+def update_staff_password(staff_uuid, new_password):
+    sp = Staff_password.query.filter(Staff_password.staffid == staff_uuid)
+    psw_hash = hashpw(new_password.encode(), gensalt())
+    sp.update({Staff_password.password:psw_hash}, synchronize_session=False)
+    db_session.commit()
 
 def update_experience(experience_id, type, description, at, reference, start, end):
     experience_update = {}
