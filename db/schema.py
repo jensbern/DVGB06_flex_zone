@@ -87,7 +87,7 @@ class CreateExperience(graphene.Mutation):
 
 class DeleteStaff(graphene.Mutation):
   class Arguments:
-    username = graphene.String()
+    username = graphene.String(required=True)
 
   ok = graphene.Boolean()
 
