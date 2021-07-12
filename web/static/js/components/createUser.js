@@ -13,10 +13,13 @@ export class CreateUser extends HTMLElement {
       background-color: rgb(252, 252, 252);
       border: 1px solid lightgrey;
     }
-    input[type="text"], input[type="password"], input[type="url"], textarea, select{
-      width: 71%;
+
+    p {
       margin: 8px;
+    }
+    input[type="text"], input[type="password"], input[type="url"], textarea, select{
       padding: 8px;
+      width: 90%;
       border: 1px solid darkgrey;
       font-size: 1.1em;
       font-family: Georgia, 'Times New Roman', Times, serif;
@@ -24,23 +27,32 @@ export class CreateUser extends HTMLElement {
       }
     input, button {
       border: 1px solid darkgrey;
-      margin: 8px 0;
+      // margin: 8px 0;
       
       padding: 8px;
       font-size: 1.05em;
       background-color: white;
     }
-    form button, form input {
+    form button, form input, form select, form textarea {
       margin: 8px;
       padding: 8px;
       font-size: 1.05em;
       background-color: white;
     }
-    #contact_address {
-      width: 30%;
+    legend{
+      margin-left: 8px;
     }
-    #contact_type {
-      width: 40%;
+    fieldset {
+      display:flex;
+      align-items:center;
+    }
+
+    a {
+      display:block;
+      margin-top: 16px;
+      font-size: 1.2em;
+      color: black;
+      text-decoration: none;
     }
     
     .error:focus {
@@ -48,12 +60,18 @@ export class CreateUser extends HTMLElement {
       outline-color: red;
       background-color: lightred;
     }
+
+    .update{
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+    }
     `;
     this.shadowRoot.append(STYLE);
   }
 
-  displayCreateUser = () => {
+  displayCreateUser = (user) => {
     const FORM_createUser = document.createElement("form");
+    FORM_createUser.setAttribute("id", "update_user");
     const P_name = document.createElement("p");
     const LABEL_name = document.createElement("label");
     LABEL_name.innerText = "Name";
@@ -65,6 +83,8 @@ export class CreateUser extends HTMLElement {
     INPUT_name.setAttribute("name", "name");
     INPUT_name.setAttribute("placeholder", "Name");
     INPUT_name.required = true;
+    INPUT_name.value = user ? user.name : "";
+
     P_name.append(LABEL_name, INPUT_name, "*");
     FORM_createUser.append(P_name);
 
@@ -79,24 +99,35 @@ export class CreateUser extends HTMLElement {
     INPUT_username.setAttribute("name", "username");
     INPUT_username.setAttribute("placeholder", "Username");
     INPUT_username.required = true;
+    INPUT_username.value = user ? user.username : "";
+
     P_usernname.append(LABEL_username, INPUT_username, "*");
     FORM_createUser.append(P_usernname);
 
-    const P_password = document.createElement("p");
-    const LABEL_password = document.createElement("label");
-    LABEL_password.innerText = "Password";
-    LABEL_password.setAttribute("for", "password");
-    LABEL_password.style = "display:none;";
-    const INPUT_password = document.createElement("input");
-    INPUT_password.setAttribute("type", "password");
-    INPUT_password.setAttribute("id", "password");
-    INPUT_password.setAttribute("name", "password");
-    INPUT_password.setAttribute("placeholder", "Password");
-    INPUT_password.required = true;
-    P_password.append(LABEL_password, INPUT_password, "*");
-    FORM_createUser.append(P_password);
+    if (!user) {
+      const P_password = document.createElement("p");
+      const LABEL_password = document.createElement("label");
+      LABEL_password.innerText = "Password";
+      LABEL_password.setAttribute("for", "password");
+      LABEL_password.style = "display:none;";
+      const INPUT_password = document.createElement("input");
+      INPUT_password.setAttribute("type", "password");
+      INPUT_password.setAttribute("id", "password");
+      INPUT_password.setAttribute("name", "password");
+      INPUT_password.setAttribute(
+        "placeholder",
+        user ? "New password" : "Password"
+      );
+      P_password.append(LABEL_password, INPUT_password, "*")
+      FORM_createUser.append(P_password)
+    }
 
     const P_contact = document.createElement("p");
+    const FIELDSET = document.createElement("fieldset");
+    const LEGEND = document.createElement("legend");
+    LEGEND.innerText = "Contact Information";
+    FIELDSET.append(LEGEND);
+
     const LABEL_contact_address = document.createElement("label");
     LABEL_contact_address.innerText = "contact address";
     LABEL_contact_address.setAttribute("for", "contact_address");
@@ -109,7 +140,8 @@ export class CreateUser extends HTMLElement {
       "placeholder",
       "Contact address (email, discord, phone ...)"
     );
-    INPUT_contact_address.required = true;
+    INPUT_contact_address.required = !!!user;
+    INPUT_contact_address.value = user ? user.contactInfo : "";
 
     const LABEL_contact_type = document.createElement("label");
     LABEL_contact_type.innerText = "contact type";
@@ -119,7 +151,7 @@ export class CreateUser extends HTMLElement {
     SELECT_contact_type.setAttribute("type", "text");
     SELECT_contact_type.setAttribute("id", "contact_type");
     SELECT_contact_type.setAttribute("name", "contact_type");
-    SELECT_contact_type.required = true;
+    SELECT_contact_type.required = !!!user;
     SELECT_contact_type.addEventListener(
       "change",
       this.handleContactTypeChange
@@ -133,16 +165,19 @@ export class CreateUser extends HTMLElement {
       var OPTION_type = document.createElement("option");
       OPTION_type.innerText = options[i];
       OPTION_type.setAttribute("value", options[i].toLowerCase());
+      if (user && options[i].toLowerCase() === user.contactType) {
+        OPTION_type.selected = true;
+      }
       SELECT_contact_type.append(OPTION_type);
     }
-    P_contact.append(
+    FIELDSET.append(
       LABEL_contact_type,
       SELECT_contact_type,
-      "*",
       LABEL_contact_address,
       INPUT_contact_address,
       "*"
     );
+    P_contact.append(FIELDSET);
 
     FORM_createUser.append(P_contact);
 
@@ -164,31 +199,109 @@ export class CreateUser extends HTMLElement {
     const P_submit = document.createElement("p");
     const INPUT_submit = document.createElement("input");
     INPUT_submit.setAttribute("type", "submit");
-    INPUT_submit.setAttribute("value", "Create User");
-    INPUT_submit.addEventListener("click", this.handleCreateUser);
+    INPUT_submit.setAttribute("value", user ? "Update User" : "Create User");
+    INPUT_submit.addEventListener("click", (e) => {
+      this.handleCreateUser(e, user ? user.uuid : "");
+    });
     const BUTTON_cancel = document.createElement("button");
     BUTTON_cancel.innerText = "Cancel";
     BUTTON_cancel.addEventListener("click", this.handleCancel);
     P_submit.append(BUTTON_cancel, INPUT_submit);
     FORM_createUser.append(P_submit);
-    this.shadowRoot.prepend(FORM_createUser);
+    this.shadowRoot.querySelector("section").prepend(FORM_createUser);
+  };
+
+  displayUpdatePassword = (userid) => {
+    const FORM = document.createElement("form");
+    FORM.setAttribute("id", "update_password");
+    const P_password_old = document.createElement("p");
+    const LABEL_password_old = document.createElement("label");
+    LABEL_password_old.innerText = "Old password";
+    LABEL_password_old.setAttribute("for", "password_old");
+    LABEL_password_old.style = "display:none;";
+    const INPUT_password_old = document.createElement("input");
+    INPUT_password_old.setAttribute("type", "password");
+    INPUT_password_old.setAttribute("id", "password_old");
+    INPUT_password_old.setAttribute("name", "password_old");
+    INPUT_password_old.setAttribute("placeholder", "Old password");
+    INPUT_password_old.required = true;
+    P_password_old.append(LABEL_password_old, INPUT_password_old, "*");
+    FORM.append(P_password_old);
+
+    const P_password = document.createElement("p");
+    const LABEL_password = document.createElement("label");
+    LABEL_password.innerText = "Password";
+    LABEL_password.setAttribute("for", "password");
+    LABEL_password.style = "display:none;";
+    const INPUT_password = document.createElement("input");
+    INPUT_password.setAttribute("type", "password");
+    INPUT_password.setAttribute("id", "password");
+    INPUT_password.setAttribute("name", "password");
+    INPUT_password.setAttribute("placeholder", "New password");
+    INPUT_password.required = true;
+    P_password.append(LABEL_password, INPUT_password, "*");
+    FORM.append(P_password);
+
+    const P_password_confirm = document.createElement("p");
+    const LABEL_password_confirm = document.createElement("label");
+    LABEL_password_confirm.innerText = "Confirm password";
+    LABEL_password_confirm.setAttribute("for", "password_confirm");
+    LABEL_password_confirm.style = "display:none;";
+    const INPUT_password_confirm = document.createElement("input");
+    INPUT_password_confirm.setAttribute("type", "password");
+    INPUT_password_confirm.setAttribute("id", "password_confirm");
+    INPUT_password_confirm.setAttribute("name", "password_confirm");
+    INPUT_password_confirm.setAttribute(
+      "placeholder",
+      "Confirm new password (enter new password again)"
+    );
+    INPUT_password_confirm.required = true;
+
+    P_password_confirm.append(
+      LABEL_password_confirm,
+      INPUT_password_confirm,
+      "*"
+    );
+    FORM.append(P_password_confirm);
+
+    const P_submit = document.createElement("p");
+    const INPUT_submit = document.createElement("input");
+    INPUT_submit.setAttribute("type", "submit");
+    INPUT_submit.setAttribute("value", "Update Password");
+    INPUT_submit.addEventListener("click", (e) => {
+      this.handleUpdatePassword(e, userid);
+    });
+    const SPAN_message = document.createElement("span");
+    SPAN_message.setAttribute("id", "password_update_message")
+    P_submit.append(INPUT_submit, SPAN_message);
+    FORM.append(P_submit);
+    this.shadowRoot.querySelector("section").append(FORM);
   };
 
   handleCancel = (e) => {
     e.preventDefault();
-    window.location = "/"
-    console.log("TODO: Go back to start-page");
+    const username = this.getAttribute("username");
+    if (username) {
+      window.location = `/user/${username}`;
+    } else {
+      window.location = "/";
+    }
   };
 
-  handleCreateUser = (e) => {
+  handleCreateUser = (e, userid) => {
     var isValid = true;
-    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll("[required]");
+    const username = this.getAttribute("username");
+    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll("#update_user [required]");
     for (let i = 0; i < REQUIRED_ELEMENTS.length; i++) {
       isValid = isValid && !!REQUIRED_ELEMENTS[i].value;
     }
     if (isValid) {
       e.preventDefault();
-      this.handleSubmit();
+      if (username) {
+        this.updateStaff(userid);
+      } else {
+        this.handleSubmit();
+      }
     }
   };
 
@@ -243,7 +356,7 @@ export class CreateUser extends HTMLElement {
   };
 
   handleSubmit = () => {
-    const FORM = this.shadowRoot.querySelector("form");
+    const FORM = this.shadowRoot.querySelector("#update_user");
     const INPUT_username = this.shadowRoot.querySelector("#username");
     INPUT_username.classList.remove("error");
 
@@ -293,8 +406,165 @@ export class CreateUser extends HTMLElement {
       });
   };
 
+  updateStaff = () => {
+    const FORM = this.shadowRoot.querySelector("#update_user");
+    const INPUT_username = this.shadowRoot.querySelector("#username");
+    const username = this.getAttribute("username");
+    const formData = new FormData(FORM);
+    fetch("/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+          mutation UpdateStaff($current_username: String!, $name: String, $new_username: String, $contact_info: String, $contact_type: String) {
+            updateStaff(currentUsername: $current_username, newUsername: $new_username, name: $name, contactInfo: $contact_info, contactType: $contact_type) {
+              ok
+              staff {
+                username
+              }
+            }
+          }
+        `,
+        variables: {
+          current_username: username,
+          name: formData.get("name"),
+          new_username: formData.get("username"),
+          contact_info: formData.get("contact_address"),
+          contact_type: formData.get("contact_type"),
+        },
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        if (data.errors) {
+          // TODO: Lägg till feedback till användare
+
+          INPUT_username.classList.add("error");
+          INPUT_username.focus();
+          this.addToolTip(INPUT_username, "Username already taken");
+        } else {
+          console.log(data.data.updateStaff.staff.username);
+          window.location = `/edituser/${data.data.updateStaff.staff.username}`;
+        }
+      });
+  };
+
+  handleUpdatePassword = (e, userid) => {
+    var isValid = true;
+    const username = this.getAttribute("username");
+    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll("#update_password [required]");
+    for (let i = 0; i < REQUIRED_ELEMENTS.length; i++) {
+      isValid = isValid && !!REQUIRED_ELEMENTS[i].value;
+    }
+    if (isValid) {
+      console.log(e);
+      e.preventDefault();
+      if (username) {
+        this.updatePassword(userid);
+      } else {
+        this.handleSubmit();
+      }
+    }
+  }
+
+  updatePassword = (userid) => {
+    const FORM = this.shadowRoot.querySelector("#update_password");
+    const formData = new FormData(FORM);
+    fetch("/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+          mutation UpdatePassword($staff_id: ID!, $old_password: String!, $confirm_password: String!, $new_password: String!) {
+            updatePassword(staffUuid: $staff_id, oldPassword: $old_password, confirmPassword: $confirm_password, newPassword: $new_password) {
+              ok
+            }
+          }
+        `,
+        variables: {
+          staff_id: userid,
+          old_password: formData.get("password_old"),
+          confirm_password: formData.get("password_confirm"),
+          new_password: formData.get("password"),
+        },
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Update password:", data.data.updatePassword.ok);
+        if(data.data.updatePassword.ok){
+          this.shadowRoot.querySelector("#password_update_message").innerText = "Password update succesful!";
+          const FORM_password_inputs = this.shadowRoot.querySelectorAll("#update_password input");
+          for(let i = 0; i < FORM_password_inputs.length-1; i++) {
+            FORM_password_inputs[i].value = "";
+          }
+        } else {
+          this.shadowRoot.querySelector("#password_update_message").innerText =
+            "Password information is not valid";
+
+        }
+      });
+  };
+
+
+  getUserData = (username, callback) => {
+    fetch("/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+        query ($username:String)
+          {
+            staff(username: $username) {
+              name
+              uuid
+              username
+              contactInfo
+              contactType
+            }
+          }
+        `,
+        variables: {
+          username: username,
+        },
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        callback(data);
+      });
+  };
+
   connectedCallback() {
-    this.displayCreateUser();
+    const username = this.getAttribute("username");
+    const SECTION = document.createElement("section");
+    this.shadowRoot.append(SECTION);
+    if (username) {
+      SECTION.classList.add("update");
+      this.getUserData(username, (data) => {
+        this.shadowRoot.style = "";
+        this.displayCreateUser(data.data.staff[0]);
+        this.displayUpdatePassword(data.data.staff[0].uuid);
+      });
+    } else {
+      this.displayCreateUser();
+    }
+    const A = document.createElement("a");
+    A.href = "/user/"+username;
+    A.innerText = "Back to userpage"
+    this.shadowRoot.append(A);
   }
 
   disconnectedCallback() {
