@@ -2,7 +2,6 @@ from flask import Flask, render_template, request
 from flask_graphql import GraphQLView
 
 from db.models import db_session
-from db.api import check_login, check_username, create_staff
 from db.schema import schema, Staff, Experience
 
 app = Flask(__name__, static_url_path="",
@@ -35,14 +34,9 @@ def user(username=None):
 def createuser():
     return render_template("createUser.html")
 
-
-
-@app.route("/login", methods=["POST"])
-def login():
-    if check_login(username, password):
-        return "logged in"
-    else:
-        return "wrong password/username"
+@app.route("/edituser/<string:username>")
+def edituser(username=None):
+    return render_template("createUser.html", username=username)
 
 app.add_url_rule(
     '/graphql',
