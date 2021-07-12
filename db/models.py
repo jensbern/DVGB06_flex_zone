@@ -15,7 +15,7 @@ Base.query = db_session.query_property()
 
 class Staff(Base):
     __tablename__ = "staff"
-    id = Column(Integer, primary_key=True)
+    uuid = Column(Integer, primary_key=True)
     name = Column(String)
     contact_info = Column(String)
     contact_type = Column(String)
@@ -23,8 +23,8 @@ class Staff(Base):
 
 class Staff_password(Base):
     __tablename__ = "staff_password"
-    id = Column(Integer, primary_key=True)
-    staffid = Column(Integer, ForeignKey("staff.id"))
+    uuid = Column(Integer, primary_key=True)
+    staffid = Column(Integer, ForeignKey("staff.uuid"))
     password = Column(LargeBinary)
     staff = relationship (
         Staff,
@@ -33,8 +33,8 @@ class Staff_password(Base):
 
 class Experience(Base):
     __tablename__ = "experience"
-    id=Column(Integer, primary_key=True)
-    staffid = Column(Integer, ForeignKey('staff.id'))
+    uuid=Column(Integer, primary_key=True)
+    staffid = Column(Integer, ForeignKey('staff.uuid'))
     type=Column(String)
     description=Column(String)
     at=Column(String)
@@ -49,8 +49,8 @@ class Experience(Base):
 
 class Skill(Base):
     __tablename__ = "skill"
-    id=Column(Integer, primary_key=True)
-    staffid = Column(Integer, ForeignKey('staff.id'))
+    uuid=Column(Integer, primary_key=True)
+    staffid = Column(Integer, ForeignKey('staff.uuid'))
     name=Column(String)
     description=Column(String)
     reference = Column(String)

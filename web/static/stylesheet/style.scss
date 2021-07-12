@@ -12,9 +12,27 @@ header{
 h1 {
   padding: 16px 32px;
   font-size: 2em;
-  span {
-    display: inline-block;
-    transform: scale(-1, 1);
+  a{
+    text-decoration: none;
+    color: inherit;
+    .right {
+      display: inline-block;
+      transform: scale(-1, 1);
+      transition: transform 100ms ease-in-out;
+    }
+    .left{
+      display: inline-block;
+      transition: transform 100ms ease-in-out;
+    }
+    &:visited{
+      color: inherit;
+    }
+    &:hover .left{
+      transform:rotate(40deg) translateY(-6px) scale(1.2);
+    }
+    &:hover .right{
+      transform:rotate(-40deg) translateY(-6px) scale(-1.2, 1.2);
+    }
   }
 }
 

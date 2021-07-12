@@ -44,9 +44,9 @@ export class CreateUser extends HTMLElement {
     }
     
     .error:focus {
-      border: 2px solid red !important;
+      border: 2px solid red;
       outline-color: red;
-      background-color: lightred !important;
+      background-color: lightred;
     }
     `;
     this.shadowRoot.append(STYLE);
@@ -176,7 +176,8 @@ export class CreateUser extends HTMLElement {
 
   handleCancel = (e) => {
     e.preventDefault();
-    window.location = "/";
+    window.location = "/"
+    console.log("TODO: Go back to start-page");
   };
 
   handleCreateUser = (e) => {

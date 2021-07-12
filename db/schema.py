@@ -2,8 +2,8 @@ from sqlalchemy.engine import interfaces
 import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
-from .models import db_session, Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel
-from .api import create_staff, create_skill, create_experience
+from .models import Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel
+from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience, delete_skill, update_staff, update_experience, update_skill
 
 
 class Staff(SQLAlchemyObjectType):
@@ -59,9 +59,9 @@ class CreateSkill(graphene.Mutation):
   skill = graphene.Field(lambda: Skill)
 
   def mutate(root, info, staff_username, name, description, reference):
-    staff = create_skill(staff_username, name, description, reference)
+    skill_id, staff = create_skill(staff_username, name, description, reference)
     skill = Skill(name=name, description=description, reference=reference, staff=staff)
-    
+    skill.uuid = skill_id
     ok = True
     return CreateSkill(skill=skill, ok=ok)
 
@@ -79,21 +79,137 @@ class CreateExperience(graphene.Mutation):
   experience = graphene.Field(lambda: Experience)
 
   def mutate(root, info, staff_username, exp_type, at, description, reference, start, end):
-    staff = create_experience(staff_username, exp_type, description, at, reference, start, end)
+    experience_id, staff = create_experience(staff_username, exp_type, description, at, reference, start, end)
     experience = Experience(type=exp_type, description=description, at=at, reference=reference, start=start, end=end, staff=staff)
-
+    experience.uuid = experience_id
     ok = True
     return CreateExperience(experience=experience, ok=ok)
 
+class DeleteStaff(graphene.Mutation):
+  class Arguments:
+    username = graphene.String()
+
+  ok = graphene.Boolean()
+
+  def mutate(root, info, username):
+    delete_staff(username)
+    ok = True
+    return DeleteStaff(ok=ok)
+
+class DeleteExperience(graphene.Mutation):
+  class Arguments:
+    experience_id = graphene.ID()
+  
+  ok = graphene.Boolean()
+
+  def mutate(root, info, experience_id):
+    delete_experience(experience_id)
+    ok = True
+    return DeleteExperience(ok=ok)
+  
+class DeleteSkill(graphene.Mutation):
+  class Arguments:
+    skill_id = graphene.ID()
+  ok = graphene.Boolean()
+  def mutate(root, info, skill_id):
+    delete_skill(skill_id)
+    ok = True
+    return DeleteSkill(ok=ok)
+
+class UpdateStaff(graphene.Mutation):
+  class Arguments:
+    current_username = graphene.String(required=True)
+    name = graphene.String(required=False)
+    new_username = graphene.String(required=False)
+    contact_info = graphene.String(required=False)
+    contact_type = graphene.String(required=False)
+  
+  ok = graphene.Boolean()
+  staff = graphene.Field(lambda: Staff)
+
+  def mutate(root, info, current_username, name=None, new_username=None, contact_info=None, contact_type=None):
+    staff = update_staff(current_username, name, new_username, contact_type, contact_info)
+    ok = True
+    return UpdateStaff(ok=ok, staff=staff)
+""" e.g.
+mutation UpdateStaff {
+  updateStaff(currentUsername: "pelle123", name:"Pelle P", contactInfo:"pelle#123") {
+    staff {
+      name
+      contactInfo
+    }
+  }
+}
+"""
+
+class UpdateExperience(graphene.Mutation):
+  class Arguments: 
+    experience_id=graphene.ID(required=True)
+    type=graphene.String()
+    description=graphene.String()
+    at=graphene.String()
+    reference=graphene.String()
+    start=graphene.Date()
+    end=graphene.Date()
+  
+  ok=graphene.Boolean()
+  experience=graphene.Field(lambda:Experience)
+  def mutate(root, info, experience_id, type=None, description=None, at=None, reference=None, start=None, end=None):
+    experience = update_experience(experience_id, type, description, at, reference, start, end)
+    ok=True
+    return UpdateExperience(ok=ok, experience=experience)
+
+""" e.g.
+mutation UpdateExperience {
+  updateExperience(experienceId: 3, at: "Pepega Gaming") {
+    experience {
+      type
+      at
+    }
+  }
+}
+"""
+
+class UpdateSkill(graphene.Mutation):
+  class Arguments:
+    skill_id=graphene.ID(required=True)
+    name=graphene.String()
+    description=graphene.String()
+    reference=graphene.String()
+  
+  ok=graphene.Boolean()
+  skill=graphene.Field(lambda:Skill)
+
+  def mutate(root, info, skill_id, name=None, description=None, reference=None):
+    skill = update_skill(skill_id, name, description, reference)
+    ok=True
+    return UpdateSkill(ok=ok, skill=skill)
+"""
+mutation UpdateSkill {
+  updateSkill(skillId: 4, name: "Test") {
+    ok
+    skill {
+      name
+      description
+    }
+  }
+}
+"""
 class Mutations(graphene.ObjectType):
   create_staff=CreateStaff.Field()
   create_skill=CreateSkill.Field()
   create_experience=CreateExperience.Field()
+  delete_staff=DeleteStaff.Field()
+  delete_experience=DeleteExperience.Field()
+  delete_skill=DeleteSkill.Field()
+  update_staff=UpdateStaff.Field()
+  update_experience=UpdateExperience.Field()
+  update_skill=UpdateSkill.Field()
 
 class Query(graphene.ObjectType):
   node = relay.Node.Field()
   search = graphene.List(SearchResult, q=graphene.String())
-  staff = graphene.List(Staff, name=graphene.String(), id=graphene.Int(), username=graphene.String())
+  staff = graphene.List(Staff, name=graphene.String(), uuid=graphene.Int(), username=graphene.String())
   skills = graphene.List(Skill, name=graphene.String())
   experiences = graphene.List(Experience, experience_type=graphene.String(), at=graphene.String())
   # Allows sorting over multiple columns, by default over the primary key
@@ -109,7 +225,7 @@ class Query(graphene.ObjectType):
         __typename
         ... on Staff {
           name
-          id
+          uuid
           contactInfo
         }
       }
@@ -126,10 +242,10 @@ class Query(graphene.ObjectType):
   def resolve_staff(self, info, **args):
     name = args.get("name")
     username = args.get("username")
-    staff_id = args.get("id")
+    staff_id = args.get("uuid")
     staff_query = Staff.get_query(info)
     if staff_id:
-      staff = staff_query.filter(StaffModel.id == staff_id).all()
+      staff = staff_query.filter(StaffModel.uuid == staff_id).all()
       return staff
     
     if username:
