@@ -1,7 +1,7 @@
 from db.models import db_session, Staff, Staff_password, Skill, Experience
-
+# from flask import jsonify
 from bcrypt import gensalt, hashpw, checkpw
-
+from flask_jwt_extended import create_access_token
 
 def check_password(staff_uuid, password) -> bool:
     # print(username)
@@ -16,6 +16,18 @@ def check_password(staff_uuid, password) -> bool:
     else:
         return False
 
+def login(username, password):
+    # print(username)
+    s = Staff.query.filter(Staff.username == username).first()
+    if s == None:
+        return {"msg": "Bad username or password"}
+    s_pw = Staff_password.query.filter(Staff_password.staffid == s.uuid).first()
+    # print(s.username, s_pw.password)
+    if checkpw(password.encode(), s_pw.password):
+        access_token = create_access_token(identity=username)
+        return {"access_token":access_token}
+    else:
+        return {"msg": "Bad username or password"}
 
 def check_username(username):
     s = Staff.query.filter(Staff.username == username).first()

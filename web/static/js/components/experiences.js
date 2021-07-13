@@ -246,7 +246,7 @@ export class Experiences extends HTMLElement {
     end,
     reference
   ) => {
-    const BUTTON_create_experience = BUTTON; //BUTTON
+    const BUTTON_create_experience = BUTTON; 
 
     const FORM_createExperience = document.createElement("form");
     const P_type = document.createElement("p");
@@ -396,6 +396,7 @@ export class Experiences extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
       },
       body: JSON.stringify({
         query: `
@@ -509,6 +510,7 @@ export class Experiences extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
       },
       body: JSON.stringify({
         query: `
@@ -570,6 +572,7 @@ export class Experiences extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
       },
       body: JSON.stringify({
         query: `

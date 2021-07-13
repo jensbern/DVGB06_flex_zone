@@ -1,9 +1,12 @@
-from sqlalchemy.engine import interfaces
+
 import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
+
+from flask_jwt_extended import jwt_required
+
 from .models import Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel
-from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience, delete_skill, update_staff, update_experience, update_skill, update_staff_password, check_password
+from .api import create_staff, create_skill, create_experience, delete_staff, delete_experience, delete_skill, update_staff, update_experience, update_skill, update_staff_password, check_password, login
 
 
 class Staff(SQLAlchemyObjectType):
@@ -57,7 +60,7 @@ class CreateSkill(graphene.Mutation):
   
   ok = graphene.Boolean()
   skill = graphene.Field(lambda: Skill)
-
+  @jwt_required()
   def mutate(root, info, staff_username, name, description, reference):
     skill_id, staff = create_skill(staff_username, name, description, reference)
     skill = Skill(name=name, description=description, reference=reference, staff=staff)
@@ -77,7 +80,7 @@ class CreateExperience(graphene.Mutation):
   
   ok = graphene.Boolean()
   experience = graphene.Field(lambda: Experience)
-
+  @jwt_required()
   def mutate(root, info, staff_username, exp_type, at, description, reference, start, end):
     experience_id, staff = create_experience(staff_username, exp_type, description, at, reference, start, end)
     experience = Experience(type=exp_type, description=description, at=at, reference=reference, start=start, end=end, staff=staff)
@@ -91,6 +94,7 @@ class DeleteStaff(graphene.Mutation):
 
   ok = graphene.Boolean()
 
+  @jwt_required()
   def mutate(root, info, username):
     delete_staff(username)
     ok = True
@@ -101,7 +105,8 @@ class DeleteExperience(graphene.Mutation):
     experience_id = graphene.ID()
   
   ok = graphene.Boolean()
-
+  
+  @jwt_required()
   def mutate(root, info, experience_id):
     delete_experience(experience_id)
     ok = True
@@ -111,6 +116,8 @@ class DeleteSkill(graphene.Mutation):
   class Arguments:
     skill_id = graphene.ID()
   ok = graphene.Boolean()
+  
+  @jwt_required()
   def mutate(root, info, skill_id):
     delete_skill(skill_id)
     ok = True
@@ -126,7 +133,7 @@ class UpdateStaff(graphene.Mutation):
   
   ok = graphene.Boolean()
   staff = graphene.Field(lambda: Staff)
-
+  @jwt_required()
   def mutate(root, info, current_username, name=None, new_username=None, contact_info=None, contact_type=None):
     staff = update_staff(current_username, name, new_username, contact_type, contact_info)
     ok = True
@@ -150,7 +157,8 @@ class UpdateStaffPassword(graphene.Mutation):
     confirm_password = graphene.String(required=True)
 
   ok = graphene.Boolean()
-
+  
+  @jwt_required()
   def mutate(root, info, staff_uuid, old_password, new_password, confirm_password):
     ok = False
     if new_password == confirm_password:
@@ -179,6 +187,8 @@ class UpdateExperience(graphene.Mutation):
   
   ok=graphene.Boolean()
   experience=graphene.Field(lambda:Experience)
+
+  @jwt_required()
   def mutate(root, info, experience_id, type=None, description=None, at=None, reference=None, start=None, end=None):
     experience = update_experience(experience_id, type, description, at, reference, start, end)
     ok=True
@@ -193,7 +203,7 @@ mutation UpdateExperience {
     }
   }
 }
-"""
+""" 
 
 class UpdateSkill(graphene.Mutation):
   class Arguments:
@@ -220,6 +230,23 @@ mutation UpdateSkill {
   }
 }
 """
+
+
+class LoginResponse(graphene.ObjectType):
+  msg=graphene.String()
+  access_token=graphene.String()
+class Login(graphene.Mutation):
+
+  class Arguments:
+    username=graphene.String(required=True)
+    password=graphene.String(required=True)
+
+  resp = graphene.Field(lambda: LoginResponse)
+
+  def mutate(root, _, username, password):
+    resp = login(username, password)
+    return Login(resp=resp)
+
 class Mutations(graphene.ObjectType):
   create_staff=CreateStaff.Field()
   create_skill=CreateSkill.Field()
@@ -231,6 +258,7 @@ class Mutations(graphene.ObjectType):
   update_experience=UpdateExperience.Field()
   update_skill=UpdateSkill.Field()
   update_password = UpdateStaffPassword.Field()
+  login_user=Login.Field()
 
 class Query(graphene.ObjectType):
   node = relay.Node.Field()

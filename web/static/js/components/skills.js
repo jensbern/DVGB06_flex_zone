@@ -207,6 +207,7 @@ export class Skills extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
       },
       body: JSON.stringify({
         query: `
@@ -277,7 +278,8 @@ export class Skills extends HTMLElement {
     fetch("/graphql", {
       method:"POST", 
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
       }, 
       body: JSON.stringify({
         query: `
@@ -444,6 +446,7 @@ export class Skills extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("accessToken")
       },
       body: JSON.stringify({
         query: `

@@ -1,14 +1,22 @@
 from flask import Flask, render_template, request
 from flask_graphql import GraphQLView
+from dotenv import load_dotenv
+from os import getenv
+from flask_jwt_extended import JWTManager
 
 from db.models import db_session
-from db.schema import schema, Staff, Experience
+from db.schema import schema
 
+
+load_dotenv()
 app = Flask(__name__, static_url_path="",
             static_folder="web/static", template_folder="web/templates")
 
+app.config["JWT_SECRET_KEY"] = getenv("JWT_SECRET_KEY")
+
 app.debug = True
 
+jwt = JWTManager(app)
 
 @app.route("/")
 def index():
@@ -17,8 +25,8 @@ def index():
 
 @app.route("/user/<string:username>")
 def user(username=None):
-    query_string = """query($username:String)
-    { 
+    query_string = """
+    query($username:String){ 
         staff(username:$username) 
             {
                 name
@@ -34,11 +42,15 @@ def user(username=None):
 def createuser():
     return render_template("createUser.html")
 
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
 @app.route("/edituser/<string:username>")
 def edituser(username=None):
-    query_string = """query($username:String)
-    { 
-        staff(username:$username) 
+    query_string = """
+        query($username:String) { 
+            staff(username:$username) 
             {
                 name
             } 
@@ -65,3 +77,6 @@ def shutdown_session(exception=None):
 
 # start (Powershell):
 # . .\env\Scripts\activate
+
+if __name__ == "__main__":
+    app.run()

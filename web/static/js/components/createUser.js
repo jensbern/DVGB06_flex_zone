@@ -415,6 +415,7 @@ export class CreateUser extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
       },
       body: JSON.stringify({
         query: `
@@ -478,6 +479,7 @@ export class CreateUser extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
       },
       body: JSON.stringify({
         query: `

@@ -21,7 +21,6 @@ export class User extends HTMLElement {
         font-size: 0.9em;
       }
     `;
-
     this.shadowRoot.append(STYLE);
   }
 
@@ -44,6 +43,7 @@ export class User extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("accessToken")
       },
       body: JSON.stringify({
         query: `
