@@ -39,9 +39,10 @@ export class HeaderLogin extends HTMLElement {
       text-decoration:none;
     }
 
-    a:hover li {
+    a:hover li, .logout:hover {
       background-color: rgb(250,250,250);
       border: 1px solid gray;
+      cursor:pointer;
     }
 
     .hidden{
@@ -59,6 +60,7 @@ export class HeaderLogin extends HTMLElement {
     }
     `;
     this.shadowRoot.append(STYLE);
+    console.log(localStorage.getItem("accessToken"))
   }
 
   createDropdownButton = () => {
@@ -83,6 +85,7 @@ export class HeaderLogin extends HTMLElement {
       A_option.setAttribute("href", `/edituser/${username}`);
       A_option.append(LI_option);
       UL_dropdown.append(A_option); 
+      UL_dropdown.append(this.addLogoutLI());
       UL_dropdown.append(this.addDeleteAccountLI(username));
     } else {
       const options = ["Login", "Create account"];
@@ -95,12 +98,32 @@ export class HeaderLogin extends HTMLElement {
         LI_option.innerText = options[i];
         A_option.setAttribute("href", links[i]);
         A_option.append(LI_option);
+        
         UL_dropdown.append(A_option);
       }
     }
     UL_dropdown.classList.add("hidden");
     this.shadowRoot.append(UL_dropdown);
   };
+
+  addLogoutLI = () => {
+    const LI = document.createElement("li");
+    LI.classList.add("logout")
+    LI.innerText = "Log out";
+    LI.addEventListener("click", () => {
+      confirmPopup(document.body, "Log out?", (choice) => {
+        if (choice) {
+          this.logoutAccount();
+        }
+      });
+    });
+    return LI;
+  }
+
+  logoutAccount = () => {
+    localStorage.removeItem("accessToken");
+    window.location = "/"
+  }
 
   addDeleteAccountLI = (username) => {
     const LI = document.createElement("li");
