@@ -42,14 +42,15 @@ class CreateStaff(graphene.Mutation):
     password = graphene.String()
   
   ok = graphene.Boolean()
+  access_token = graphene.String()
   staff = graphene.Field(lambda: Staff)
 
   def mutate(root, info, name, contact_info, contact_type, username, password):
     staff = Staff(name=name, contact_info=contact_info, contact_type=contact_type, username=username)
-    create_staff(name, contact_info, contact_type, username, password)
+    accessToken = create_staff(name, contact_info, contact_type, username, password)
 
     ok = True
-    return CreateStaff(staff=staff, ok=ok)
+    return CreateStaff(staff=staff, ok=ok, access_token=accessToken)
 
 class CreateSkill(graphene.Mutation):
   class Arguments:

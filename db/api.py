@@ -49,6 +49,8 @@ def create_staff(name, contact_info, contact_type, username, password):
     db_session.commit()
     db_session.add(staff_password)    
     db_session.commit()
+    access_token = create_access_token(identity=username)
+    return access_token
 
 
 def create_skill(staff_username, name, description, reference):
