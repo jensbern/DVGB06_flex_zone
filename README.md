@@ -12,6 +12,7 @@ Project in course DVGB06 TIllämpad Programmering
 * [graphene_sqlalchemy](https://docs.graphene-python.org/projects/sqlalchemy/en/latest/)
 * [Flask-GraphQL](https://pypi.org/project/Flask-GraphQL/)
 * [flask-jwt-extended](https://pypi.org/project/Flask-JWT-Extended/)
+* [Bcrypt](https://pypi.org/project/bcrypt/)
 * [python-dotenv](https://pypi.org/project/python-dotenv/)
 
 ### For development
@@ -38,6 +39,7 @@ pip install SQLAlchemy
 pip install graphene_sqlalchemy
 pip install Flask-GraphQL
 pip install Flask-JWT-Extended
+pip install bcrypt
 pip install python-dotenv
 ```
 3. Create some dummy users:
