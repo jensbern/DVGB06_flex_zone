@@ -34,7 +34,13 @@ Enter environment (in PowerShell):
 ```
 . .\env\Scripts\activate
 ```
-3. Install packages:
+3. Create .env file
+
+create a file named `.env` which holds your secret jwt key. e.g.:
+```
+JWT_SECRET_KEY=secret_key_here
+```
+4. Install packages:
 
 ```
 pip install flask
@@ -45,13 +51,13 @@ pip install Flask-JWT-Extended
 pip install bcrypt
 pip install python-dotenv
 ```
-4. Create some dummy users:
+5. Create some dummy users:
 Run file [create_data.py](create_data.py)  e.g. 
 
 ```
 py create_data.py
 ```
-5. Start flask-server:
+6. Start flask-server:
 (in Powershell)
 ```
 $Env:FLASK_APP = "app.py"
