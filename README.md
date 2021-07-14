@@ -8,15 +8,10 @@ Project in course DVGB06 TIllämpad Programmering
 
 ### Libraries:
 * [Flask](https://flask.palletsprojects.com/en/2.0.x/)
-
 * [SQLAlchemy](https://pypi.org/project/SQLAlchemy/)
 * [graphene_sqlalchemy](https://docs.graphene-python.org/projects/sqlalchemy/en/latest/)
-
 * [Flask-GraphQL](https://pypi.org/project/Flask-GraphQL/)
-
 * [flask-jwt-extended](https://pypi.org/project/Flask-JWT-Extended/)
-
-
 * [python-dotenv](https://pypi.org/project/python-dotenv/)
 
 ### For development
@@ -31,13 +26,10 @@ Project in course DVGB06 TIllämpad Programmering
 pip install virtualenv
 virtualenv env
 ```
-
-
-
 Enter environment (in PowerShell):
-
-`. .\env\Scripts\activate`
-
+```
+. .\env\Scripts\activate
+```
 2. Install packages:
 
 ```
@@ -48,14 +40,12 @@ pip install Flask-GraphQL
 pip install Flask-JWT-Extended
 pip install python-dotenv
 ```
-
 3. Create some dummy users:
 Run file [create_data.py](create_data.py)  e.g. 
 
 ```
 py create_data.py
 ```
-
 4. Start flask-server:
 (in Powershell)
 ```
