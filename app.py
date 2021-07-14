@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 from flask_graphql import GraphQLView
 from dotenv import load_dotenv
 from os import getenv
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, get_jwt_identity, jwt_required
 
 from db.models import db_session
 from db.schema import schema
@@ -19,12 +19,16 @@ app.debug = True
 jwt = JWTManager(app)
 
 @app.route("/")
+@jwt_required(optional=True, locations=['headers', 'cookies'])
 def index():
-    return render_template("index.html")
+    user = get_jwt_identity()
+    return render_template("index.html", logged_in_as=user)
 
 
 @app.route("/user/<string:username>")
-def user(username=None):
+@jwt_required(optional=True, locations=['headers', 'cookies'])
+def user(username=None, methods=["GET"]):
+    user = get_jwt_identity()
     query_string = """
     query($username:String){ 
         staff(username:$username) 
@@ -33,9 +37,10 @@ def user(username=None):
             } 
         }"""
     result = schema.execute(query_string, variables={"username": username})
+    user = get_jwt_identity()
     if len(result.data["staff"]) > 0:
         name = result.data["staff"][0]["name"]
-        return render_template("user.html", name=name, username=username)
+        return render_template("user.html", name=name, username=username, logged_in_as=user)
     return render_template("not_found.html")
 
 @app.route("/createuser")
@@ -47,6 +52,7 @@ def login():
     return render_template("login.html")
 
 @app.route("/edituser/<string:username>")
+@jwt_required(locations=['headers', 'cookies'])
 def edituser(username=None):
     query_string = """
         query($username:String) { 
@@ -56,9 +62,12 @@ def edituser(username=None):
             } 
         }"""
     result = schema.execute(query_string, variables={"username": username})
-    print(result)
+    user = get_jwt_identity()
     if len(result.data["staff"]) > 0:
-        return render_template("createUser.html", username=username)
+        if user == username:
+            return render_template("createUser.html", username=username, logged_in_as=user)
+        else:
+            return render_template("login.html")
     return render_template("not_found.html")
 
 app.add_url_rule(

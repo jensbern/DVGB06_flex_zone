@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}{{name}}{% endblock %}
 {% block username %}{{username}}{% endblock %}
+{% block logged_in_as%}{{logged_in_as}}{% endblock %}
 {% block head %}
     {{ super() }}
 {% endblock %}
@@ -12,11 +13,11 @@
 <article id="user_page">
   <section>
     <h2>Experiences</h2>
-    <experiences-element username="{{username}}"></experiences-element>
+    <experiences-element username="{{username}}" logged_in_as={{logged_in_as}}></experiences-element>
   </section>
   <section>
     <h2>Skills</h2>
-    <skills-element username="{{username}}"></skills-element>
+    <skills-element username="{{username}}" logged_in_as={{logged_in_as}}></skills-element>
   </section>
 </article>
 {% endblock %}

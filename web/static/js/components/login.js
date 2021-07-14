@@ -121,6 +121,7 @@ export class Login extends HTMLElement {
       }else {
         // document.cookie = `accessToken=${}`;
         localStorage.setItem("accessToken", data.data.loginUser.resp.accessToken)
+        document.cookie = `access_token_cookie=${data.data.loginUser.resp.accessToken}`;
         window.location = `/user/${formData.get("username")}`
       }
     })

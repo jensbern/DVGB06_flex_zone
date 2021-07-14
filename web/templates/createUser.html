@@ -7,6 +7,7 @@
   {% endif %}
 {% endblock %}
 {% block username %}{{username}}{% endblock %}
+{% block logged_in_as%}{{logged_in_as}}{% endblock %}
 {% block head %}
     {{ super() }}
 {% endblock %}
@@ -17,7 +18,7 @@
   {% else %}
     <h2>Create user</h2>
   {% endif %}
-  <createuser-element username="{{username}}">
+  <createuser-element username="{{username}}" logged_in_as="{{logged_in_as}}">
   </createuser-element>
 {# comment <article id="user_page">
   <section>

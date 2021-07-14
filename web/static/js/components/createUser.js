@@ -1,4 +1,4 @@
-import { baseTemplate } from "./template.js";
+import { baseTemplate, confirmPopup, logged_in } from "./template.js";
 
 export class CreateUser extends HTMLElement {
   constructor() {
@@ -65,6 +65,15 @@ export class CreateUser extends HTMLElement {
       display: grid;
       grid-template-columns: 3fr 2fr;
     }
+    .delete{
+      margin-top:24px;
+      background-color: #fcc4c4;
+      cursor:pointer;
+    }
+    .delete:hover{
+      border: 1px solid #fd6b6b;
+      background-color: #ffa4a4;
+    }
     `;
     this.shadowRoot.append(STYLE);
   }
@@ -118,8 +127,8 @@ export class CreateUser extends HTMLElement {
         "placeholder",
         user ? "New password" : "Password"
       );
-      P_password.append(LABEL_password, INPUT_password, "*")
-      FORM_createUser.append(P_password)
+      P_password.append(LABEL_password, INPUT_password, "*");
+      FORM_createUser.append(P_password);
     }
 
     const P_contact = document.createElement("p");
@@ -272,7 +281,7 @@ export class CreateUser extends HTMLElement {
       this.handleUpdatePassword(e, userid);
     });
     const SPAN_message = document.createElement("span");
-    SPAN_message.setAttribute("id", "password_update_message")
+    SPAN_message.setAttribute("id", "password_update_message");
     P_submit.append(INPUT_submit, SPAN_message);
     FORM.append(P_submit);
     this.shadowRoot.querySelector("section").append(FORM);
@@ -291,7 +300,9 @@ export class CreateUser extends HTMLElement {
   handleCreateUser = (e, userid) => {
     var isValid = true;
     const username = this.getAttribute("username");
-    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll("#update_user [required]");
+    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll(
+      "#update_user [required]"
+    );
     for (let i = 0; i < REQUIRED_ELEMENTS.length; i++) {
       isValid = isValid && !!REQUIRED_ELEMENTS[i].value;
     }
@@ -371,6 +382,7 @@ export class CreateUser extends HTMLElement {
           mutation CreateStaff($contact_info: String, $contact_type: String, $password: String, $username: String, $name: String) {
             createStaff(contactInfo: $contact_info, contactType: $contact_type, password: $password, username: $username, name: $name) {
               ok
+              accessToken
               staff {
                 username
               }
@@ -401,6 +413,11 @@ export class CreateUser extends HTMLElement {
           INPUT_username.focus();
           this.addToolTip(INPUT_username, "Username already taken");
         } else {
+          localStorage.setItem(
+            "accessToken",
+            data.data.createStaff.accessToken
+          );
+          document.cookie = `access_token_cookie=${data.data.loginUser.accessToken}`;
           window.location = `/user/${data.data.createStaff.staff.username}`;
         }
       });
@@ -415,7 +432,7 @@ export class CreateUser extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -457,7 +474,9 @@ export class CreateUser extends HTMLElement {
   handleUpdatePassword = (e, userid) => {
     var isValid = true;
     const username = this.getAttribute("username");
-    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll("#update_password [required]");
+    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll(
+      "#update_password [required]"
+    );
     for (let i = 0; i < REQUIRED_ELEMENTS.length; i++) {
       isValid = isValid && !!REQUIRED_ELEMENTS[i].value;
     }
@@ -470,7 +489,7 @@ export class CreateUser extends HTMLElement {
         this.handleSubmit();
       }
     }
-  }
+  };
 
   updatePassword = (userid) => {
     const FORM = this.shadowRoot.querySelector("#update_password");
@@ -479,7 +498,7 @@ export class CreateUser extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -502,20 +521,21 @@ export class CreateUser extends HTMLElement {
       })
       .then((data) => {
         console.log("Update password:", data.data.updatePassword.ok);
-        if(data.data.updatePassword.ok){
-          this.shadowRoot.querySelector("#password_update_message").innerText = "Password update succesful!";
-          const FORM_password_inputs = this.shadowRoot.querySelectorAll("#update_password input");
-          for(let i = 0; i < FORM_password_inputs.length-1; i++) {
+        if (data.data.updatePassword.ok) {
+          this.shadowRoot.querySelector("#password_update_message").innerText =
+            "Password update succesful!";
+          const FORM_password_inputs = this.shadowRoot.querySelectorAll(
+            "#update_password input"
+          );
+          for (let i = 0; i < FORM_password_inputs.length - 1; i++) {
             FORM_password_inputs[i].value = "";
           }
         } else {
           this.shadowRoot.querySelector("#password_update_message").innerText =
             "Password information is not valid";
-
         }
       });
   };
-
 
   getUserData = (username, callback) => {
     fetch("/graphql", {
@@ -549,6 +569,58 @@ export class CreateUser extends HTMLElement {
       });
   };
 
+  addDeleteAccountLI = (username) => {
+    const BUTTON = document.createElement("button");
+    BUTTON.classList.add("delete");
+    BUTTON.innerText = "Delete Account";
+    BUTTON.addEventListener("click", () => {
+      confirmPopup(document.body, "Delete account?", (choice) => {
+        if (choice) {
+          this.deleteAccount(username);
+        }
+      });
+    });
+    return BUTTON;
+  };
+
+  deleteAccount = (username) => {
+    fetch("/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      body: JSON.stringify({
+        query: `
+        mutation DeleteStaff($username:String!){
+          deleteStaff(username:$username){ok}
+        }
+        `,
+        variables: {
+          username: username,
+        },
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Error while deleting User");
+        }
+      })
+      .then((data) => {
+        console.log(data);
+        if (data.errors) {
+          console.log("Error while deleting");
+        } else {
+          localStorage.removeItem("accessToken");
+          document.cookie =
+            "access_token_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+          window.location = `/`;
+        }
+      });
+  };
+
   connectedCallback() {
     const username = this.getAttribute("username");
     const SECTION = document.createElement("section");
@@ -563,9 +635,13 @@ export class CreateUser extends HTMLElement {
     } else {
       this.displayCreateUser();
     }
+    if (logged_in(this)) {
+      const BUTTON_delete = this.addDeleteAccountLI(username);
+      this.shadowRoot.append(BUTTON_delete);
+    }
     const A = document.createElement("a");
-    A.href = "/user/"+username;
-    A.innerText = "Back to userpage"
+    A.href = "/user/" + username;
+    A.innerText = "Back to userpage";
     this.shadowRoot.append(A);
   }
 

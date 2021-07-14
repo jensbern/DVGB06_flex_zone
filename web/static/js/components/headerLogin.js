@@ -1,4 +1,4 @@
-import { baseTemplate, confirmPopup } from "./template.js";
+import { baseTemplate, confirmPopup, logged_in } from "./template.js";
 
 export class HeaderLogin extends HTMLElement {
   constructor() {
@@ -48,24 +48,14 @@ export class HeaderLogin extends HTMLElement {
     .hidden{
       display:none;
     }
-
-    .delete{
-      margin-top:24px;
-      background-color: #fcc4c4;
-      cursor:pointer;
-    }
-    .delete:hover{
-      border: 1px solid #fd6b6b;
-      background-color: #ffa4a4;
-    }
     `;
     this.shadowRoot.append(STYLE);
-    console.log(localStorage.getItem("accessToken"))
+    
   }
 
-  createDropdownButton = () => {
+  createDropdownButton = (logged_in_as) => {
     const BUTTON = document.createElement("button");
-    BUTTON.innerHTML = "Log in | Create account";
+    BUTTON.innerHTML = logged_in_as? logged_in_as : "Log in | Create account";
     BUTTON.addEventListener("click", () => {
       const UL_dropdown = this.shadowRoot.querySelector("ul");
       UL_dropdown.classList.toggle("hidden");
@@ -74,31 +64,32 @@ export class HeaderLogin extends HTMLElement {
   };
 
   createDropdown = () => {
-    const username = this.getAttribute("username");
-    const UL_dropdown = document.createElement("ul");
+    const logged_in_as = this.getAttribute("logged_in_as");
     
-    if(username){
+    const UL_dropdown = document.createElement("ul");
+    if (logged_in_as && logged_in_as != "None") {
       var LI_option = document.createElement("li");
       var A_option = document.createElement("a");
 
       LI_option.innerText = "Edit account";
-      A_option.setAttribute("href", `/edituser/${username}`);
+      A_option.setAttribute(
+        "href",
+        `/edituser/${this.getAttribute("logged_in_as")}`
+      );
       A_option.append(LI_option);
-      UL_dropdown.append(A_option); 
+      UL_dropdown.append(A_option);
       UL_dropdown.append(this.addLogoutLI());
-      UL_dropdown.append(this.addDeleteAccountLI(username));
     } else {
       const options = ["Login", "Create account"];
       const links = ["/login", "/createuser"];
       for (let i = 0; i < options.length; i++) {
-  
         var LI_option = document.createElement("li");
         var A_option = document.createElement("a");
-        
+
         LI_option.innerText = options[i];
         A_option.setAttribute("href", links[i]);
         A_option.append(LI_option);
-        
+
         UL_dropdown.append(A_option);
       }
     }
@@ -122,61 +113,12 @@ export class HeaderLogin extends HTMLElement {
 
   logoutAccount = () => {
     localStorage.removeItem("accessToken");
+    document.cookie =
+      "access_token_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; 
     window.location = "/"
   }
 
-  addDeleteAccountLI = (username) => {
-    const LI = document.createElement("li");
-    LI.classList.add("delete");
-    LI.innerText = "Delete Account";
-    LI.addEventListener("click", () => {
-      confirmPopup(document.body, "Delete account?", (choice) => {
-        if (choice) {
-          this.deleteAccount(username);
-        }
-      });
-    });
-    return LI;
-  };
   
-  deleteAccount = (username) => {
-    fetch("/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: `
-        mutation DeleteStaff($username:String!){
-          deleteStaff(username:$username){ok}
-        }
-        `,
-        variables: {
-          username: username,
-        },
-      }),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Error while deleting User");
-        }
-      })
-      .then((data) => {
-        console.log(data);
-        if (data.errors) {
-          this.addToolTip(
-            document.body.querySelector("headerlogin-element"),
-            "Error while deleting user"
-          );
-          console.log("Error while deleting");
-        } else {
-          window.location = `/`;
-        }
-      });
-  };
-
   addToolTip = (DOM, text) => {
     const TOOLTIP = document.createElement("div");
     const DOM_rect = DOM.getBoundingClientRect();
@@ -199,7 +141,14 @@ export class HeaderLogin extends HTMLElement {
     DOM.addEventListener("keyup", keyup_func);
   };
   connectedCallback() {
-    this.createDropdownButton();
+    if (
+      this.getAttribute("logged_in_as") &&
+      this.getAttribute("logged_in_as") != "None"
+    ) {
+      this.createDropdownButton(this.getAttribute("logged_in_as"));
+    } else {
+      this.createDropdownButton();
+    }
     this.createDropdown();
     const UL_dropdown = this.shadowRoot.querySelector("ul");
     const BUTTON_dropdown = this.shadowRoot.querySelector("button");

@@ -13,7 +13,7 @@
     <header>
         <h1> <a href="/"> <span class="left">💪</span>Flex Zone<span class="right">💪</span> </a></h1>
         {# Lägg till så användar-profil visas om man är inloggad #}
-        <headerlogin-element username="{% block username %}{% endblock %}"></headerlogin-element>
+        <headerlogin-element username="{% block username %}{% endblock %}" logged_in_as="{% block logged_in_as %}{% endblock %}"></headerlogin-element>
     </header>
     <main>{% block content %}{% endblock %}</main>
     <footer>

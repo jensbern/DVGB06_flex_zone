@@ -1,4 +1,4 @@
-import { baseTemplate, confirmPopup } from "./template.js";
+import { baseTemplate, confirmPopup, logged_in } from "./template.js";
 
 export class Experiences extends HTMLElement {
   constructor() {
@@ -113,7 +113,9 @@ export class Experiences extends HTMLElement {
       const SECTION = document.createElement("section");
       SECTION.setAttribute("id", `experience${experiences[i].node.uuid}`);
       const ARTIClE = document.createElement("article");
-      this.settingsButton(ARTIClE, experiences[i].node);
+      if (logged_in(this)) {
+        this.settingsButton(ARTIClE, experience);
+      }
       const H3_name = document.createElement("h3");
       H3_name.innerText = experiences[i].node.type;
       ARTIClE.append(H3_name);
@@ -151,8 +153,9 @@ export class Experiences extends HTMLElement {
     const SECTION = document.createElement("section");
     SECTION.setAttribute("id", `experience${experience.uuid}`);
     const ARTIClE = document.createElement("article");
-
-    this.settingsButton(ARTIClE, experience);
+    if (logged_in(this)) {
+      this.settingsButton(ARTIClE, experience);
+    }
 
     const H3_name = document.createElement("h3");
     H3_name.innerText = experience.type;
@@ -183,13 +186,13 @@ export class Experiences extends HTMLElement {
     A_reference.innerText = "Reference";
     ARTIClE.append(A_reference);
     SECTION.append(ARTIClE);
-    if(!root){
+    if (!root) {
       this.shadowRoot.insertBefore(
         SECTION,
         this.shadowRoot.querySelector("#add_experience")
       );
-    }else{
-      root.querySelector("article").remove()
+    } else {
+      root.querySelector("article").remove();
       root.append(ARTIClE);
     }
   };
@@ -246,7 +249,7 @@ export class Experiences extends HTMLElement {
     end,
     reference
   ) => {
-    const BUTTON_create_experience = BUTTON; 
+    const BUTTON_create_experience = BUTTON;
 
     const FORM_createExperience = document.createElement("form");
     const P_type = document.createElement("p");
@@ -396,7 +399,7 @@ export class Experiences extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -476,23 +479,25 @@ export class Experiences extends HTMLElement {
     this.displayCreateExperience(
       SECTION,
       null,
-      e => {
-        this.checkEditExperience(e, experience.uuid)
+      (e) => {
+        this.checkEditExperience(e, experience.uuid);
       },
-      e => {
-        this.cancelEditExperience(experience.uuid)
+      (e) => {
+        this.cancelEditExperience(experience.uuid);
       },
       experience.type,
       experience.at,
       experience.description,
-      experience.start ? experience.start.split("T")[0]: "",
-      experience.end ? experience.end.split("T")[0]: "",
+      experience.start ? experience.start.split("T")[0] : "",
+      experience.end ? experience.end.split("T")[0] : "",
       experience.reference
     );
   };
   checkEditExperience = (e, experience_id) => {
     var isValid = true;
-    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll(`#experience${experience_id} [required]`);
+    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll(
+      `#experience${experience_id} [required]`
+    );
     for (let i = 0; i < REQUIRED_ELEMENTS.length; i++) {
       isValid = isValid && !!REQUIRED_ELEMENTS[i].value;
     }
@@ -500,17 +505,18 @@ export class Experiences extends HTMLElement {
       e.preventDefault();
       this.submitEditExperience(experience_id);
     }
-    
-  }
+  };
   submitEditExperience = (experience_id) => {
-    const SECTION = this.shadowRoot.querySelector(`#experience${experience_id}`);
+    const SECTION = this.shadowRoot.querySelector(
+      `#experience${experience_id}`
+    );
     const FORM = SECTION.querySelector("form");
     var formData = new FormData(FORM);
     fetch("/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -572,7 +578,7 @@ export class Experiences extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -604,7 +610,9 @@ export class Experiences extends HTMLElement {
     if (username) {
       this.getExperienceData(username, (data) => {
         this.displayExperiences(data.data.staff[0].experiences.edges);
-        this.addCreateExperienceButton();
+        if (logged_in(this)) {
+          this.addCreateExperienceButton();
+        }
         // (data.data.allStaff.edges[0].node.experiences.edges);
       });
     }

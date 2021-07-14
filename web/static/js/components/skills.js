@@ -1,4 +1,4 @@
-import { baseTemplate, confirmPopup } from "./template.js";
+import { baseTemplate, confirmPopup, logged_in } from "./template.js";
 
 export class Skills extends HTMLElement {
   constructor() {
@@ -119,8 +119,10 @@ export class Skills extends HTMLElement {
   addSkill = (skill, root) => {
     const SECTION = document.createElement("section");
     const ARTIClE = document.createElement("article");
-    this.settingsButton(ARTIClE, skill)
-    SECTION.setAttribute("id", `skill${skill.uuid}`)
+    if (logged_in(this)) {
+      this.settingsButton(ARTIClE, skill);
+    }
+    SECTION.setAttribute("id", `skill${skill.uuid}`);
     const H3_name = document.createElement("h3");
     H3_name.innerText = skill.name;
     ARTIClE.append(H3_name);
@@ -132,25 +134,27 @@ export class Skills extends HTMLElement {
     A_reference.setAttribute("target", "_blank");
     A_reference.innerText = "Reference";
     ARTIClE.append(A_reference);
-    SECTION.append(ARTIClE)
-    if(!root){
+    SECTION.append(ARTIClE);
+    if (!root) {
       this.shadowRoot.insertBefore(
         SECTION,
         this.shadowRoot.querySelector("#add_skill")
       );
-    }else{
-      root.querySelector("article").remove()
+    } else {
+      root.querySelector("article").remove();
       root.append(ARTIClE);
     }
-  }
+  };
 
   displaySkills(skills) {
     for (var i = 0; i < skills.length; i++) {
       const SECTION = document.createElement("section");
       const ARTIClE = document.createElement("article");
-      this.settingsButton(ARTIClE, skills[i].node)
-      
-      SECTION.setAttribute("id", `skill${skills[i].node.uuid}`)
+      if (logged_in(this)) {
+        this.settingsButton(ARTIClE, skills[i].node);
+      }
+
+      SECTION.setAttribute("id", `skill${skills[i].node.uuid}`);
       const H3_name = document.createElement("h3");
       H3_name.innerText = skills[i].node.name;
       ARTIClE.append(H3_name);
@@ -162,24 +166,22 @@ export class Skills extends HTMLElement {
       A_reference.setAttribute("target", "_blank");
       A_reference.innerText = "Reference";
       ARTIClE.append(A_reference);
-      SECTION.append(ARTIClE)
+      SECTION.append(ARTIClE);
       this.shadowRoot.append(SECTION);
     }
   }
 
   editSkill = (skill) => {
-    const SECTION = this.shadowRoot.querySelector(
-      `#skill${skill.uuid}`
-    );
+    const SECTION = this.shadowRoot.querySelector(`#skill${skill.uuid}`);
     SECTION.querySelector("article").style = "display:none;";
     this.displayCreateSkill(
       SECTION,
       null,
-      e => {
-        this.checkEditSkill(e, skill.uuid)
+      (e) => {
+        this.checkEditSkill(e, skill.uuid);
       },
-      e => {
-        this.cancelEditSkill(skill.uuid)
+      (e) => {
+        this.cancelEditSkill(skill.uuid);
       },
       skill.name,
       skill.description,
@@ -189,7 +191,9 @@ export class Skills extends HTMLElement {
 
   checkEditSkill = (e, skill_id) => {
     var isValid = true;
-    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll(`#skill${skill_id} [required]`);
+    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll(
+      `#skill${skill_id} [required]`
+    );
     for (let i = 0; i < REQUIRED_ELEMENTS.length; i++) {
       isValid = isValid && !!REQUIRED_ELEMENTS[i].value;
     }
@@ -197,7 +201,7 @@ export class Skills extends HTMLElement {
       e.preventDefault();
       this.submitEditSkill(skill_id);
     }
-  }
+  };
 
   submitEditSkill = (skill_id) => {
     const SECTION = this.shadowRoot.querySelector(`#skill${skill_id}`);
@@ -207,7 +211,7 @@ export class Skills extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -242,13 +246,13 @@ export class Skills extends HTMLElement {
         this.cancelEditSkill(skill_id);
         this.addSkill(data.data.updateSkill.skill, SECTION);
       });
-  }
+  };
 
   cancelEditSkill = (skill_id) => {
     const SELECT = this.shadowRoot.querySelector(`#skill${skill_id}`);
     SELECT.querySelector("form").remove();
     SELECT.querySelector("article").style = "display:block";
-  }
+  };
 
   deleteSkillButton = (root, skill_id) => {
     const SPAN = document.createElement("span");
@@ -258,29 +262,29 @@ export class Skills extends HTMLElement {
       top: 0;
       right: 0;
       margin: 16px;
-    `
+    `;
 
-    SPAN.addEventListener("click", e => {
-     this.deleteSkill( skill_id); 
+    SPAN.addEventListener("click", (e) => {
+      this.deleteSkill(skill_id);
     });
-    root.append(SPAN)
-  }
+    root.append(SPAN);
+  };
 
   deleteSkill = (skill_id) => {
-    confirmPopup(document.body, "Delete Skill?", choice => {
-      if(choice){
+    confirmPopup(document.body, "Delete Skill?", (choice) => {
+      if (choice) {
         this.submitDeleteSkill(skill_id);
       }
-    })
-  }
+    });
+  };
 
   submitDeleteSkill = (skill_id) => {
     fetch("/graphql", {
-      method:"POST", 
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer "+ localStorage.getItem("accessToken")
-      }, 
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
       body: JSON.stringify({
         query: `
           mutation DeleteSkill($skill_id: ID) {
@@ -288,19 +292,22 @@ export class Skills extends HTMLElement {
               ok
             }
           }
-        `, variables: {
-          "skill_id": skill_id 
-        }
-      })
-    }).then(response => {
-      return response.json()
-    }).then(data => {
-      if(data.errors){
-        throw new Error("Error removing skill")
-      }
-      this.shadowRoot.querySelector(`#skill${skill_id}`).remove()
+        `,
+        variables: {
+          skill_id: skill_id,
+        },
+      }),
     })
-  }
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        if (data.errors) {
+          throw new Error("Error removing skill");
+        }
+        this.shadowRoot.querySelector(`#skill${skill_id}`).remove();
+      });
+  };
 
   getSkillsData = (username, callback) => {
     fetch("/graphql", {
@@ -355,7 +362,15 @@ export class Skills extends HTMLElement {
     }
   };
 
-  displayCreateSkill = (root, BUTTON, onSubmit, onCancel, title, description, reference) => {
+  displayCreateSkill = (
+    root,
+    BUTTON,
+    onSubmit,
+    onCancel,
+    title,
+    description,
+    reference
+  ) => {
     const BUTTON_add_skill = BUTTON; //BUTTON
 
     const FORM_createSkill = document.createElement("form");
@@ -370,7 +385,7 @@ export class Skills extends HTMLElement {
     INPUT_title.setAttribute("name", "skill_title");
     INPUT_title.setAttribute("placeholder", "Title ...");
     INPUT_title.required = true;
-    INPUT_title.value = title ? title: "";
+    INPUT_title.value = title ? title : "";
 
     P_title.append(LABEL_title, INPUT_title, "*");
     FORM_createSkill.append(P_title);
@@ -417,8 +432,8 @@ export class Skills extends HTMLElement {
     BUTTON_cancel.addEventListener("click", onCancel); // onCancel
     P_submit.append(BUTTON_cancel, INPUT_submit);
     FORM_createSkill.append(P_submit);
-    
-    if(BUTTON != null){
+
+    if (BUTTON != null) {
       BUTTON_add_skill.disabled = true;
       root.insertBefore(FORM_createSkill, BUTTON_add_skill); // Root
     } else {
@@ -431,7 +446,12 @@ export class Skills extends HTMLElement {
     BUTTON_addSkill.innerText = "Add skill";
     BUTTON_addSkill.setAttribute("id", "add_skill");
     BUTTON_addSkill.addEventListener("click", () => {
-      this.displayCreateSkill(this.shadowRoot, BUTTON_addSkill, this.handleCreateSkill, this.concealCreateSkill)
+      this.displayCreateSkill(
+        this.shadowRoot,
+        BUTTON_addSkill,
+        this.handleCreateSkill,
+        this.concealCreateSkill
+      );
     });
 
     this.shadowRoot.append(BUTTON_addSkill);
@@ -446,7 +466,7 @@ export class Skills extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + localStorage.getItem("accessToken")
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -478,7 +498,7 @@ export class Skills extends HTMLElement {
         }
       })
       .then((data) => {
-        this.concealCreateSkill()
+        this.concealCreateSkill();
         this.addSkill(data.data.createSkill.skill);
       });
   };
@@ -488,7 +508,9 @@ export class Skills extends HTMLElement {
     if (username) {
       this.getSkillsData(username, (data) => {
         this.displaySkills(data.data.staff[0].skills.edges);
-        this.addCreateSkillButton();
+        if (logged_in(this)) {
+          this.addCreateSkillButton();
+        }
       });
     }
   }

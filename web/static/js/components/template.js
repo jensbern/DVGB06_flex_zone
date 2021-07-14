@@ -4,7 +4,12 @@ baseTemplate.innerHTML = `
     @import url("/stylesheet/normalize.css");
   </style>
 `
-
+const logged_in = (root) => {
+  return (
+      root.getAttribute("username") &&
+      root.getAttribute("username") === root.getAttribute("logged_in_as")
+    )
+}
 const confirmPopup = (root, text, callback) => {
   const DIV_container = document.createElement("div");
   DIV_container.style = `
@@ -77,4 +82,4 @@ const confirmPopup = (root, text, callback) => {
 
 
 
-export {baseTemplate, confirmPopup};
+export {baseTemplate, confirmPopup, logged_in};
