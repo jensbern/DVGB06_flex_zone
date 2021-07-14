@@ -113,8 +113,9 @@ export class Experiences extends HTMLElement {
       const SECTION = document.createElement("section");
       SECTION.setAttribute("id", `experience${experiences[i].node.uuid}`);
       const ARTIClE = document.createElement("article");
+  
       if (logged_in(this)) {
-        this.settingsButton(ARTIClE, experience);
+        this.settingsButton(ARTIClE, experiences[i].node);
       }
       const H3_name = document.createElement("h3");
       H3_name.innerText = experiences[i].node.type;

@@ -413,11 +413,12 @@ export class CreateUser extends HTMLElement {
           INPUT_username.focus();
           this.addToolTip(INPUT_username, "Username already taken");
         } else {
+
           localStorage.setItem(
             "accessToken",
             data.data.createStaff.accessToken
           );
-          document.cookie = `access_token_cookie=${data.data.loginUser.accessToken}`;
+          document.cookie = `access_token_cookie=${data.data.createStaff.accessToken}`;
           window.location = `/user/${data.data.createStaff.staff.username}`;
         }
       });
