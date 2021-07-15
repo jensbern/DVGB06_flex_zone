@@ -7,7 +7,57 @@ export class Login extends HTMLElement {
     this.shadowRoot.append(baseTemplate.content.cloneNode(true));
     const STYLE = document.createElement("style");
     STYLE.innerText = `
+      article {
+        border: 1px solid darkgrey;
+        padding: 16px;
+        margin-bottom: 8px;
+        background-color: #fff;
+        position:relative;
+      }
+      h3 {
+        padding-top: 8px;
+        font-size: 1.4em;
+      }
+      p{
+        padding: 8px 0;
+        font-size: 1.2em;
+      }
+      a {
+        font-size: 1.1em;
+      }
+      form {
+        margin: 8px;
+        padding: 8px;
+        background-color: rgb(252, 252, 252);
+        border: 1px solid lightgrey;
+      }
+      input[type="text"], input[type="password"]{
+        
+        margin: 8px;
+        padding: 8px;
+        border: 1px solid darkgrey;
+        font-size: 1.1em;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        }
+        
+      form button, form input[type="submit"] {
+        margin: 8px;
+        padding: 8px;
+        font-size: 1.05em;
+        background-color: white;
+        cursor: pointer;
+        border: 1px solid darkgrey;
+      }
+      form button:hover, form input[type="submit"]:hover{
+        background-color: rgb(250,250,250);
+        box-shadow:  3px 3px 2px rgb(240,240,240);
 
+      }
+      label{
+        margin: 8px;
+        margin-right: 0px;
+        padding: 8px;
+      }
     `;
     this.shadowRoot.append(STYLE);
   }
