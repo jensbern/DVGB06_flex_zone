@@ -122,9 +122,6 @@ export class Search extends HTMLElement {
   search = () => {
     const FORM = this.shadowRoot.querySelector("form");
     const formData = new FormData(FORM)
-    for(let [key, val] of formData){
-      console.log(key, val);
-    }
     fetch("/graphql", {
       method: "POST",
       headers: {
@@ -169,7 +166,6 @@ export class Search extends HTMLElement {
         return resp.json();
       })
       .then((data) => {
-        console.log(data);
         this.displaySearchData(data.data.search);
       });
     }
@@ -177,6 +173,13 @@ export class Search extends HTMLElement {
   displaySearchData = (data) => {
     const SECTION_search = this.shadowRoot.querySelector("#search_result");
     SECTION_search.innerHTML = "";
+    if(!data.length){
+      const H3_error = document.createElement("h3");
+      H3_error.innerText = "No result found";
+      SECTION_search.append(H3_error);
+      return;
+    }
+    
     var currentType = "";
     var ARTICLE_current = document.createElement("article");
     for(let i = 0; i < data.length; i++){
@@ -189,11 +192,10 @@ export class Search extends HTMLElement {
         H3_type.innerText = currentType;
         ARTICLE_current.append(H3_type);
         ARTICLE_current.append(this.createSearchDataElement(data[i]));
-        console.log(currentType, ARTICLE_current);
+        
         SECTION_search.append(ARTICLE_current);
       }
     }
-    console.log(SECTION_search)
   }
 
   createSearchDataElement = (data) => {
