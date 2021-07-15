@@ -1,7 +1,7 @@
 from db.models import db_session, Staff, Staff_password, Skill, Experience
 # from flask import jsonify
 from bcrypt import gensalt, hashpw, checkpw
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token
 
 def check_password(staff_uuid, password) -> bool:
     # print(username)
@@ -25,7 +25,8 @@ def login(username, password):
     # print(s.username, s_pw.password)
     if checkpw(password.encode(), s_pw.password):
         access_token = create_access_token(identity=username)
-        return {"access_token":access_token}
+        refresh_token = create_refresh_token(identity=username)
+        return {"access_token":access_token, "refresh_token":refresh_token}
     else:
         return {"msg": "Bad username or password"}
 
@@ -50,7 +51,8 @@ def create_staff(name, contact_info, contact_type, username, password):
     db_session.add(staff_password)    
     db_session.commit()
     access_token = create_access_token(identity=username)
-    return access_token
+    refresh_token = create_refresh_token(identity=username)
+    return {"access_token":access_token, "refresh_token":refresh_token}
 
 
 def create_skill(staff_username, name, description, reference):

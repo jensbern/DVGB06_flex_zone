@@ -95,36 +95,54 @@ export class Login extends HTMLElement {
     const formData = new FormData(FORM);
     fetch("/graphql", {
       method: "POST",
-      headers:{
+      headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         query: `
         mutation login($username: String!, $password: String!) {
           loginUser(username: $username, password: $password) {
-            resp {
+            tokens {
               accessToken
-              msg
+              refreshToken
             }
+            msg
           }
         }`,
         variables: {
-          "username": formData.get("username"),
-          "password": formData.get("password")
-        }
-      })
-    }).then(resp => {
-      return resp.json()
-    }).then(data => {
-      if(data.data.loginUser.resp.msg){
-        this.addToolTip(this.shadowRoot.querySelector('form button'), data.data.loginUser.resp.msg)
-      }else {
-        // document.cookie = `accessToken=${}`;
-        localStorage.setItem("accessToken", data.data.loginUser.resp.accessToken)
-        document.cookie = `access_token_cookie=${data.data.loginUser.resp.accessToken}`;
-        window.location = `/user/${formData.get("username")}`
-      }
+          username: formData.get("username"),
+          password: formData.get("password"),
+        },
+      }),
     })
+      .then((resp) => {
+        return resp.json();
+      })
+      .then((data) => {
+        console.log(data);
+        if (data.data.loginUser.msg) {
+          this.addToolTip(
+            this.shadowRoot.querySelector("form button"),
+            data.data.loginUser.msg
+          );
+        } else {
+          // document.cookie = `accessToken=${}`;
+          sessionStorage.setItem(
+            "accessToken",
+            data.data.loginUser.tokens.accessToken
+          );
+          localStorage.setItem(
+            "refreshToken",
+            data.data.loginUser.tokens.refreshToken
+          );
+          let d = new Date();
+          d.setTime(d.getTime() + 60 * 60 * 1000); // set expiration to 1h
+          document.cookie = `access_token_cookie=${
+            data.data.loginUser.tokens.accessToken
+          }; expires=${d.toUTCString()}; path=/`;
+          window.location = `/user/${formData.get("username")}`;
+        }
+      });
   }
 
   handleCancel = (e) => {

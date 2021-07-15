@@ -50,7 +50,9 @@ export class HeaderLogin extends HTMLElement {
     }
     `;
     this.shadowRoot.append(STYLE);
-    
+    if(sessionStorage.getItem("accessToken")){
+      this.refreshAccessToken()
+    }
   }
 
   createDropdownButton = (logged_in_as) => {
@@ -112,9 +114,9 @@ export class HeaderLogin extends HTMLElement {
   }
 
   logoutAccount = () => {
-    localStorage.removeItem("accessToken");
+    sessionStorage.removeItem("accessToken");
     document.cookie =
-      "access_token_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; 
+      "access_token_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     window.location = "/"
   }
 
@@ -122,7 +124,6 @@ export class HeaderLogin extends HTMLElement {
   addToolTip = (DOM, text) => {
     const TOOLTIP = document.createElement("div");
     const DOM_rect = DOM.getBoundingClientRect();
-    console.log(DOM_rect, DOM_rect.x, DOM_rect.y);
     TOOLTIP.innerText = text;
     TOOLTIP.style = `
       background-color: #fd6b6b;
@@ -140,6 +141,24 @@ export class HeaderLogin extends HTMLElement {
     };
     DOM.addEventListener("keyup", keyup_func);
   };
+
+  refreshAccessToken = () => {
+    fetch("/refresh", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("refreshToken")
+      }
+    }).then(resp => {
+      return resp.json()
+    }).then(data => {
+      let d = new Date();
+      d.setTime(d.getTime() + 60*60*1000) // set expiration to 1h
+      document.cookie = `access_token_cookie=${data.access_token}; expires=${d.toUTCString()}; path=/`;
+      sessionStorage.setItem("accessToken", data.access_token)
+
+    })
+  }
   connectedCallback() {
     if (
       this.getAttribute("logged_in_as") &&

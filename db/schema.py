@@ -33,6 +33,26 @@ class SearchResult(graphene.Union):
   class Meta:
     types = (Staff, Experience, Skill)
 
+class Tokens(graphene.ObjectType):
+  access_token=graphene.String()
+  refresh_token=graphene.String()
+
+
+class Login(graphene.Mutation):
+  class Arguments:
+    username = graphene.String(required=True)
+    password = graphene.String(required=True)
+
+  tokens = graphene.Field(lambda: Tokens)
+  msg = graphene.String()
+
+  def mutate(root, _, username, password):
+    resp = login(username, password)
+    if resp.get("msg"):
+      return Login(msg=resp["msg"], tokens=None)
+    else:
+      return Login(msg=None, tokens=resp)
+
 class CreateStaff(graphene.Mutation):
   class Arguments:
     name = graphene.String()
@@ -42,15 +62,15 @@ class CreateStaff(graphene.Mutation):
     password = graphene.String()
   
   ok = graphene.Boolean()
-  access_token = graphene.String()
+  tokens = graphene.Field(lambda: Tokens)
   staff = graphene.Field(lambda: Staff)
 
   def mutate(root, info, name, contact_info, contact_type, username, password):
     staff = Staff(name=name, contact_info=contact_info, contact_type=contact_type, username=username)
-    accessToken = create_staff(name, contact_info, contact_type, username, password)
+    tokens = create_staff(name, contact_info, contact_type, username, password)
 
     ok = True
-    return CreateStaff(staff=staff, ok=ok, access_token=accessToken)
+    return CreateStaff(staff=staff, ok=ok, tokens=tokens)
 
 class CreateSkill(graphene.Mutation):
   class Arguments:
@@ -232,21 +252,6 @@ mutation UpdateSkill {
 }
 """
 
-
-class LoginResponse(graphene.ObjectType):
-  msg=graphene.String()
-  access_token=graphene.String()
-class Login(graphene.Mutation):
-
-  class Arguments:
-    username=graphene.String(required=True)
-    password=graphene.String(required=True)
-
-  resp = graphene.Field(lambda: LoginResponse)
-
-  def mutate(root, _, username, password):
-    resp = login(username, password)
-    return Login(resp=resp)
 
 class Mutations(graphene.ObjectType):
   create_staff=CreateStaff.Field()

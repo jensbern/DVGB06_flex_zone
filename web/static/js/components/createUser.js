@@ -382,7 +382,10 @@ export class CreateUser extends HTMLElement {
           mutation CreateStaff($contact_info: String, $contact_type: String, $password: String, $username: String, $name: String) {
             createStaff(contactInfo: $contact_info, contactType: $contact_type, password: $password, username: $username, name: $name) {
               ok
-              accessToken
+              tokens{
+                accessToken
+                refreshToken
+              }
               staff {
                 username
               }
@@ -413,12 +416,19 @@ export class CreateUser extends HTMLElement {
           INPUT_username.focus();
           this.addToolTip(INPUT_username, "Username already taken");
         } else {
-
-          localStorage.setItem(
+          sessionStorage.setItem(
             "accessToken",
             data.data.createStaff.accessToken
           );
-          document.cookie = `access_token_cookie=${data.data.createStaff.accessToken}`;
+          localStorage.setItem(
+            "refreshToken",
+            data.data.createStaff.refreshToken
+          );
+          let d = new Date();
+          d.setTime(d.getTime() + 60 * 60 * 1000); // set expiration to 1h
+          document.cookie = `access_token_cookie=${
+            data.data.createStaff.tokens.accessToken
+          }; expires=${d.toUTCString()}; path=/`;
           window.location = `/user/${data.data.createStaff.staff.username}`;
         }
       });
@@ -433,7 +443,7 @@ export class CreateUser extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -466,7 +476,6 @@ export class CreateUser extends HTMLElement {
           INPUT_username.focus();
           this.addToolTip(INPUT_username, "Username already taken");
         } else {
-          console.log(data.data.updateStaff.staff.username);
           window.location = `/edituser/${data.data.updateStaff.staff.username}`;
         }
       });
@@ -499,7 +508,7 @@ export class CreateUser extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -589,7 +598,7 @@ export class CreateUser extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -614,7 +623,8 @@ export class CreateUser extends HTMLElement {
         if (data.errors) {
           console.log("Error while deleting");
         } else {
-          localStorage.removeItem("accessToken");
+          sessionStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
           document.cookie =
             "access_token_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
           window.location = `/`;
