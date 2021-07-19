@@ -1,12 +1,30 @@
-from db.models import engine, db_session, Base, Skill, Staff, Experience, Staff_password
+from db.models import (
+    engine,
+    db_session,
+    Base,
+    Skill,
+    Staff,
+    Experience,
+    Staff_password,
+    Reference,
+)
 from datetime import datetime
 import bcrypt
 
 Base.metadata.create_all(bind=engine)
 
-staff1 = Staff(name="Pelle", contact_info="pelle#1234", contact_type="discord", username="pelle123")
-staff2 = Staff(name="Lisa", contact_info="1234-5678-90", contact_type="phone", username="lisa123")
-staff3 = Staff(name="Jonas", contact_info="jonas@mail.com", contact_type="email", username="jonas@mail.com")
+staff1 = Staff(
+    name="Pelle", contact_info="pelle#1234", contact_type="discord", username="pelle123"
+)
+staff2 = Staff(
+    name="Lisa", contact_info="1234-5678-90", contact_type="phone", username="lisa123"
+)
+staff3 = Staff(
+    name="Jonas",
+    contact_info="jonas@mail.com",
+    contact_type="email",
+    username="jonas@mail.com",
+)
 db_session.add(staff1)
 db_session.add(staff2)
 db_session.add(staff3)
@@ -27,16 +45,105 @@ db_session.add(password1)
 db_session.add(password2)
 db_session.add(password3)
 
-skill1 = Skill(staff=staff1, name="Pick Ban", description="Good at analyzing och doing pick ban", reference="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-skill2 = Skill(staff=staff1, name="Top lane matchups", description="Good at top lane matchups, tanks", reference="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-skill3 = Skill(staff=staff2, name="Pick Ban", description="Good att analyzing och doing pick ban", reference="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+skill1 = Skill(
+    staff=staff1,
+    name="Pick Ban",
+    description="Good at analyzing och doing pick ban",
+)
+
+ref1 = Reference(ref_type="link", link="https://www.google.com/")
+ref2 = Reference(ref_type="link", link="https://www.twitch.com/")
+ref3 = Reference(ref_type="user", link="test")
+
+skill1.references.append(ref1)
+skill1.references.append(ref2)
+skill1.references.append(ref3)
+
+db_session.add(ref1)
+db_session.add(ref2)
+db_session.add(ref3)
+
+skill2 = Skill(
+    staff=staff1,
+    name="Top lane matchups",
+    description="Good at top lane matchups, tanks",
+)
+ref1 = Reference(ref_type="link", link="https://www.google.com/")
+ref3 = Reference(ref_type="user", link="test")
+
+skill2.references.append(ref1)
+skill2.references.append(ref3)
+
+db_session.add(ref1)
+db_session.add(ref3)
+
+skill3 = Skill(
+    staff=staff2,
+    name="Pick Ban",
+    description="Good att analyzing och doing pick ban",
+)
+
+ref1 = Reference(ref_type="link", link="https://www.google.com/")
+
+skill3.references.append(ref1)
+
+db_session.add(ref1)
+
 db_session.add(skill1)
 db_session.add(skill2)
 db_session.add(skill3)
 
-experience1 = Experience(type="Coach", description="Head coach, focus in team morale", at="Pepega Gaming", reference="1234-5678-90", start=datetime(2020, 1, 1), end=datetime(2021, 1, 1), staff=staff2)
-experience2 = Experience(type="Analyst", description="Analyst, focus on LPL", at="Pepega Gaming", reference="1234-5678-90", start=datetime(2020, 1, 1), end=datetime(2021, 1, 1), staff=staff3)
-experience3 = Experience(type="Assistant coach", description="Assistant coach, focus one to one relationships", at="Pepega Gaming", reference="1234-5678-90", start=datetime(2021, 1, 1), staff=staff1)
+experience1 = Experience(
+    type="Coach",
+    description="Head coach, focus in team morale",
+    at="Pepega Gaming",
+    start=datetime(2020, 1, 1),
+    end=datetime(2021, 1, 1),
+    staff=staff2,
+)
+
+ref1 = Reference(ref_type="link", link="https://www.google.com/")
+ref2 = Reference(ref_type="link", link="https://www.twitch.com/")
+ref3 = Reference(ref_type="user", link="test")
+experience1.references.append(ref1)
+experience1.references.append(ref2)
+experience1.references.append(ref3)
+
+db_session.add(ref1)
+db_session.add(ref2)
+db_session.add(ref3)
+
+experience2 = Experience(
+    type="Analyst",
+    description="Analyst, focus on LPL",
+    at="Pepega Gaming",
+    start=datetime(2020, 1, 1),
+    end=datetime(2021, 1, 1),
+    staff=staff3,
+)
+
+
+ref1 = Reference(ref_type="link", link="https://www.google.com/")
+ref2 = Reference(ref_type="user", link="test")
+experience2.references.append(ref1)
+experience2.references.append(ref2)
+
+db_session.add(ref1)
+db_session.add(ref2)
+
+experience3 = Experience(
+    type="Assistant coach",
+    description="Assistant coach, focus one to one relationships",
+    at="Pepega Gaming",
+    start=datetime(2021, 1, 1),
+    staff=staff1,
+)
+
+
+ref1 = Reference(ref_type="link", link="https://www.google.com/")
+experience3.references.append(ref1)
+
+db_session.add(ref1)
 
 db_session.add(experience1)
 db_session.add(experience2)
