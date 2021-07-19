@@ -1,4 +1,5 @@
-from db.models import db_session, Staff, Staff_password, Skill, Experience
+from graphene.relay.node import Node
+from db.models import Reference, db_session, Staff, Staff_password, Skill, Experience
 # from flask import jsonify
 from bcrypt import gensalt, hashpw, checkpw
 from flask_jwt_extended import create_access_token, create_refresh_token
@@ -71,6 +72,19 @@ def create_experience(staff_username, exp_type, description, at, reference, star
     db_session.refresh(experience)
     return experience.uuid, staff
 
+def create_reference(for_id, for_type, type, link):
+    reference = Reference(ref_type=type, link=link)
+    if for_type == "experience":
+        ref_for = Experience.query.filter(Experience.uuid == for_id).first()
+    
+    elif for_type == "skill":
+        ref_for = Skill.query.filter(Skill.uuid == for_id).first()
+    ref_for.references.append(reference)
+    db_session.add(reference)
+    db_session.commit()
+    db_session.refresh(reference)
+    return reference
+
 def delete_staff(username):
     staff = Staff.query.filter(Staff.username == username).first()
     db_session.delete(staff)
@@ -85,6 +99,11 @@ def delete_experience(experience_id):
 def delete_skill(skill_id):
     skill = Skill.query.filter(Skill.uuid == skill_id).first()
     db_session.delete(skill)
+    db_session.commit()
+
+def delete_reference(reference_id):
+    reference = Reference.query.filter(Reference.uuid == reference_id).first()
+    db_session.delete(reference)
     db_session.commit()
 
 def update_staff(current_username, name, new_username, contact_type, contact_info):
@@ -142,3 +161,15 @@ def update_skill(skill_id, name, description, reference):
     skill_db.update(skill_update, synchronize_session="fetch")
     db_session.commit()
     return skill
+
+def update_reference(ref_id, type, link):
+    reference_update = {}
+    if type != None:
+        reference_update[Reference.ref_type] = type
+    elif link != None:
+        reference_update[Reference.link] = link
+    reference_db = Reference.query.filter(Reference.uuid == ref_id)
+    reference = reference_db.first()
+    reference_db.update(reference_update, synchronize_session="fetch")
+    db_session.commit()
+    return reference
