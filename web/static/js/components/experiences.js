@@ -141,9 +141,10 @@ export class Experiences extends HTMLElement {
       ARTIClE.append(P_duration);
 
       const A_reference = document.createElement("a");
-      A_reference.setAttribute("href", experiences[i].node.reference);
-      A_reference.setAttribute("target", "_blank");
-      A_reference.innerText = "Reference";
+      const REFERENCE = document.createElement("reference-element")
+      REFERENCE.setAttribute("for_id", experiences[i].node.uuid);
+      REFERENCE.setAttribute("for_type", "experience");
+      ARTIClE.append(REFERENCE);
       ARTIClE.append(A_reference);
       SECTION.append(ARTIClE);
       this.shadowRoot.append(SECTION);

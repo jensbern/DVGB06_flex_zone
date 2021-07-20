@@ -143,7 +143,7 @@ class CreateReference(graphene.Mutation):
     ok = graphene.Boolean()
     reference = graphene.Field(lambda: Reference)
 
-    @jwt_required()
+    # @jwt_required()
     def mutate(root, info, for_id, for_type, type, link):
         
         reference = create_reference(for_id, for_type, type, link)
@@ -358,9 +358,9 @@ class Query(graphene.ObjectType):
     search = graphene.List(SearchResult, q=graphene.String())
     staff = graphene.List(Staff, name=graphene.String(),
                           uuid=graphene.Int(), username=graphene.String())
-    skills = graphene.List(Skill, name=graphene.String())
+    skills = graphene.List(Skill, name=graphene.String(), id=graphene.ID())
     experiences = graphene.List(
-        Experience, experience_type=graphene.String(), at=graphene.String())
+        Experience, experience_type=graphene.String(), at=graphene.String(), id=graphene.ID())
     # Allows sorting over multiple columns, by default over the primary key
     all_staff = SQLAlchemyConnectionField(Staff.connection)
     all_experience = SQLAlchemyConnectionField(Experience.connection)
@@ -413,16 +413,26 @@ class Query(graphene.ObjectType):
 
     def resolve_skills(self, info, **args):
         name = args.get("name")
+        id = args.get("id")
         skill_query = Skill.get_query(info)
-        skills = skill_query.filter(SkillModel.name.contains(name)).all()
+        if id:
+            skills = skill_query.filter(SkillModel.uuid.contains(id)).all()
+        if name:
+            skills = skill_query.filter(SkillModel.name.contains(name)).all()
+            
         return skills
 
     def resolve_experiences(self, info, **args):
         experience_type = args.get("experience_type")
         at = args.get("at")
-
+        id = args.get("id")
         experience_query = Experience.get_query(info)
 
+        if id:
+            experiences = experience_query.filter(
+                ExperienceModel.uuid.contains(id)).all()
+            return experiences
+        
         if experience_type:
             experiences = experience_query.filter(
                 ExperienceModel.type.contains(experience_type)).all()
@@ -432,6 +442,7 @@ class Query(graphene.ObjectType):
             experiences = experience_query.filter(
                 ExperienceModel.at.contains(at)).all()
             return experiences
+        
 
 
 schema = graphene.Schema(query=Query, mutation=Mutations, types=[
