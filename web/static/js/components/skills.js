@@ -129,11 +129,11 @@ export class Skills extends HTMLElement {
     const P_description = document.createElement("p");
     P_description.innerText = skill.description;
     ARTIClE.append(P_description);
-    const A_reference = document.createElement("a");
-    A_reference.setAttribute("href", skill.reference);
-    A_reference.setAttribute("target", "_blank");
-    A_reference.innerText = "Reference";
-    ARTIClE.append(A_reference);
+    
+    const REFERENCE = document.createElement("reference-element")
+    REFERENCE.setAttribute("for_id", skill.uuid);
+    REFERENCE.setAttribute("for_type", "skill");
+    ARTIClE.append(REFERENCE);
     SECTION.append(ARTIClE);
     if (!root) {
       this.shadowRoot.insertBefore(
@@ -161,11 +161,10 @@ export class Skills extends HTMLElement {
       const P_description = document.createElement("p");
       P_description.innerText = skills[i].node.description;
       ARTIClE.append(P_description);
-      const A_reference = document.createElement("a");
-      A_reference.setAttribute("href", skills[i].node.reference);
-      A_reference.setAttribute("target", "_blank");
-      A_reference.innerText = "Reference";
-      ARTIClE.append(A_reference);
+      const REFERENCE = document.createElement("reference-element")
+      REFERENCE.setAttribute("for_id", skills[i].node.uuid);
+      REFERENCE.setAttribute("for_type", "skill");
+      ARTIClE.append(REFERENCE);
       SECTION.append(ARTIClE);
       this.shadowRoot.append(SECTION);
     }
@@ -185,7 +184,7 @@ export class Skills extends HTMLElement {
       },
       skill.name,
       skill.description,
-      skill.reference
+      skill.uuid
     );
   };
 
@@ -215,14 +214,13 @@ export class Skills extends HTMLElement {
       },
       body: JSON.stringify({
         query: `
-        mutation UpdateSkill($skill_id:ID!, $name: String, $description: String, $reference: String) {
-          updateSkill(skillId: $skill_id, name: $name, description: $description, reference: $reference) {
+        mutation UpdateSkill($skill_id:ID!, $name: String, $description: String) {
+          updateSkill(skillId: $skill_id, name: $name, description: $description) {
             ok
             skill {
               uuid
               name
               description
-              reference
             }
           }
         }
@@ -231,7 +229,6 @@ export class Skills extends HTMLElement {
           skill_id: skill_id,
           name: formData.get("skill_title"),
           description: formData.get("skill_description"),
-          reference: formData.get("skill_reference"),
         },
       }),
     })
@@ -325,7 +322,6 @@ export class Skills extends HTMLElement {
                   name
                   uuid
                   description
-                  reference
                 }
               }
             }
@@ -369,7 +365,7 @@ export class Skills extends HTMLElement {
     onCancel,
     title,
     description,
-    reference
+    uuid
   ) => {
     const BUTTON_add_skill = BUTTON; //BUTTON
 
@@ -404,23 +400,16 @@ export class Skills extends HTMLElement {
 
     P_description.append(LABEL_description, TEXTAREA_description);
     FORM_createSkill.append(P_description);
+    if(uuid){
+      const P_reference = document.createElement("p");
+      const REFERENCE = document.createElement("reference-element");
+      REFERENCE.setAttribute("for_id", uuid);
+      REFERENCE.setAttribute("for_type", "skill");
+      REFERENCE.setAttribute("edit", true);
+      P_reference.append(REFERENCE);
+      FORM_createSkill.append(P_reference);
 
-    const P_reference = document.createElement("p");
-    const LABEL_reference = document.createElement("label");
-    LABEL_reference.innerText = "Reference";
-    LABEL_reference.setAttribute("for", "skill_reference");
-    LABEL_reference.style = "display:none;";
-    const INPUT_reference = document.createElement("input");
-    INPUT_reference.setAttribute("type", "url");
-    INPUT_reference.setAttribute("id", "skill_reference");
-    INPUT_reference.setAttribute("name", "skill_reference");
-    INPUT_reference.setAttribute(
-      "placeholder",
-      "Reference URL (e.g. video, article, ...)"
-    );
-    INPUT_reference.value = reference ? reference : "";
-    P_reference.append(LABEL_reference, INPUT_reference);
-    FORM_createSkill.append(P_reference);
+    }
 
     const P_submit = document.createElement("p");
     const INPUT_submit = document.createElement("input");
@@ -470,14 +459,13 @@ export class Skills extends HTMLElement {
       },
       body: JSON.stringify({
         query: `
-          mutation CreateSkill($name:String, $description:String, $staff_username:String, $reference:String) {
-            createSkill(description: $description, name: $name, staffUsername: $staff_username, reference: $reference) {
+          mutation CreateSkill($name:String, $description:String, $staff_username:String) {
+            createSkill(description: $description, name: $name, staffUsername: $staff_username) {
               ok
               skill {
                 description
                 name
                 uuid
-                reference
               }
             }
           }
@@ -485,7 +473,6 @@ export class Skills extends HTMLElement {
         variables: {
           name: formData.get("skill_title"),
           description: formData.get("skill_description"),
-          reference: formData.get("skill_reference"),
           staff_username: username,
         },
       }),

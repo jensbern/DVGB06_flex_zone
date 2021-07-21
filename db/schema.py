@@ -136,14 +136,14 @@ class CreateExperience(graphene.Mutation):
 
 class CreateReference(graphene.Mutation):
     class Arguments:
-        for_id = graphene.Int(required=True)
+        for_id = graphene.ID(required=True)
         for_type = graphene.String(required=True)
         type = graphene.String(required=True)
         link = graphene.String(required=True)
     ok = graphene.Boolean()
     reference = graphene.Field(lambda: Reference)
 
-    # @jwt_required()
+    @jwt_required()
     def mutate(root, info, for_id, for_type, type, link):
         
         reference = create_reference(for_id, for_type, type, link)

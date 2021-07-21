@@ -113,7 +113,7 @@ export class Experiences extends HTMLElement {
       const SECTION = document.createElement("section");
       SECTION.setAttribute("id", `experience${experiences[i].node.uuid}`);
       const ARTIClE = document.createElement("article");
-  
+
       if (logged_in(this)) {
         this.settingsButton(ARTIClE, experiences[i].node);
       }
@@ -140,12 +140,10 @@ export class Experiences extends HTMLElement {
       P_duration.innerText = `${start} - ${end}`;
       ARTIClE.append(P_duration);
 
-      const A_reference = document.createElement("a");
-      const REFERENCE = document.createElement("reference-element")
+      const REFERENCE = document.createElement("reference-element");
       REFERENCE.setAttribute("for_id", experiences[i].node.uuid);
       REFERENCE.setAttribute("for_type", "experience");
       ARTIClE.append(REFERENCE);
-      ARTIClE.append(A_reference);
       SECTION.append(ARTIClE);
       this.shadowRoot.append(SECTION);
     }
@@ -182,11 +180,10 @@ export class Experiences extends HTMLElement {
     P_duration.innerText = `${start} - ${end}`;
     ARTIClE.append(P_duration);
 
-    const A_reference = document.createElement("a");
-    A_reference.setAttribute("href", experience.reference);
-    A_reference.setAttribute("target", "_blank");
-    A_reference.innerText = "Reference";
-    ARTIClE.append(A_reference);
+    const REFERENCE = document.createElement("reference-element");
+    REFERENCE.setAttribute("for_id", experience.uuid);
+    REFERENCE.setAttribute("for_type", "experience");
+    ARTIClE.append(REFERENCE);
     SECTION.append(ARTIClE);
     if (!root) {
       this.shadowRoot.insertBefore(
@@ -217,7 +214,6 @@ export class Experiences extends HTMLElement {
                     uuid
                     description
                     at
-                    reference
                     start
                     end
                   }
@@ -249,7 +245,7 @@ export class Experiences extends HTMLElement {
     description,
     start,
     end,
-    reference
+    uuid
   ) => {
     const BUTTON_create_experience = BUTTON;
 
@@ -260,7 +256,7 @@ export class Experiences extends HTMLElement {
     LABEL_type.setAttribute("for", "experience_type");
     LABEL_type.style = "display:none;";
     const SELECT_type = document.createElement("select");
-    SELECT_type.setAttribute("type", "text");
+    // SELECT_type.setAttribute("type", "text");
     SELECT_type.setAttribute("id", "experience_type");
     SELECT_type.setAttribute("name", "experience_type");
     SELECT_type.required = true;
@@ -339,22 +335,16 @@ export class Experiences extends HTMLElement {
     P_from_to.append(LABEL_from, INPUT_from, "*", LABEL_to, INPUT_to);
     FORM_createExperience.append(P_from_to);
 
-    const P_reference = document.createElement("p");
-    const LABEL_reference = document.createElement("label");
-    LABEL_reference.innerText = "Reference";
-    LABEL_reference.setAttribute("for", "experience_reference");
-    LABEL_reference.style = "display:none;";
-    const INPUT_reference = document.createElement("input");
-    INPUT_reference.setAttribute("type", "url");
-    INPUT_reference.setAttribute("id", "experience_reference");
-    INPUT_reference.setAttribute("name", "experience_reference");
-    INPUT_reference.setAttribute(
-      "placeholder",
-      "Reference URL (e.g. video, article, ...)"
-    );
-    INPUT_reference.value = reference ? reference : "";
-    P_reference.append(LABEL_reference, INPUT_reference);
-    FORM_createExperience.append(P_reference);
+    if (uuid){
+      const P_reference = document.createElement("p");
+      const REFERENCE = document.createElement("reference-element");
+      REFERENCE.setAttribute("for_id", uuid);
+      REFERENCE.setAttribute("for_type", "experience");
+      REFERENCE.setAttribute("edit", true);
+      P_reference.append(REFERENCE);
+      FORM_createExperience.append(P_reference);
+
+    }
 
     const P_submit = document.createElement("p");
     const INPUT_submit = document.createElement("input");
@@ -405,8 +395,8 @@ export class Experiences extends HTMLElement {
       },
       body: JSON.stringify({
         query: `
-        mutation CreateExperience($staff_username: String, $type: String, $description: String, $at: String, $reference: String, $start: Date, $end: Date) {
-          createExperience(staffUsername: $staff_username, expType: $type, description: $description, at: $at, reference: $reference, start: $start, end: $end) {
+        mutation CreateExperience($staff_username: String, $type: String, $description: String, $at: String, $start: Date, $end: Date) {
+          createExperience(staffUsername: $staff_username, expType: $type, description: $description, at: $at, start: $start, end: $end) {
             ok
             experience {
               uuid
@@ -415,7 +405,6 @@ export class Experiences extends HTMLElement {
               start
               end
               description
-              reference
             }
           }
         }
@@ -425,7 +414,6 @@ export class Experiences extends HTMLElement {
           type: formData.get("experience_type"),
           description: formData.get("experience_description"),
           at: formData.get("experience_at"),
-          reference: formData.get("experience_reference"),
           start: formData.get("experience_from"),
           end: formData.get("experience_to"),
         },
@@ -492,7 +480,7 @@ export class Experiences extends HTMLElement {
       experience.description,
       experience.start ? experience.start.split("T")[0] : "",
       experience.end ? experience.end.split("T")[0] : "",
-      experience.reference
+      experience.uuid
     );
   };
   checkEditExperience = (e, experience_id) => {
@@ -522,8 +510,8 @@ export class Experiences extends HTMLElement {
       },
       body: JSON.stringify({
         query: `
-        mutation UpdateExperience($experience_id:ID!, $type: String, $description: String, $at: String, $reference: String, $start: Date, $end: Date) {
-          updateExperience(experienceId: $experience_id, type: $type, description: $description, at: $at, reference: $reference, start: $start, end: $end) {
+        mutation UpdateExperience($experience_id:ID!, $type: String, $description: String, $at: String, $start: Date, $end: Date) {
+          updateExperience(experienceId: $experience_id, type: $type, description: $description, at: $at, start: $start, end: $end) {
             ok
             experience {
               uuid
@@ -532,7 +520,6 @@ export class Experiences extends HTMLElement {
               start
               end
               description
-              reference
             }
           }
         }
@@ -542,7 +529,6 @@ export class Experiences extends HTMLElement {
           type: formData.get("experience_type"),
           description: formData.get("experience_description"),
           at: formData.get("experience_at"),
-          reference: formData.get("experience_reference"),
           start: formData.get("experience_from"),
           end: formData.get("experience_to"),
         },
