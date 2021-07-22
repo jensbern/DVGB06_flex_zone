@@ -95,17 +95,16 @@ class CreateSkill(graphene.Mutation):
         staff_username = graphene.String()
         name = graphene.String()
         description = graphene.String()
-        reference = graphene.String()
 
     ok = graphene.Boolean()
     skill = graphene.Field(lambda: Skill)
 
     @jwt_required()
-    def mutate(root, info, staff_username, name, description, reference):
+    def mutate(root, info, staff_username, name, description):
         skill_id, staff = create_skill(
-            staff_username, name, description, reference)
+            staff_username, name, description,)
         skill = Skill(name=name, description=description,
-                      reference=reference, staff=staff)
+                       staff=staff)
         skill.uuid = skill_id
         ok = True
         return CreateSkill(skill=skill, ok=ok)
@@ -113,23 +112,22 @@ class CreateSkill(graphene.Mutation):
 
 class CreateExperience(graphene.Mutation):
     class Arguments:
-        staff_username = graphene.String()
-        exp_type = graphene.String()
-        at = graphene.String()
+        staff_username = graphene.String(required=True)
+        exp_type = graphene.String(required=True)
+        at = graphene.String(required=True)
         description = graphene.String()
-        reference = graphene.String()
-        start = graphene.Date()
+        start = graphene.Date(required=True)
         end = graphene.Date()
 
     ok = graphene.Boolean()
     experience = graphene.Field(lambda: Experience)
 
     @jwt_required()
-    def mutate(root, info, staff_username, exp_type, at, description, reference, start, end):
+    def mutate(root, info, staff_username, exp_type, at, start, description=None, end=None):
         experience_id, staff = create_experience(
-            staff_username, exp_type, description, at, reference, start, end)
+            staff_username, exp_type, description, at, start, end)
         experience = Experience(type=exp_type, description=description,
-                                at=at, reference=reference, start=start, end=end, staff=staff)
+                                at=at, start=start, end=end, staff=staff)
         experience.uuid = experience_id
         ok = True
         return CreateExperience(experience=experience, ok=ok)
@@ -266,7 +264,6 @@ class UpdateExperience(graphene.Mutation):
         type = graphene.String()
         description = graphene.String()
         at = graphene.String()
-        reference = graphene.String()
         start = graphene.Date()
         end = graphene.Date()
 
@@ -274,9 +271,9 @@ class UpdateExperience(graphene.Mutation):
     experience = graphene.Field(lambda: Experience)
 
     @jwt_required()
-    def mutate(root, info, experience_id, type=None, description=None, at=None, reference=None, start=None, end=None):
+    def mutate(root, info, experience_id, type=None, description=None, at=None,  start=None, end=None):
         experience = update_experience(
-            experience_id, type, description, at, reference, start, end)
+            experience_id, type, description, at,  start, end)
         ok = True
         return UpdateExperience(ok=ok, experience=experience)
 
@@ -298,13 +295,12 @@ class UpdateSkill(graphene.Mutation):
         skill_id = graphene.ID(required=True)
         name = graphene.String()
         description = graphene.String()
-        reference = graphene.String()
 
     ok = graphene.Boolean()
     skill = graphene.Field(lambda: Skill)
 
-    def mutate(root, info, skill_id, name=None, description=None, reference=None):
-        skill = update_skill(skill_id, name, description, reference)
+    def mutate(root, info, skill_id, name=None, description=None):
+        skill = update_skill(skill_id, name, description)
         ok = True
         return UpdateSkill(ok=ok, skill=skill)
 

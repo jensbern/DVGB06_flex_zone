@@ -56,17 +56,17 @@ def create_staff(name, contact_info, contact_type, username, password):
     return {"access_token":access_token, "refresh_token":refresh_token}
 
 
-def create_skill(staff_username, name, description, reference):
+def create_skill(staff_username, name, description):
     staff = Staff.query.filter(Staff.username == staff_username).first()
-    skill = Skill(name=name, description=description, reference=reference, staff=staff)
+    skill = Skill(name=name, description=description, staff=staff)
     db_session.add(skill)
     db_session.commit()
     db_session.refresh(skill)
     return skill.uuid, staff
 
-def create_experience(staff_username, exp_type, description, at, reference, start, end):
+def create_experience(staff_username, exp_type, description, at, start, end):
     staff = Staff.query.filter(Staff.username == staff_username).first()
-    experience = Experience(type=exp_type, description=description, at=at, reference=reference, start=start, end=end, staff=staff)
+    experience = Experience(type=exp_type, description=description, at=at, start=start, end=end, staff=staff)
     db_session.add(experience)
     db_session.commit()
     db_session.refresh(experience)
@@ -128,7 +128,7 @@ def update_staff_password(staff_uuid, new_password):
     sp.update({Staff_password.password:psw_hash}, synchronize_session=False)
     db_session.commit()
 
-def update_experience(experience_id, type, description, at, reference, start, end):
+def update_experience(experience_id, type, description, at,  start, end):
     experience_update = {}
     if type != None:
         experience_update[Experience.type] = type
@@ -136,8 +136,6 @@ def update_experience(experience_id, type, description, at, reference, start, en
         experience_update[Experience.description] = description
     if at != None:
         experience_update[Experience.at] = at
-    if reference != None:
-        experience_update[Experience.reference] = reference
     if start != None:
         experience_update[Experience.start] = start
     if end != None:
@@ -148,14 +146,13 @@ def update_experience(experience_id, type, description, at, reference, start, en
     db_session.commit()
     return experience    
 
-def update_skill(skill_id, name, description, reference):
+def update_skill(skill_id, name, description):
     skill_update={}
     if name != None:
         skill_update[Skill.name] = name
     if description != None:
         skill_update[Skill.description] = description
-    if reference != None:
-        skill_update[Skill.reference] = reference
+
     skill_db = Skill.query.filter(Skill.uuid == skill_id)
     skill = skill_db.first()
     skill_db.update(skill_update, synchronize_session="fetch")
@@ -166,7 +163,7 @@ def update_reference(ref_id, type, link):
     reference_update = {}
     if type != None:
         reference_update[Reference.ref_type] = type
-    elif link != None:
+    if link != None:
         reference_update[Reference.link] = link
     reference_db = Reference.query.filter(Reference.uuid == ref_id)
     reference = reference_db.first()
