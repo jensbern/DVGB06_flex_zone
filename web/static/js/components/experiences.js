@@ -143,6 +143,8 @@ export class Experiences extends HTMLElement {
       const REFERENCE = document.createElement("reference-element");
       REFERENCE.setAttribute("for_id", experiences[i].node.uuid);
       REFERENCE.setAttribute("for_type", "experience");
+      REFERENCE.setAttribute("username", this.getAttribute("username"));
+      REFERENCE.setAttribute("logged_in_as", this.getAttribute("logged_in_as"));
       ARTIClE.append(REFERENCE);
       SECTION.append(ARTIClE);
       this.shadowRoot.append(SECTION);
@@ -183,6 +185,8 @@ export class Experiences extends HTMLElement {
     const REFERENCE = document.createElement("reference-element");
     REFERENCE.setAttribute("for_id", experience.uuid);
     REFERENCE.setAttribute("for_type", "experience");
+    REFERENCE.setAttribute("username", this.getAttribute("username"));
+    REFERENCE.setAttribute("logged_in_as", this.getAttribute("logged_in_as"));
     ARTIClE.append(REFERENCE);
     SECTION.append(ARTIClE);
     if (!root) {
@@ -335,21 +339,16 @@ export class Experiences extends HTMLElement {
     P_from_to.append(LABEL_from, INPUT_from, "*", LABEL_to, INPUT_to);
     FORM_createExperience.append(P_from_to);
 
-    if (uuid){
-      const P_reference = document.createElement("p");
-      const REFERENCE = document.createElement("reference-element");
-      REFERENCE.setAttribute("for_id", uuid);
-      REFERENCE.setAttribute("for_type", "experience");
-      REFERENCE.setAttribute("edit", true);
-      P_reference.append(REFERENCE);
-      FORM_createExperience.append(P_reference);
-
-    }
-
     const P_submit = document.createElement("p");
     const INPUT_submit = document.createElement("input");
     INPUT_submit.setAttribute("type", "submit");
-    INPUT_submit.setAttribute("value", "Create Experience");
+    if (uuid) {
+      INPUT_submit.setAttribute("value", "Edit Experience");
+
+      INPUT_submit.setAttribute("id", `create_experience${uuid}`);
+    } else {
+      INPUT_submit.setAttribute("value", "Create Experience");
+    }
     INPUT_submit.addEventListener("click", onSubmit); //onSubmit
     const BUTTON_cancel = document.createElement("button");
     BUTTON_cancel.innerText = "Cancel";
@@ -367,6 +366,7 @@ export class Experiences extends HTMLElement {
 
   handleCancelCreateExperience = () => {
     this.shadowRoot.querySelector("#add_experience").disabled = false; //BUTTON
+
     this.shadowRoot.querySelector("form").remove();
   };
 
@@ -395,7 +395,7 @@ export class Experiences extends HTMLElement {
       },
       body: JSON.stringify({
         query: `
-        mutation CreateExperience($staff_username: String, $type: String, $description: String, $at: String, $start: Date, $end: Date) {
+        mutation CreateExperience($staff_username: String!, $type: String!, $description: String, $at: String!, $start: Date!, $end: Date) {
           createExperience(staffUsername: $staff_username, expType: $type, description: $description, at: $at, start: $start, end: $end) {
             ok
             experience {
@@ -415,18 +415,15 @@ export class Experiences extends HTMLElement {
           description: formData.get("experience_description"),
           at: formData.get("experience_at"),
           start: formData.get("experience_from"),
-          end: formData.get("experience_to"),
+          end: formData.get("experience_to") ? formData.get("experience_to") : null,
         },
       }),
     })
       .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Error");
-        }
+        return response.json();
       })
       .then((data) => {
+        console.log(data);
         this.handleCancelCreateExperience();
         this.addExperience(data.data.createExperience.experience);
       });
@@ -473,7 +470,7 @@ export class Experiences extends HTMLElement {
         this.checkEditExperience(e, experience.uuid);
       },
       (e) => {
-        this.cancelEditExperience(experience.uuid);
+        this.cancelEditExperience(experience.uuid, true);
       },
       experience.type,
       experience.at,
@@ -542,13 +539,14 @@ export class Experiences extends HTMLElement {
         }
       })
       .then((data) => {
-        this.cancelEditExperience(experience_id);
+        this.cancelEditExperience(experience_id, false);
         this.addExperience(data.data.updateExperience.experience, SECTION);
       });
   };
 
   cancelEditExperience = (experience_id) => {
     const SELECT = this.shadowRoot.querySelector(`#experience${experience_id}`);
+
     SELECT.querySelector("form").remove();
     SELECT.querySelector("article").style = "display:block";
   };

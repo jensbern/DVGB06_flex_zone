@@ -129,10 +129,12 @@ export class Skills extends HTMLElement {
     const P_description = document.createElement("p");
     P_description.innerText = skill.description;
     ARTIClE.append(P_description);
-    
-    const REFERENCE = document.createElement("reference-element")
+
+    const REFERENCE = document.createElement("reference-element");
     REFERENCE.setAttribute("for_id", skill.uuid);
     REFERENCE.setAttribute("for_type", "skill");
+    REFERENCE.setAttribute("username", this.getAttribute("username"));
+    REFERENCE.setAttribute("logged_in_as", this.getAttribute("logged_in_as"));
     ARTIClE.append(REFERENCE);
     SECTION.append(ARTIClE);
     if (!root) {
@@ -161,9 +163,11 @@ export class Skills extends HTMLElement {
       const P_description = document.createElement("p");
       P_description.innerText = skills[i].node.description;
       ARTIClE.append(P_description);
-      const REFERENCE = document.createElement("reference-element")
+      const REFERENCE = document.createElement("reference-element");
       REFERENCE.setAttribute("for_id", skills[i].node.uuid);
       REFERENCE.setAttribute("for_type", "skill");
+      REFERENCE.setAttribute("username", this.getAttribute("username"));
+      REFERENCE.setAttribute("logged_in_as", this.getAttribute("logged_in_as"));
       ARTIClE.append(REFERENCE);
       SECTION.append(ARTIClE);
       this.shadowRoot.append(SECTION);
@@ -400,21 +404,16 @@ export class Skills extends HTMLElement {
 
     P_description.append(LABEL_description, TEXTAREA_description);
     FORM_createSkill.append(P_description);
-    if(uuid){
-      const P_reference = document.createElement("p");
-      const REFERENCE = document.createElement("reference-element");
-      REFERENCE.setAttribute("for_id", uuid);
-      REFERENCE.setAttribute("for_type", "skill");
-      REFERENCE.setAttribute("edit", true);
-      P_reference.append(REFERENCE);
-      FORM_createSkill.append(P_reference);
-
-    }
 
     const P_submit = document.createElement("p");
     const INPUT_submit = document.createElement("input");
     INPUT_submit.setAttribute("type", "submit");
-    INPUT_submit.setAttribute("value", "Create Skill");
+    if (uuid) {
+      INPUT_submit.setAttribute("value", "Edit Skill");
+      INPUT_submit.setAttribute("id", `create_skill${uuid}`);
+    } else {
+      INPUT_submit.setAttribute("value", "Create Skill");
+    }
     INPUT_submit.addEventListener("click", onSubmit); // onSubmit
     const BUTTON_cancel = document.createElement("button");
     BUTTON_cancel.innerText = "Cancel";
