@@ -13,7 +13,7 @@ const logged_in = (root) => {
 const confirmPopup = (root, text, callback) => {
   const DIV_container = document.createElement("div");
   DIV_container.style = `
-    position: absolute;
+    position: fixed;
     width: 100%;
     height: 100vh;
     top:0;
