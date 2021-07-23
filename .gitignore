@@ -113,6 +113,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Powershell scripts
+init.ps1
 
 # DB
 create_data_password.py
