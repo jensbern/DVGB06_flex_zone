@@ -79,7 +79,7 @@ export class Reference extends HTMLElement {
       REFERENCES.append(LI);
     }
     this.shadowRoot.append(REFERENCES);
-    if (!this.getAttribute("edit")) {
+    if (logged_in(this)) {
       this.addReferenceButton(
         this.getAttribute("for_type"),
         this.getAttribute("for_id")
