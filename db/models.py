@@ -63,6 +63,7 @@ class Experience(Base):
         Reference,
         # backref=backref("references", uselist=True, cascade="delete,all"),
         secondary=experience_reference_association,
+        cascade="all, delete"
     )
     # reference = relationship(
     #     Reference, backref=backref("references", uselist=True, cascade="delete,all")
@@ -85,6 +86,7 @@ class Skill(Base):
         Reference,
         # backref=backref("references", uselist=True, cascade="delete,all"),
         secondary=skill_reference_association,
+        cascade="all, delete"
     )
     staff = relationship(
         Staff, backref=backref("skills", uselist=True, cascade="delete,all")
