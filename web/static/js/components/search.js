@@ -73,7 +73,7 @@ export class Search extends HTMLElement {
       }
       .search_forms{
         display:grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
       }
       .selected {
         border: 2px solid black;
