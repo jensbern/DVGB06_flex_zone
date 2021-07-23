@@ -372,7 +372,7 @@ class Query(graphene.ObjectType):
         staff = staff_query.filter(StaffModel.name.contains(
             q) | StaffModel.username.contains(q)).all()
         experiences = experience_query.filter(
-            ExperienceModel.type.contains(q) | ExperienceModel.description.contains(q)).all()
+            ExperienceModel.type.contains(q) | ExperienceModel.description.contains(q) |  ExperienceModel.at.contains(q)).all()
         skills = skill_query.filter(
             SkillModel.name.contains(q) | SkillModel.description.contains(q)).all()
         return staff + experiences + skills
@@ -414,7 +414,7 @@ class Query(graphene.ObjectType):
         if id:
             skills = skill_query.filter(SkillModel.uuid.contains(id)).all()
         if name:
-            skills = skill_query.filter(SkillModel.name.contains(name)).all()
+            skills = skill_query.filter(SkillModel.name.contains(name) | SkillModel.description.contains(name)).all()
             
         return skills
 
