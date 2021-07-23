@@ -18,6 +18,7 @@ export class Skills extends HTMLElement {
       h3 {
         padding-top: 8px;
         font-size: 1.4em;
+        text-transform: capitalize;
       }
 
       p{
