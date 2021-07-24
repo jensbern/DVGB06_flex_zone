@@ -5,7 +5,8 @@ import {CreateUser} from "./createUser.js";
 import {HeaderLogin} from "./headerLogin.js";
 import {Login} from "./login.js";
 import {Search} from "./search.js";
-import {Reference} from "./reference.js"
+import {Reference} from "./reference.js";
+import {Footer} from "./footer.js";
 
 customElements.define("experiences-element", Experiences);
 customElements.define("skills-element", Skills);
@@ -15,3 +16,4 @@ customElements.define("headerlogin-element", HeaderLogin);
 customElements.define("login-element", Login);
 customElements.define("search-element", Search);
 customElements.define("reference-element", Reference);
+customElements.define("footer-element", Footer);
