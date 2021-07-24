@@ -487,9 +487,9 @@ export class Reference extends HTMLElement {
         break;
 
       case "user":
-        INPUT_link.setAttribute("type", "tel");
+        INPUT_link.setAttribute("type", "text");
         INPUT_link.setAttribute("placeholder", "Username");
-
+        
         break;
 
       default:
