@@ -399,6 +399,11 @@ class Query(graphene.ObjectType):
             staff = staff_query.filter(StaffModel.uuid == staff_id).all()
             return staff
 
+        if name and username:
+            staff = staff_query.filter(StaffModel.name.startswith(
+                name) | StaffModel.username.startswith(name)).all()
+            return staff
+
         if username:
             staff = staff_query.filter(StaffModel.username == username).all()
             return staff
