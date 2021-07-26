@@ -418,11 +418,11 @@ export class CreateUser extends HTMLElement {
         } else {
           sessionStorage.setItem(
             "accessToken",
-            data.data.createStaff.accessToken
+            data.data.createStaff.tokens.accessToken
           );
           localStorage.setItem(
             "refreshToken",
-            data.data.createStaff.refreshToken
+            data.data.createStaff.tokens.refreshToken
           );
           let d = new Date();
           d.setTime(d.getTime() + 60 * 60 * 1000); // set expiration to 1h
@@ -530,7 +530,6 @@ export class CreateUser extends HTMLElement {
         return res.json();
       })
       .then((data) => {
-        console.log("Update password:", data.data.updatePassword.ok);
         if (data.data.updatePassword.ok) {
           this.shadowRoot.querySelector("#password_update_message").innerText =
             "Password update succesful!";
