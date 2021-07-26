@@ -70,6 +70,13 @@ export class HeaderLogin extends HTMLElement {
     
     const UL_dropdown = document.createElement("ul");
     if (logged_in_as && logged_in_as != "None") {
+      var LI_profile = document.createElement("li");
+      var A_profile = document.createElement("a")
+      A_profile.href = "/user/" + this.getAttribute("logged_in_as"); 
+      LI_profile.innerText = "Profile page";
+      A_profile.append(LI_profile);
+      UL_dropdown.append(A_profile);
+      
       var LI_option = document.createElement("li");
       var A_option = document.createElement("a");
 
