@@ -44,6 +44,29 @@ export class Reference extends HTMLElement {
         background-color: white;
       }
 
+      .suggested_users{
+        background-color: white;
+        border: 1px solid black;
+      }
+
+      .suggested_users p {
+        margin: 8px;
+        padding: 8px;
+        cursor: pointer;
+      }
+
+      .suggested_users p:hover{
+        background-color: rgb(250, 250, 250);
+      }
+
+      input + .suggested_users, button+.suggested_users{
+        display:none;
+      }
+
+      .user:focus + .suggested_users, .suggested_users:hover{
+        display:block;
+      }
+
       .edit{
         background-color: lightgray;
         border-radius: 8px;
@@ -58,6 +81,8 @@ export class Reference extends HTMLElement {
       }
     `;
     this.shadowRoot.append(STYLE);
+
+    this.suggested_users = [];
   }
 
   displayReferences = (data) => {
@@ -120,22 +145,22 @@ export class Reference extends HTMLElement {
       this.displayEditReference(e, data);
     });
     SPAN_edit.innerText = "Edit";
-    SPAN_edit.className = "edit"
+    SPAN_edit.className = "edit";
 
     const SPAN_delete = document.createElement("span");
     SPAN_delete.innerText = "Delete";
-    SPAN_delete.className = "delete"
+    SPAN_delete.className = "delete";
 
     SPAN_delete.addEventListener("click", (e) => {
       confirmPopup(document.body, "Delete Reference?", (choice) => {
-        if(choice){
+        if (choice) {
           this.deleteReference(data.uuid);
         }
-      })
-    })
+      });
+    });
 
-    LI.append(A)
-    if(logged_in(this)){
+    LI.append(A);
+    if (logged_in(this)) {
       LI.append(SPAN_edit, SPAN_delete);
     }
     return LI;
@@ -158,10 +183,15 @@ export class Reference extends HTMLElement {
     FORM.id = "edit_reference" + data.uuid;
     const SELECT_type = document.createElement("select");
     SELECT_type.required = true;
+
+    const keyupEvent = () => {
+      this.suggestUsersEvent(INPUT_link);
+    };
+
     SELECT_type.setAttribute("id", "reference_type" + data.uuid);
     SELECT_type.setAttribute("name", "reference_type" + data.uuid);
     const options = ["User", "Phone", "Email", "External link"];
-
+    
     for (let i = 0; i < options.length; i++) {
       var OPTION_type = document.createElement("option");
       if (options[i].toLowerCase() === data.refType) {
@@ -170,16 +200,25 @@ export class Reference extends HTMLElement {
       OPTION_type.innerText = options[i];
       OPTION_type.setAttribute("value", options[i].toLowerCase());
       // if (type == options[i].toLowerCase()) {
-      //   OPTION_type.selected = true;
-      // }
-      SELECT_type.append(OPTION_type);
-    }
-    const INPUT_link = document.createElement("input");
-    INPUT_link.setAttribute("id", "reference_link" + data.uuid);
-    INPUT_link.setAttribute("name", "reference_link" + data.uuid);
-    INPUT_link.value = data.link;
-    INPUT_link.required = true;
-
+        //   OPTION_type.selected = true;
+        // }
+        SELECT_type.append(OPTION_type);
+      }
+      const INPUT_link = document.createElement("input");
+      INPUT_link.setAttribute("id", "reference_link" + data.uuid);
+      INPUT_link.setAttribute("name", "reference_link" + data.uuid);
+      
+      if(data.refType === "user") {
+        INPUT_link.addEventListener("keyup", keyupEvent);
+        INPUT_link.classList.add("user")
+      }
+      INPUT_link.autocomplete = "off";
+      INPUT_link.value = data.link;
+      INPUT_link.required = true;
+      SELECT_type.addEventListener("change", (e) => {
+        this.handleTypeChange(e, INPUT_link, keyupEvent);
+      });
+      
     const BUTTON_cancel = document.createElement("button");
     BUTTON_cancel.innerText = "Cancel";
 
@@ -225,15 +264,15 @@ export class Reference extends HTMLElement {
         return response.json();
       })
       .then((data) => {
-        if(data.data.deleteReference.ok){
+        if (data.data.deleteReference.ok) {
           this.deleteDisplayedReference(uuid);
         }
       });
-  }
+  };
 
   deleteDisplayedReference = (uuid) => {
-    this.shadowRoot.querySelector(`#reference${uuid}`).remove()
-  }
+    this.shadowRoot.querySelector(`#reference${uuid}`).remove();
+  };
 
   editReference = (uuid) => {
     const FORM = this.shadowRoot.querySelector(`#edit_reference${uuid}`);
@@ -320,9 +359,39 @@ export class Reference extends HTMLElement {
         return response.json();
       })
       .then((data) => {
-        if (data.data.experiences) {
-          this.displayReferences(data.data.experiences[0].references);
+        if (!data.errors) {
+          if (data.data.experiences) {
+            this.displayReferences(data.data.experiences[0].references);
+          }
         }
+      });
+  };
+
+  getUsers = (search_string, callback) => {
+    fetch("/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+          query get_user($name: String) {
+            staff(name: $name, username: $name) {
+              name
+              username
+            }
+          }
+        `,
+        variables: {
+          name: search_string,
+        },
+      }),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        callback(data);
       });
   };
 
@@ -430,31 +499,41 @@ export class Reference extends HTMLElement {
     SELECT_type.required = true;
     SELECT_type.setAttribute("id", "reference_type");
     SELECT_type.setAttribute("name", "reference_type");
-    SELECT_type.addEventListener("change", this.handleTypeChange);
 
+    const keyupEvent = () => {
+      this.suggestUsersEvent(INPUT_link);
+    };
+
+    
     var OPTION_type = document.createElement("option");
     OPTION_type.innerText = "Select Type";
     OPTION_type.setAttribute("value", "");
     SELECT_type.append(OPTION_type);
     const options = ["User", "Phone", "Email", "External link"];
-
+    
     for (let i = 0; i < options.length; i++) {
       var OPTION_type = document.createElement("option");
       OPTION_type.innerText = options[i];
       OPTION_type.setAttribute("value", options[i].toLowerCase());
       // if (type == options[i].toLowerCase()) {
-      //   OPTION_type.selected = true;
-      // }
-      SELECT_type.append(OPTION_type);
-    }
-
-    const INPUT_link = document.createElement("input");
-    INPUT_link.setAttribute("id", "reference_link");
-    INPUT_link.setAttribute("name", "reference_link");
-    INPUT_link.setAttribute("placeholder", "link");
-    INPUT_link.required = true;
-    P_refrence.append(SELECT_type, INPUT_link, "*");
-    FORM.append(P_refrence);
+        //   OPTION_type.selected = true;
+        // }
+        SELECT_type.append(OPTION_type);
+      }
+      
+      const INPUT_link = document.createElement("input");
+      INPUT_link.setAttribute("id", "reference_link");
+      INPUT_link.setAttribute("name", "reference_link");
+      INPUT_link.setAttribute("placeholder", "link");
+      INPUT_link.autocomplete = "off";
+      
+      SELECT_type.addEventListener("change", (e) => {
+        this.handleTypeChange(e,INPUT_link , keyupEvent);
+      });
+      
+      INPUT_link.required = true;
+      P_refrence.append(SELECT_type, INPUT_link, "*");
+      FORM.append(P_refrence);
 
     const P_submit = document.createElement("p");
     const INPUT_submit = document.createElement("input");
@@ -473,28 +552,96 @@ export class Reference extends HTMLElement {
     this.shadowRoot.insertBefore(FORM, INSERT_BEFORE);
   };
 
-  handleTypeChange = (e) => {
-    const INPUT_link = this.shadowRoot.querySelector("#reference_link");
+  suggestUsersEvent = (INPUT) => {
+    if (!this.suggested_users.length && INPUT.value.length >= 1) {
+      this.getUsers(INPUT.value[0], (data) => {
+        this.suggested_users = data.data.staff;
+        var suggested_users = this.suggested_users.filter((e) => {
+          return (
+            e.name.toLowerCase().includes(INPUT.value) ||
+            e.username.toLowerCase().includes(INPUT.value)
+          );
+        });
+        this.displaySuggestUsers(suggested_users, INPUT);
+      });
+    } else if (INPUT.value.length == 0) {
+      this.suggested_users = [];
+      const OLD = INPUT.parentNode.querySelector("aside");
+      if (OLD) OLD.remove();
+    } else {
+      var suggested_users = this.suggested_users.filter((e) => {
+        return (
+          e.name.toLowerCase().includes(INPUT.value) ||
+          e.username.toLowerCase().includes(INPUT.value)
+        );
+      });
+
+      this.displaySuggestUsers(suggested_users, INPUT);
+    }
+  };
+
+  displaySuggestUsers = (suggested_users, INPUT) => {
+    const OLD = INPUT.parentNode.querySelector(".suggested_users");
+    if (OLD) OLD.remove();
+
+    const INPUT_rect = INPUT.getBoundingClientRect();
+    const ASIDE_users = document.createElement("aside");
+    ASIDE_users.classList.add("suggested_users")
+    ASIDE_users.style = `
+    position:absolute;
+    z-index:1;
+    // top: ${0}px;
+    left: ${INPUT_rect.width * 0.9}px; 
+    `;
+    for (let i = 0; i < suggested_users.length; i++) {
+      var P_user = document.createElement("p");
+      P_user.innerText = `${suggested_users[i].name}[${suggested_users[i].username}]`;
+      P_user.addEventListener("click", () => {
+        this.clickedSuggestedUser(suggested_users[i], ASIDE_users, INPUT);
+      });
+      ASIDE_users.append(P_user);
+    }
+
+    INPUT.parentNode.insertBefore(ASIDE_users, INPUT.nextSibling);
+  };
+
+  clickedSuggestedUser = (user, ASIDE, INPUT) => {
+    ASIDE.remove();
+    INPUT.value = user.username;
+  };
+
+  handleTypeChange = (e, INPUT_link, keyupEvent) => {
     switch (e.target.value) {
       case "email":
         INPUT_link.setAttribute("type", "email");
         INPUT_link.setAttribute("placeholder", "Email address");
+        INPUT_link.removeEventListener("keyup", keyupEvent);
+        INPUT_link.classList.remove("user");
+
         break;
 
       case "phone":
         INPUT_link.setAttribute("type", "tel");
         INPUT_link.setAttribute("placeholder", "Phone number");
+        INPUT_link.removeEventListener("keyup", keyupEvent);
+        INPUT_link.classList.remove("user");
+
         break;
 
       case "user":
         INPUT_link.setAttribute("type", "text");
         INPUT_link.setAttribute("placeholder", "Username");
-        
+        INPUT_link.classList.add("user");
+        INPUT_link.addEventListener("keyup", keyupEvent);
         break;
 
       default:
         INPUT_link.setAttribute("type", "text");
         INPUT_link.setAttribute("placeholder", "External link");
+        INPUT_link.classList.remove("user");
+
+        INPUT_link.removeEventListener("keyup", keyupEvent);
+
         break;
     }
   };
