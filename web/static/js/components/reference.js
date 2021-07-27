@@ -191,7 +191,7 @@ export class Reference extends HTMLElement {
     SELECT_type.setAttribute("id", "reference_type" + data.uuid);
     SELECT_type.setAttribute("name", "reference_type" + data.uuid);
     const options = ["User", "Phone", "Email", "External link"];
-    
+
     for (let i = 0; i < options.length; i++) {
       var OPTION_type = document.createElement("option");
       if (options[i].toLowerCase() === data.refType) {
@@ -200,25 +200,25 @@ export class Reference extends HTMLElement {
       OPTION_type.innerText = options[i];
       OPTION_type.setAttribute("value", options[i].toLowerCase());
       // if (type == options[i].toLowerCase()) {
-        //   OPTION_type.selected = true;
-        // }
-        SELECT_type.append(OPTION_type);
-      }
-      const INPUT_link = document.createElement("input");
-      INPUT_link.setAttribute("id", "reference_link" + data.uuid);
-      INPUT_link.setAttribute("name", "reference_link" + data.uuid);
-      
-      if(data.refType === "user") {
-        INPUT_link.addEventListener("keyup", keyupEvent);
-        INPUT_link.classList.add("user")
-      }
-      INPUT_link.autocomplete = "off";
-      INPUT_link.value = data.link;
-      INPUT_link.required = true;
-      SELECT_type.addEventListener("change", (e) => {
-        this.handleTypeChange(e, INPUT_link, keyupEvent);
-      });
-      
+      //   OPTION_type.selected = true;
+      // }
+      SELECT_type.append(OPTION_type);
+    }
+    const INPUT_link = document.createElement("input");
+    INPUT_link.setAttribute("id", "reference_link" + data.uuid);
+    INPUT_link.setAttribute("name", "reference_link" + data.uuid);
+
+    if (data.refType === "user") {
+      INPUT_link.addEventListener("keyup", keyupEvent);
+      INPUT_link.classList.add("user");
+    }
+    INPUT_link.autocomplete = "off";
+    INPUT_link.value = data.link;
+    INPUT_link.required = true;
+    SELECT_type.addEventListener("change", (e) => {
+      this.handleTypeChange(e, INPUT_link, keyupEvent);
+    });
+
     const BUTTON_cancel = document.createElement("button");
     BUTTON_cancel.innerText = "Cancel";
 
@@ -230,7 +230,7 @@ export class Reference extends HTMLElement {
     INPUT_submit.type = "submit";
     INPUT_submit.value = "Edit Reference";
     INPUT_submit.addEventListener("click", (e) => {
-      this.checkInputs(e, () => {
+      this.checkInputs(e, FORM, () => {
         this.editReference(data.uuid);
       });
     });
@@ -468,10 +468,19 @@ export class Reference extends HTMLElement {
       });
   };
 
-  checkInputs = (e, callback) => {
+ 
+
+  checkInputs = (e, FORM, callback) => {
     var isValid = true;
-    const REQUIRED_ELEMENTS = this.shadowRoot.querySelectorAll("[required]");
+    const REQUIRED_ELEMENTS = FORM.querySelectorAll("[required]");
     for (let i = 0; i < REQUIRED_ELEMENTS.length; i++) {
+      var type = REQUIRED_ELEMENTS[i].getAttribute("type");
+      switch (type) {
+        case "email":
+          const mail_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+          isValid = isValid && mail_regex.test(REQUIRED_ELEMENTS[i].value)
+          break;
+      }
       isValid = isValid && !!REQUIRED_ELEMENTS[i].value;
     }
     if (isValid) {
@@ -504,43 +513,42 @@ export class Reference extends HTMLElement {
       this.suggestUsersEvent(INPUT_link);
     };
 
-    
     var OPTION_type = document.createElement("option");
     OPTION_type.innerText = "Select Type";
     OPTION_type.setAttribute("value", "");
     SELECT_type.append(OPTION_type);
     const options = ["User", "Phone", "Email", "External link"];
-    
+
     for (let i = 0; i < options.length; i++) {
       var OPTION_type = document.createElement("option");
       OPTION_type.innerText = options[i];
       OPTION_type.setAttribute("value", options[i].toLowerCase());
       // if (type == options[i].toLowerCase()) {
-        //   OPTION_type.selected = true;
-        // }
-        SELECT_type.append(OPTION_type);
-      }
-      
-      const INPUT_link = document.createElement("input");
-      INPUT_link.setAttribute("id", "reference_link");
-      INPUT_link.setAttribute("name", "reference_link");
-      INPUT_link.setAttribute("placeholder", "link");
-      INPUT_link.autocomplete = "off";
-      
-      SELECT_type.addEventListener("change", (e) => {
-        this.handleTypeChange(e,INPUT_link , keyupEvent);
-      });
-      
-      INPUT_link.required = true;
-      P_refrence.append(SELECT_type, INPUT_link, "*");
-      FORM.append(P_refrence);
+      //   OPTION_type.selected = true;
+      // }
+      SELECT_type.append(OPTION_type);
+    }
+
+    const INPUT_link = document.createElement("input");
+    INPUT_link.setAttribute("id", "reference_link");
+    INPUT_link.setAttribute("name", "reference_link");
+    INPUT_link.setAttribute("placeholder", "link");
+    INPUT_link.autocomplete = "off";
+
+    SELECT_type.addEventListener("change", (e) => {
+      this.handleTypeChange(e, INPUT_link, keyupEvent);
+    });
+
+    INPUT_link.required = true;
+    P_refrence.append(SELECT_type, INPUT_link, "*");
+    FORM.append(P_refrence);
 
     const P_submit = document.createElement("p");
     const INPUT_submit = document.createElement("input");
     INPUT_submit.setAttribute("type", "submit");
     INPUT_submit.setAttribute("value", "Create Reference");
     INPUT_submit.addEventListener("click", (e) => {
-      this.checkInputs(e, () => {
+      this.checkInputs(e, FORM, () => {
         this.createReference();
       });
     }); //onSubmit
@@ -586,7 +594,7 @@ export class Reference extends HTMLElement {
 
     const INPUT_rect = INPUT.getBoundingClientRect();
     const ASIDE_users = document.createElement("aside");
-    ASIDE_users.classList.add("suggested_users")
+    ASIDE_users.classList.add("suggested_users");
     ASIDE_users.style = `
     position:absolute;
     z-index:1;
