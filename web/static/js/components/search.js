@@ -78,6 +78,12 @@ export class Search extends HTMLElement {
       .selected {
         border: 2px solid black;
       }
+
+      @media (max-width: 1010px) {
+        .search_forms {
+          grid-template-columns: 1fr;
+        }
+      }
     `;
     this.shadowRoot.append(STYLE);
   }

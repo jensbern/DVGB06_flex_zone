@@ -65,6 +65,13 @@ export class CreateUser extends HTMLElement {
       display: grid;
       grid-template-columns: 3fr 2fr;
     }
+
+    @media (max-width: 1010px){
+      .update {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .delete{
       margin-top:24px;
       background-color: #fcc4c4;
@@ -648,11 +655,16 @@ export class CreateUser extends HTMLElement {
     if (logged_in(this)) {
       const BUTTON_delete = this.addDeleteAccountLI(username);
       this.shadowRoot.append(BUTTON_delete);
+      const A = document.createElement("a");
+      A.href = "/user/" + username;
+      A.innerText = " 👈 Back to userpage";
+      this.shadowRoot.append(A);
+    } else {
+      const A = document.createElement("a");
+      A.href = "/";
+      A.innerText = "👈 Back to startpage";
+      this.shadowRoot.append(A);
     }
-    const A = document.createElement("a");
-    A.href = "/user/" + username;
-    A.innerText = "Back to userpage";
-    this.shadowRoot.append(A);
   }
 
   disconnectedCallback() {

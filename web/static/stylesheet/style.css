@@ -9,8 +9,8 @@ main {
 header {
   display: -ms-grid;
   display: grid;
-  -ms-grid-columns: auto 350px;
-      grid-template-columns: auto 350px;
+  -ms-grid-columns: auto auto;
+      grid-template-columns: auto auto;
   background-color: #f7f7f7;
 }
 
@@ -79,6 +79,13 @@ headerlogin-element {
   display: grid;
   -ms-grid-columns: 1fr 1fr;
       grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 1010px) {
+  #user_page {
+    -ms-grid-columns: 1fr;
+        grid-template-columns: 1fr;
+  }
 }
 
 #user_page section {

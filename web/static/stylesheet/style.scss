@@ -1,3 +1,5 @@
+$layout-breakpoint-medium: 1010px;
+
 body{
   font-family: Georgia, "Times New Roman", Times, serif;
 }
@@ -7,7 +9,7 @@ main {
 
 header{
   display: grid;
-  grid-template-columns: auto 350px;
+  grid-template-columns: auto auto;
   background-color: rgb(247, 247, 247);
 }
 
@@ -56,6 +58,9 @@ headerlogin-element{
   display: grid;
   grid-template-columns: 1fr 1fr;
   // column-gap: 16px;
+  @media (max-width: $layout-breakpoint-medium) {
+    grid-template-columns: 1fr;
+  }
 
   section {
     // border: 1px solid darkgray;
