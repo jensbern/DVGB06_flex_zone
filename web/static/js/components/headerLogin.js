@@ -48,6 +48,25 @@ export class HeaderLogin extends HTMLElement {
     .hidden{
       display:none;
     }
+
+    button:hover .right{
+      transform:rotate(-40deg) translateY(-6px) scale(-1.2, 1.2);
+     }
+     button:hover .left{
+      transform: rotate(40deg) translateY(-6px) scale(1.2);
+     }
+     .right{
+      display: inline-block;
+      transform: scale(-1, 1);
+      transition: transform 100ms ease-in-out;
+
+     }
+     .left{
+        display: inline-block;
+        transition: transform 80ms ease-in-out;
+
+     }
+
     `;
     this.shadowRoot.append(STYLE);
     if(sessionStorage.getItem("accessToken")){
@@ -57,7 +76,7 @@ export class HeaderLogin extends HTMLElement {
 
   createDropdownButton = (logged_in_as) => {
     const BUTTON = document.createElement("button");
-    BUTTON.innerHTML = logged_in_as? logged_in_as : "Log in | Create account";
+    BUTTON.innerHTML = logged_in_as? "<span class='left'>💪</span> "+logged_in_as+" <span class='right'>💪</span>" : "Log in | Create account";
     BUTTON.addEventListener("click", () => {
       const UL_dropdown = this.shadowRoot.querySelector("ul");
       UL_dropdown.classList.toggle("hidden");
