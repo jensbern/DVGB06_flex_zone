@@ -50,6 +50,26 @@ class Reference(Base):
     ref_type = Column(String)
     link = Column(String)
 
+interest_owner_association = Table(
+    "interest_owner_assoctaion",
+    Base.metadata, 
+    Column("owner_id", Integer, ForeignKey("staff.uuid")),
+    Column("interest_id", Integer, ForeignKey("interest.uuid"))
+)
+
+interest_to_association = Table(
+    "interest_to_association",
+    Base.metadata,
+    Column("to_id", Integer, ForeignKey("staff.uuid")),
+    Column("interest_id", Integer, ForeignKey("interest.uuid"))
+)
+
+class Interest(Base):
+    __tablename__ = "interest"
+    uuid = Column(Integer, primary_key=True)
+    owner = relationship(Staff, secondary=interest_owner_association, uselist=False, backref="interests")
+    to = relationship(Staff, secondary=interest_to_association, uselist=False, backref="interestees")
+    is_interested = Column(Boolean, default=None)
 
 class Experience(Base):
     __tablename__ = "experience"
@@ -58,7 +78,7 @@ class Experience(Base):
     type = Column(String)
     description = Column(String)
     at = Column(String)
-    reference = Column(String)
+    reference = Column(String) #depricated
     references = relationship(
         Reference,
         # backref=backref("references", uselist=True, cascade="delete,all"),
@@ -81,7 +101,7 @@ class Skill(Base):
     staffid = Column(Integer, ForeignKey("staff.uuid"))
     name = Column(String)
     description = Column(String)
-    reference = Column(String)
+    reference = Column(String) #depricated
     references = relationship(
         Reference,
         # backref=backref("references", uselist=True, cascade="delete,all"),

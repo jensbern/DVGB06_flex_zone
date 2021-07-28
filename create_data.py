@@ -1,4 +1,5 @@
 from db.models import (
+    Interest,
     engine,
     db_session,
     Base,
@@ -44,6 +45,10 @@ password3 = Staff_password(password=p3_hash, staff=staff3)
 db_session.add(password1)
 db_session.add(password2)
 db_session.add(password3)
+
+interest1 = Interest(owner=staff1, to=staff2)
+
+db_session.add(interest1)
 
 skill1 = Skill(
     staff=staff1,
