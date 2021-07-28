@@ -6,8 +6,8 @@ from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from flask_jwt_extended import jwt_required
 from sqlalchemy.orm import interfaces
 
-from .models import Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel, Reference as ReferenceModel
-from .api import create_reference, create_staff, create_skill, create_experience, delete_reference, delete_staff, delete_experience, delete_skill, update_reference, update_staff, update_experience, update_skill, update_staff_password, check_password, login
+from .models import Staff as StaffModel, Experience as ExperienceModel, Skill as SkillModel, Staff_password as Staff_passwordModel, Reference as ReferenceModel, Interest as InterestModel
+from .api import create_interest, create_reference, create_staff, create_skill, create_experience, delete_interest, delete_reference, delete_staff, delete_experience, delete_skill, update_interest, update_reference, update_staff, update_experience, update_skill, update_staff_password, check_password, login
 
 
 class Staff(SQLAlchemyObjectType):
@@ -15,10 +15,14 @@ class Staff(SQLAlchemyObjectType):
         model = StaffModel
         interfaces = (relay.Node, )
 
-
 class Staff_password(SQLAlchemyObjectType):
     class Meta:
         model = Staff_passwordModel
+        interfaces = (relay.Node, )
+
+class Interest(SQLAlchemyObjectType):
+    class Meta:
+        model = InterestModel
         interfaces = (relay.Node, )
 
 class Reference(SQLAlchemyObjectType):
@@ -39,7 +43,6 @@ class Skill(SQLAlchemyObjectType):
         interfaces = (relay.Node, )
 
     references = graphene.List(Reference)
-
 
 
 class SearchResult(graphene.Union):
@@ -149,6 +152,20 @@ class CreateReference(graphene.Mutation):
         ok = True
         return CreateReference(ok=ok, reference=reference)
 
+class CreateInterest(graphene.Mutation):
+    class Arguments:
+        owner = graphene.String(required=True) #username
+        to = graphene.String(required=True) #username
+    
+    ok = graphene.Boolean()
+    interest = graphene.Field(lambda: Interest)
+    
+    @jwt_required()
+    def mutate(root, _, owner, to):
+        interest = create_interest(owner, to)
+        ok = True
+
+        return CreateInterest(ok=ok, interest=interest)
 
 class DeleteStaff(graphene.Mutation):
     class Arguments:
@@ -197,6 +214,19 @@ class DeleteReference(graphene.Mutation):
         delete_reference(reference_id)
         ok=True
         return DeleteReference(ok=ok)
+
+class DeleteInterest(graphene.Mutation):
+    class Arguments:
+        interest_uuid = graphene.ID(required=True)
+    
+    ok=graphene.Boolean()
+    
+    @jwt_required()
+    def mutate(root, _, interest_uuid):
+        delete_interest(interest_uuid)
+        ok=True
+
+        return DeleteInterest(ok=ok)
 
 class UpdateStaff(graphene.Mutation):
     class Arguments:
@@ -330,21 +360,39 @@ mutation UpdateSkill {
 }
 """
 
+class UpdateInterest(graphene.Mutation):
+    class Arguments():
+        interest_uuid = graphene.ID(required=True)
+        is_interested = graphene.Boolean()
+    
+    ok = graphene.Boolean()
+    interest = graphene.Field(lambda: Interest)
+
+    @jwt_required()
+    def mutate(root, _, interest_uuid, is_interested=None):
+        interest = update_interest(interest_uuid, is_interested)
+        ok = True
+        return UpdateInterest(ok=ok, interest=interest)
+
+
 
 class Mutations(graphene.ObjectType):
     create_staff = CreateStaff.Field()
     create_skill = CreateSkill.Field()
     create_experience = CreateExperience.Field()
     create_reference = CreateReference.Field()
+    create_interest = CreateInterest.Field()
     delete_staff = DeleteStaff.Field()
     delete_experience = DeleteExperience.Field()
     delete_skill = DeleteSkill.Field()
     delete_reference = DeleteReference.Field()
+    delete_interest = DeleteInterest.Field()
     update_staff = UpdateStaff.Field()
     update_experience = UpdateExperience.Field()
     update_skill = UpdateSkill.Field()
     update_password = UpdateStaffPassword.Field()
     update_reference = UpdateReference.Field()
+    update_interest = UpdateInterest.Field()
     login_user = Login.Field()
 
 

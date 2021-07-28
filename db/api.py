@@ -1,5 +1,5 @@
 from graphene.relay.node import Node
-from db.models import Reference, db_session, Staff, Staff_password, Skill, Experience
+from db.models import Interest, Reference, db_session, Staff, Staff_password, Skill, Experience
 # from flask import jsonify
 from bcrypt import gensalt, hashpw, checkpw
 from flask_jwt_extended import create_access_token, create_refresh_token
@@ -85,6 +85,14 @@ def create_reference(for_id, for_type, type, link):
     db_session.refresh(reference)
     return reference
 
+def create_interest(owner, to):
+    owner_staff = Staff.query.filter(Staff.username == owner).first()
+    to_staff = Staff.query.filter(Staff.username == to).first()
+    interest = Interest(owner=owner_staff, to=to_staff)
+    db_session.add(interest)
+    db_session.commit()
+    return interest
+
 def delete_staff(username):
     staff = Staff.query.filter(Staff.username == username).first()
     db_session.delete(staff)
@@ -104,6 +112,11 @@ def delete_skill(skill_id):
 def delete_reference(reference_id):
     reference = Reference.query.filter(Reference.uuid == reference_id).first()
     db_session.delete(reference)
+    db_session.commit()
+
+def delete_interest(interest_id):
+    interest = Interest.query.filter(Interest.uuid == interest_id).first()
+    db_session.delete(interest)
     db_session.commit()
 
 def update_staff(current_username, name, new_username, contact_type, contact_info):
@@ -170,3 +183,12 @@ def update_reference(ref_id, type, link):
     reference_db.update(reference_update, synchronize_session="fetch")
     db_session.commit()
     return reference
+
+def update_interest(interest_id, is_interested):
+    interest_update = {}
+    interest_update[Interest.is_interested] = is_interested
+    interest_db = Interest.query.filter(Interest.uuid == interest_id)
+    interest = interest_db.first()
+    interest_db.update(interest_update, synchronize_session="fetch")
+    db_session.commit()
+    return interest
