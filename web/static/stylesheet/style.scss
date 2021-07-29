@@ -57,9 +57,11 @@ headerlogin-element{
 #user_page {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1f 1fr;
   // column-gap: 16px;
   @media (max-width: $layout-breakpoint-medium) {
     grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
   }
 
   section {
@@ -68,5 +70,13 @@ headerlogin-element{
     padding: 8px;
     margin: 8px;
     border: 1px solid lightgrey;
+    &:last-child{
+      grid-column-start: 1;
+      grid-column-end: 4;
+      @media (max-width: $layout-breakpoint-medium) {
+        grid-column-start: initial;
+        grid-column-end: initial;
+      }
+    }
   }
 }

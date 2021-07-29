@@ -79,12 +79,16 @@ headerlogin-element {
   display: grid;
   -ms-grid-columns: 1fr 1fr;
       grid-template-columns: 1fr 1fr;
+  -ms-grid-rows: 1f 1fr;
+      grid-template-rows: 1f 1fr;
 }
 
 @media (max-width: 1010px) {
   #user_page {
     -ms-grid-columns: 1fr;
         grid-template-columns: 1fr;
+    -ms-grid-rows: 1fr;
+        grid-template-rows: 1fr;
   }
 }
 
@@ -93,5 +97,19 @@ headerlogin-element {
   padding: 8px;
   margin: 8px;
   border: 1px solid lightgrey;
+}
+
+#user_page section:last-child {
+  -ms-grid-column: 1;
+      grid-column-start: 1;
+  grid-column-end: 4;
+}
+
+@media (max-width: 1010px) {
+  #user_page section:last-child {
+    -ms-grid-column: initial;
+        grid-column-start: initial;
+    grid-column-end: initial;
+  }
 }
 /*# sourceMappingURL=style.css.map */

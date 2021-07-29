@@ -39,6 +39,18 @@ export class Interest extends HTMLElement {
 
       }
 
+      .interests {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 16px;
+      }
+
+      @media (max-width:1010px) {
+        .interests {
+          grid-template-columns: 1fr;
+        }
+      }
+
       .delete {
         display:none;
         cursor:pointer;
@@ -50,9 +62,9 @@ export class Interest extends HTMLElement {
       }
 
       .show_interest {
-        display:none;
-        // display:inline;
-        margin-left: 4px;
+        opacity:0;
+        display:block;
+        margin-top: 8px;
         background-color: rgb(252, 252, 252);
       }
 
@@ -62,14 +74,19 @@ export class Interest extends HTMLElement {
         padding: 4px;
         border: 1px solid lightgrey;
         cursor:pointer;
+        user-select: auto;
       }
       
       .show_interest span:hover{
         border: 1px solid black;
       }
       
-      p:hover .delete, p:hover .show_interest {
+      p:hover .delete{
         display:inline;
+      }
+
+      p:hover .show_interest {
+        opacity:1;
       }
       
       .selected {
@@ -138,8 +155,6 @@ export class Interest extends HTMLElement {
       .then((data) => {
         const interests = data.data.staff[0].interests.edges;
         const interestees = data.data.staff[0].interestees.edges;
-        console.log("Interests", interests);
-        console.log("Interestees", interestees);
         callback(interests, interestees);
       });
   };
@@ -249,11 +264,23 @@ export class Interest extends HTMLElement {
       });
   };
 
-  displayInterests = (interests) => {
+  displayInterests = (interests, root) => {
     const ARTICLE = document.createElement("article");
     const H2 = document.createElement("h2");
     H2.innerText = "Interests";
     ARTICLE.append(H2);
+    if(!interests.length) {
+      const P_text = document.createElement("p");
+      P_text.innerText = "You have not selected someone of interest."
+      const P_link = document.createElement("p")
+      const A = document.createElement("a");
+      A.innerText = "Search for users on the start-page"
+      A.href = "/"
+      P_link.append(A)
+      ARTICLE.append(P_text, P_link)
+      root.append(ARTICLE)
+      return;
+    }
     for (let i = 0; i < interests.length; i++) {
       var P = document.createElement("p");
       var A = document.createElement("a");
@@ -292,7 +319,7 @@ export class Interest extends HTMLElement {
       P.append(SPAN_delete);
       ARTICLE.append(P);
     }
-    this.shadowRoot.append(ARTICLE);
+    root.append(ARTICLE);
   };
 
   showInterestBUTTON = (interested_people) => {
@@ -306,7 +333,8 @@ export class Interest extends HTMLElement {
     this.shadowRoot.append(BUTTON);
   };
 
-  displayInterestees = (interestees) => {
+  displayInterestees = (interestees, root) => {
+    if(!interestees.length) return;
     const ARTICLE = document.createElement("article");
     const H2 = document.createElement("h2");
     H2.innerText = "Interestees";
@@ -328,7 +356,7 @@ export class Interest extends HTMLElement {
       P_name.append(A, SPAN_contact, SECTION_show_interest);
       ARTICLE.append(P_name);
     }
-    this.shadowRoot.append(ARTICLE);
+    root.append(ARTICLE);
   };
 
   createShowInterestBUTTONS = (interestee) => {
@@ -346,21 +374,21 @@ export class Interest extends HTMLElement {
     SPAN_is_interested.addEventListener("click", (e) => {
       if (!e.target.classList.contains("selected")) {
         this.updateInterest(interestee.uuid, true);
-        this.shadowRoot.querySelector(".selected").classList.remove("selected");
+        SECTION.querySelector(".selected").classList.remove("selected");
         SPAN_is_interested.classList.add("selected");
       }
     });
     SPAN_not_interested.addEventListener("click", (e) => {
       if (!e.target.classList.contains("selected")) {
         this.updateInterest(interestee.uuid, false);
-        this.shadowRoot.querySelector(".selected").classList.remove("selected");
+        SECTION.querySelector(".selected").classList.remove("selected");
         SPAN_not_interested.classList.add("selected");
       }
     });
     SPAN_indifferent.addEventListener("click", (e) => {
       if (!e.target.classList.contains("selected")) {
         this.updateInterest(interestee.uuid, null);
-        this.shadowRoot.querySelector(".selected").classList.remove("selected");
+        SECTION.querySelector(".selected").classList.remove("selected");
         SPAN_indifferent.classList.add("selected");
       }
     });
@@ -389,13 +417,16 @@ export class Interest extends HTMLElement {
   };
 
   connectedCallback() {
+    const SECTION = document.createElement("section")
+    SECTION.classList.add("interests")
     if (this.getAttribute("logged_in_as")) {
       this.getInterestData(
         this.getAttribute("username"),
         (interests, interestees) => {
           if (logged_in(this)) {
-            this.displayInterests(interests);
-            this.displayInterestees(interestees);
+            this.displayInterests(interests, SECTION);
+            this.displayInterestees(interestees, SECTION);
+            this.shadowRoot.append(SECTION)
           } else {
             var is_already_interested = interestees.filter((e) => {
               return (
