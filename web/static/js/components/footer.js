@@ -74,6 +74,5 @@ export class Footer extends HTMLElement {
   }
 
   disconnectedCallback() {
-    console.log("ok", sessionStorage.getItem("cookie_ok"));
   }
 }
