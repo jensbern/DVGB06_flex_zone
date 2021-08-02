@@ -159,8 +159,17 @@ export class Interest extends HTMLElement {
         return response.json();
       })
       .then((data) => {
-        const interests = data.data.staff[0].interests.edges;
-        const interestees = data.data.staff[0].interestees.edges;
+        // sort on: 1. null, 2. true, 3. false
+        const compare = (a, b) => {
+          if(a.node.isInterested ===  b.node.isInterested){ return 0 } 
+          if(a.node.isInterested === null ){ return -1 }
+          if(a.node.isInterested === true && b.node.isInterested !== null) { return -1 }
+          if(a.node.isInterested === false) { return 1}
+        }
+        
+        const interests = data.data.staff[0].interests.edges.sort(compare);
+        const interestees = data.data.staff[0].interestees.edges.sort(compare);
+
         callback(interests, interestees);
       });
   };
@@ -170,7 +179,7 @@ export class Interest extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
+        Authorization: "Bearer " + window.sessionStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -198,7 +207,7 @@ export class Interest extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
+        Authorization: "Bearer " + window.sessionStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -251,7 +260,7 @@ export class Interest extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
+        Authorization: "Bearer " + window.sessionStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: query_string,
