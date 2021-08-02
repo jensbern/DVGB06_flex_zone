@@ -14,6 +14,7 @@ export class HeaderLogin extends HTMLElement {
       font-family: Georgia, "Times New Roman", Times, serif;
       font-size: 1.2em;
       justify-self: right;
+      position:relative;
     }
     
     ul {
@@ -66,7 +67,15 @@ export class HeaderLogin extends HTMLElement {
         transition: transform 80ms ease-in-out;
 
      }
-
+    .interestees_not_answered {
+      position: absolute;
+      left: -16px;
+      bottom: -16px;
+      background-color: white;
+      padding: 0px 8px 4px 8px;
+      border: 1px solid black;
+      border-radius: 50%;
+    }
     `;
     this.shadowRoot.append(STYLE);
     if(sessionStorage.getItem("accessToken")){
@@ -76,7 +85,14 @@ export class HeaderLogin extends HTMLElement {
 
   createDropdownButton = (logged_in_as) => {
     const BUTTON = document.createElement("button");
-    BUTTON.innerHTML = logged_in_as? "<span class='left'>💪</span> "+logged_in_as+" <span class='right'>💪</span>" : "Log in | Create account";
+    if(logged_in_as) {
+      BUTTON.innerHTML = "<span class='left'>💪</span> "+logged_in_as+" <span class='right'>💪</span>";
+      if(!location.pathname.includes("/user/")){
+        this.getInterestees(BUTTON)
+      }
+    }else {
+      BUTTON.innerText =  "Log in | Create account";
+    }
     BUTTON.addEventListener("click", () => {
       const UL_dropdown = this.shadowRoot.querySelector("ul");
       UL_dropdown.classList.toggle("hidden");
@@ -185,6 +201,52 @@ export class HeaderLogin extends HTMLElement {
 
     })
   }
+
+  getInterestees = (root) => {
+    fetch("/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        query: `
+          query staff($username: String) {
+            staff(username: $username) {
+              interestees {
+                edges {
+                  node {
+                    isInterested
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          "username": this.getAttribute("logged_in_as")
+        }
+      }) 
+    }).then(response => {
+      return response.json()
+    }).then(data => {
+      const interestees_not_answered = data.data.staff[0].interestees.edges.filter(e => {
+        return e.node.isInterested === null
+      }).length
+      if(interestees_not_answered > 0){
+        this.displayUnansweredInteresteed(root, interestees_not_answered)
+      }
+    })
+  }
+  
+  displayUnansweredInteresteed = (root, interestees_not_answered) => {
+    console.log(interestees_not_answered)
+    const SPAN = document.createElement("span")
+    SPAN.classList.add("interestees_not_answered")
+    SPAN.innerText = interestees_not_answered
+    root.append(SPAN)
+    
+  }
+
   connectedCallback() {
     if (
       this.getAttribute("logged_in_as") &&
