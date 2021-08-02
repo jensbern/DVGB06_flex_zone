@@ -77,8 +77,10 @@ export class HeaderLogin extends HTMLElement {
       border-radius: 50%;
     }
     `;
+    
     this.shadowRoot.append(STYLE);
-    if(sessionStorage.getItem("accessToken")){
+    // if(window.sessionStorage.getItem("accessToken")){
+    if(window.localStorage.getItem("refreshToken")){
       this.refreshAccessToken()
     }
   }
@@ -156,7 +158,7 @@ export class HeaderLogin extends HTMLElement {
   }
 
   logoutAccount = () => {
-    sessionStorage.removeItem("accessToken");
+    window.sessionStorage.removeItem("accessToken");
     document.cookie =
       "access_token_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     window.location = "/"
@@ -189,7 +191,7 @@ export class HeaderLogin extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + localStorage.getItem("refreshToken")
+        "Authorization": "Bearer " + window.localStorage.getItem("refreshToken")
       }
     }).then(resp => {
       return resp.json()
@@ -197,8 +199,7 @@ export class HeaderLogin extends HTMLElement {
       let d = new Date();
       d.setTime(d.getTime() + 60*60*1000) // set expiration to 1h
       document.cookie = `access_token_cookie=${data.access_token}; expires=${d.toUTCString()}; path=/`;
-      sessionStorage.setItem("accessToken", data.access_token)
-
+      window.sessionStorage.setItem("accessToken", data.access_token)
     })
   }
 
@@ -260,7 +261,8 @@ export class HeaderLogin extends HTMLElement {
     const UL_dropdown = this.shadowRoot.querySelector("ul");
     const BUTTON_dropdown = this.shadowRoot.querySelector("button");
     this.dropdownEvent = window.addEventListener("click", (e) => {
-      if (!(e.path.includes(UL_dropdown) || e.path.includes(BUTTON_dropdown))) {
+      
+      if (!(e.composedPath().includes(UL_dropdown) || e.composedPath().includes(BUTTON_dropdown))) {
         UL_dropdown.classList.add("hidden");
       }
     });

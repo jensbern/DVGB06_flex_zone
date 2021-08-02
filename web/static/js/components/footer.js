@@ -64,13 +64,13 @@ export class Footer extends HTMLElement {
   };
 
   okClick = (BUTTON_ok) => {
-    sessionStorage.setItem("cookie_ok", true);
+    window.sessionStorage.setItem("cookie_ok", true);
     BUTTON_ok.removeEventListener("click", this.okClick);
     this.shadowRoot.querySelector("section").remove();
   };
 
   connectedCallback() {
-    if (!sessionStorage.getItem("cookie_ok")) this.displayCookieInfo();
+    if (!window.sessionStorage.getItem("cookie_ok")) this.displayCookieInfo();
   }
 
   disconnectedCallback() {

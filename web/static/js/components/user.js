@@ -43,7 +43,7 @@ export class User extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + sessionStorage.getItem("accessToken")
+        "Authorization": "Bearer " + window.sessionStorage.getItem("accessToken")
       },
       body: JSON.stringify({
         query: `

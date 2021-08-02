@@ -423,11 +423,11 @@ export class CreateUser extends HTMLElement {
           INPUT_username.focus();
           this.addToolTip(INPUT_username, "Username already taken");
         } else {
-          sessionStorage.setItem(
+          window.sessionStorage.setItem(
             "accessToken",
             data.data.createStaff.tokens.accessToken
           );
-          localStorage.setItem(
+          window.localStorage.setItem(
             "refreshToken",
             data.data.createStaff.tokens.refreshToken
           );
@@ -436,7 +436,7 @@ export class CreateUser extends HTMLElement {
           document.cookie = `access_token_cookie=${
             data.data.createStaff.tokens.accessToken
           }; expires=${d.toUTCString()}; path=/`;
-          window.location = `/user/${data.data.createStaff.staff.username}`;
+        window.location = `/user/${data.data.createStaff.staff.username}`;
         }
       });
   };
@@ -450,7 +450,7 @@ export class CreateUser extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
+        Authorization: "Bearer " + window.sessionStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -515,7 +515,7 @@ export class CreateUser extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
+        Authorization: "Bearer " + window.sessionStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -604,7 +604,7 @@ export class CreateUser extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
+        Authorization: "Bearer " + window.sessionStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -629,8 +629,8 @@ export class CreateUser extends HTMLElement {
         if (data.errors) {
           console.log("Error while deleting");
         } else {
-          sessionStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
+          window.sessionStorage.removeItem("accessToken");
+          window.localStorage.removeItem("refreshToken");
           document.cookie =
             "access_token_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
           window.location = `/`;

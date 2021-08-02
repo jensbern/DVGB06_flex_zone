@@ -177,11 +177,11 @@ export class Login extends HTMLElement {
           );
         } else {
           // document.cookie = `accessToken=${}`;
-          sessionStorage.setItem(
+          window.sessionStorage.setItem(
             "accessToken",
             data.data.loginUser.tokens.accessToken
           );
-          localStorage.setItem(
+          window.localStorage.setItem(
             "refreshToken",
             data.data.loginUser.tokens.refreshToken
           );

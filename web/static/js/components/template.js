@@ -59,7 +59,7 @@ const confirmPopup = (root, text, callback) => {
   `
 
   const no_event = (e) => {
-    if((!e.path.includes(DIV_choices) | e.path.includes(BUTTON_no) )){
+    if((!e.composedPath().includes(DIV_choices) | e.composedPath().includes(BUTTON_no) )){
       callback(false)
       DIV_container.remove(); 
     }

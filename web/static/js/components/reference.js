@@ -245,7 +245,7 @@ export class Reference extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
+        Authorization: "Bearer " + window.sessionStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -281,7 +281,7 @@ export class Reference extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
+        Authorization: "Bearer " + window.sessionStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
@@ -436,7 +436,7 @@ export class Reference extends HTMLElement {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken"),
+        Authorization: "Bearer " + window.sessionStorage.getItem("accessToken"),
       },
       body: JSON.stringify({
         query: `
