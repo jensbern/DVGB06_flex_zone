@@ -101,6 +101,12 @@ export class Interest extends HTMLElement {
         font-weight: bolder;
         margin-left: 8px;
       }
+      .interestee_not_interested a, .interestee_not_interested > span{
+        color: gray;
+      }
+      .interestee_interested a, .interestee_interested > span{
+        font-weight: bolder;
+      }
     `;
     this.shadowRoot.append(STYLE);
   }
@@ -350,6 +356,7 @@ export class Interest extends HTMLElement {
       SPAN_contact.innerText = ` ${interestees[i].node.owner.contactInfo} [${interestees[i].node.owner.contactType}]`;
 
       var SECTION_show_interest = this.createShowInterestBUTTONS(
+        P_name,
         interestees[i].node
       );
 
@@ -359,7 +366,7 @@ export class Interest extends HTMLElement {
     root.append(ARTICLE);
   };
 
-  createShowInterestBUTTONS = (interestee) => {
+  createShowInterestBUTTONS = (parent, interestee) => {
     const SECTION = document.createElement("section");
     SECTION.classList.add("show_interest");
     const SPAN_is_interested = document.createElement("span");
@@ -373,6 +380,7 @@ export class Interest extends HTMLElement {
 
     SPAN_is_interested.addEventListener("click", (e) => {
       if (!e.target.classList.contains("selected")) {
+        parent.className = "interestee_interested"
         this.updateInterest(interestee.uuid, true);
         SECTION.querySelector(".selected").classList.remove("selected");
         SPAN_is_interested.classList.add("selected");
@@ -380,6 +388,7 @@ export class Interest extends HTMLElement {
     });
     SPAN_not_interested.addEventListener("click", (e) => {
       if (!e.target.classList.contains("selected")) {
+        parent.className = "interestee_not_interested";
         this.updateInterest(interestee.uuid, false);
         SECTION.querySelector(".selected").classList.remove("selected");
         SPAN_not_interested.classList.add("selected");
@@ -387,6 +396,7 @@ export class Interest extends HTMLElement {
     });
     SPAN_indifferent.addEventListener("click", (e) => {
       if (!e.target.classList.contains("selected")) {
+        parent.className = "";
         this.updateInterest(interestee.uuid, null);
         SECTION.querySelector(".selected").classList.remove("selected");
         SPAN_indifferent.classList.add("selected");
@@ -395,9 +405,11 @@ export class Interest extends HTMLElement {
     switch (interestee.isInterested) {
       case true:
         SPAN_is_interested.classList.add("selected");
+        parent.className = "interestee_interested";
         break;
       case false:
         SPAN_not_interested.classList.add("selected");
+        parent.className = "interestee_not_interested";
         break;
       case null:
         SPAN_indifferent.classList.add("selected");
