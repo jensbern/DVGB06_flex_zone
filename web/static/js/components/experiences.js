@@ -270,17 +270,17 @@ export class Experiences extends HTMLElement {
     OPTION_type.setAttribute("value", "");
     SELECT_type.append(OPTION_type);
     const options = [
-      "Analyst",
-      "Coach",
-      "Positional Coach",
-      "Sports Psychologist",
-      "Other",
+      "analyst",
+      "coach",
+      "positional coach",
+      "sports psychologist",
+      "other",
     ];
     for (let i = 0; i < options.length; i++) {
       var OPTION_type = document.createElement("option");
       OPTION_type.innerText = options[i];
-      OPTION_type.setAttribute("value", options[i].toLowerCase());
-      if (type == options[i].toLowerCase()) {
+      OPTION_type.setAttribute("value", options[i]);
+      if (type == options[i]) {
         OPTION_type.selected = true;
       }
       SELECT_type.append(OPTION_type);

@@ -184,8 +184,8 @@ export class CreateUser extends HTMLElement {
     for (let i = 0; i < options.length; i++) {
       var OPTION_type = document.createElement("option");
       OPTION_type.innerText = options[i];
-      OPTION_type.setAttribute("value", options[i].toLowerCase());
-      if (user && options[i].toLowerCase() === user.contactType) {
+      OPTION_type.setAttribute("value", options[i]);
+      if (user && options[i] === user.contactType) {
         OPTION_type.selected = true;
       }
       SELECT_contact_type.append(OPTION_type);

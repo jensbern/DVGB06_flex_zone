@@ -183,16 +183,16 @@ export class Search extends HTMLElement {
     OPTION_type.setAttribute("value", "");
     SELECT_search.append(OPTION_type);
     const options = [
-      "Analyst",
-      "Coach",
-      "Positional Coach",
-      "Sports Psychologist",
-      "Other",
+      "analyst",
+      "coach",
+      "positional coach",
+      "sports psychologist",
+      "other",
     ];
     for (let i = 0; i < options.length; i++) {
       var OPTION_type = document.createElement("option");
       OPTION_type.innerText = options[i];
-      OPTION_type.setAttribute("value", options[i].toLowerCase());
+      OPTION_type.setAttribute("value", options[i]);
       SELECT_search.append(OPTION_type);
     }
     P_search.append(LABEL_search, SELECT_search, "*");
