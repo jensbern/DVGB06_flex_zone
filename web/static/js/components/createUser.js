@@ -446,7 +446,7 @@ export class CreateUser extends HTMLElement {
           d.setTime(d.getTime() + 60 * 60 * 1000); // set expiration to 1h
           document.cookie = `access_token_cookie=${
             data.data.createStaff.tokens.accessToken
-          }; expires=${d.toUTCString()}; path=/`;
+          }; expires=${d.toUTCString()}; path=/; SameSite=Strict`;
           window.location = `/user/${data.data.createStaff.staff.username}`;
         }
       });
@@ -646,7 +646,7 @@ export class CreateUser extends HTMLElement {
           window.sessionStorage.removeItem("accessToken");
           window.localStorage.removeItem("refreshToken");
           document.cookie =
-            "access_token_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            "access_token_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict";
           window.location = `/`;
         }
       });

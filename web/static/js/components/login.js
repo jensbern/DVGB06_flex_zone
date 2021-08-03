@@ -189,7 +189,7 @@ export class Login extends HTMLElement {
           d.setTime(d.getTime() + 60 * 60 * 1000); // set expiration to 1h
           document.cookie = `access_token_cookie=${
             data.data.loginUser.tokens.accessToken
-          }; expires=${d.toUTCString()}; path=/`;
+          }; expires=${d.toUTCString()}; path=/; SameSite=Strict;`;
           window.location = `/user/${formData.get("username")}`;
         }
       });

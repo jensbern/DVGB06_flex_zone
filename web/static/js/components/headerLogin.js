@@ -161,7 +161,7 @@ export class HeaderLogin extends HTMLElement {
     window.sessionStorage.removeItem("accessToken");
     window.localStorage.removeItem("refreshToken");
     document.cookie =
-      "access_token_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      "access_token_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict;";
     window.location = "/"
   }
 
@@ -199,7 +199,7 @@ export class HeaderLogin extends HTMLElement {
     }).then(data => {
       let d = new Date();
       d.setTime(d.getTime() + 60*60*1000) // set expiration to 1h
-      document.cookie = `access_token_cookie=${data.access_token}; expires=${d.toUTCString()}; path=/`;
+      document.cookie = `access_token_cookie=${data.access_token}; expires=${d.toUTCString()}; path=/; SameSite=Strict`;
       window.sessionStorage.setItem("accessToken", data.access_token)
     })
   }
