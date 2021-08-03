@@ -64,17 +64,16 @@ export class Experiences extends HTMLElement {
         margin-left: 0px;
       }
       span ul{
-        display:none;
+        
         text-align: right;
         position: absolute;
         right: 0;
         padding: 16px 0;
       }
 
-      span:hover ul, span ul:hover{
-        display:block;
+      .hidden {
+        display:none;
       }
-
       span ul li{
         margin-bottom: 8px;
         background-color: rgb(250, 250, 250);
@@ -434,15 +433,17 @@ export class Experiences extends HTMLElement {
     const SPAN = document.createElement("span");
     SPAN.innerText = "...";
     SPAN.style = `
-      position: absolute;
-      top: 0;
-      right: 0;
-      margin: 16px;
-      border: 1px solid gray;
-      padding: 4px 8px 8px 8px;
-      border-radius: 4px;
+    position: absolute;
+    cursor:pointer;
+    top: 0;
+    right: 0;
+    margin: 16px;
+    border: 1px solid gray;
+    padding: 4px 8px 8px 8px;
+    border-radius: 4px;
     `;
-    const UL = document.createElement("ul");
+    const UL = document.createElement("ul"); 
+    UL.classList.add("hidden");
     const LI_edit = document.createElement("li");
     LI_edit.innerText = "Edit";
     LI_edit.addEventListener("click", (e) => {
@@ -455,7 +456,18 @@ export class Experiences extends HTMLElement {
     });
     UL.append(LI_edit, LI_delete);
     SPAN.append(UL);
-
+    
+    const click_event_hide = (e) => {
+      if(!e.composedPath().includes(UL)){
+        UL.classList.add("hidden")
+        window.removeEventListener("mousedown", click_event_hide)
+      }
+    }
+    const click_event_show = (e) => {
+      window.addEventListener("mousedown", click_event_hide)
+      UL.classList.remove("hidden")
+    }
+    SPAN.addEventListener("mouseup", click_event_show)
     root.append(SPAN);
   };
 

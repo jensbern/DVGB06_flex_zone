@@ -52,8 +52,8 @@ export class Interest extends HTMLElement {
       }
 
       .delete {
-        display:none;
         cursor:pointer;
+        position:absolute;
         margin-left: 16px;
         background-color: lightgray;
         border: 1px solid black;
@@ -62,9 +62,9 @@ export class Interest extends HTMLElement {
       }
 
       .show_interest {
-        opacity:0;
         display:block;
         margin-top: 8px;
+        margin-bottom: 8px;
         background-color: rgb(252, 252, 252);
       }
 
@@ -81,8 +81,17 @@ export class Interest extends HTMLElement {
         border: 1px solid black;
       }
       
-      p:hover .delete{
-        display:inline;
+      .hidden {
+        display:none;
+      }
+      
+      .no_response, .interested {
+        cursor:pointer;
+        margin-left: 8px;
+      }
+
+      .interested {
+        font-weight: bolder;
       }
 
       p:hover .show_interest {
@@ -97,10 +106,6 @@ export class Interest extends HTMLElement {
         border: 1px solid lightgrey !important;
       }
 
-      .interested {
-        font-weight: bolder;
-        margin-left: 8px;
-      }
       .interestee_not_interested a, .interestee_not_interested > span{
         color: gray;
       }
@@ -161,12 +166,20 @@ export class Interest extends HTMLElement {
       .then((data) => {
         // sort on: 1. null, 2. true, 3. false
         const compare = (a, b) => {
-          if(a.node.isInterested ===  b.node.isInterested){ return 0 } 
-          if(a.node.isInterested === null ){ return -1 }
-          if(a.node.isInterested === true && b.node.isInterested !== null) { return -1 }
-          if(a.node.isInterested === false) { return 1}
-        }
-        
+          if (a.node.isInterested === b.node.isInterested) {
+            return 0;
+          }
+          if (a.node.isInterested === null) {
+            return -1;
+          }
+          if (a.node.isInterested === true && b.node.isInterested !== null) {
+            return -1;
+          }
+          if (a.node.isInterested === false) {
+            return 1;
+          }
+        };
+
         const interests = data.data.staff[0].interests.edges.sort(compare);
         const interestees = data.data.staff[0].interestees.edges.sort(compare);
 
@@ -284,16 +297,16 @@ export class Interest extends HTMLElement {
     const H2 = document.createElement("h2");
     H2.innerText = "Interests";
     ARTICLE.append(H2);
-    if(!interests.length) {
+    if (!interests.length) {
       const P_text = document.createElement("p");
-      P_text.innerText = "You have not selected someone of interest."
-      const P_link = document.createElement("p")
+      P_text.innerText = "You have not selected someone of interest.";
+      const P_link = document.createElement("p");
       const A = document.createElement("a");
-      A.innerText = "Search for users on the start-page"
-      A.href = "/"
-      P_link.append(A)
-      ARTICLE.append(P_text, P_link)
-      root.append(ARTICLE)
+      A.innerText = "Search for users on the start-page";
+      A.href = "/";
+      P_link.append(A);
+      ARTICLE.append(P_text, P_link);
+      root.append(ARTICLE);
       return;
     }
     for (let i = 0; i < interests.length; i++) {
@@ -304,9 +317,10 @@ export class Interest extends HTMLElement {
       A.innerText = `${interests[i].node.to.name} [${interests[i].node.to.username}]`;
       P.append(A);
 
-      var SPAN_delete = document.createElement("span");
+      const SPAN_delete = document.createElement("span");
       SPAN_delete.innerText = "Delete";
       SPAN_delete.classList.add("delete");
+      SPAN_delete.classList.add("hidden");
       SPAN_delete.addEventListener("click", (e) => {
         confirmPopup(document.body, "Delete interest?", (choice) => {
           if (choice) {
@@ -315,22 +329,39 @@ export class Interest extends HTMLElement {
           }
         });
       });
-
+      
+      const SPAN_interested = document.createElement("span");
+      SPAN_interested.setAttribute("title", "Click to manage")
       switch (interests[i].node.isInterested) {
         case true:
-          var SPAN_interested = document.createElement("span");
           SPAN_interested.innerText = "Interested";
           SPAN_interested.classList.add("interested");
           P.append(SPAN_interested);
           break;
 
         case false:
-          var SPAN_interested = document.createElement("span");
           SPAN_interested.innerText = "Not interested";
           SPAN_interested.classList.add("interested");
           P.append(SPAN_interested);
           break;
+        default:
+          SPAN_interested.innerText = "No response yet";
+          SPAN_interested.classList.add("no_response");
+          P.append(SPAN_interested);
       }
+      const click_event_hide = (e) => {
+        if (!e.composedPath().includes(SPAN_delete)) {
+          console.log(SPAN_interested, SPAN_delete);
+          SPAN_delete.classList.add("hidden");
+          window.removeEventListener("mousedown", click_event_hide);
+        }
+      };
+      const click_event_show = (e) => {
+        console.log(SPAN_interested, SPAN_delete);
+        window.addEventListener("mousedown", click_event_hide);
+        SPAN_delete.classList.remove("hidden");
+      };
+      SPAN_interested.addEventListener("mouseup", click_event_show);
       P.append(SPAN_delete);
       ARTICLE.append(P);
     }
@@ -349,7 +380,7 @@ export class Interest extends HTMLElement {
   };
 
   displayInterestees = (interestees, root) => {
-    if(!interestees.length) return;
+    if (!interestees.length) return;
     const ARTICLE = document.createElement("article");
     const H2 = document.createElement("h2");
     H2.innerText = "Interestees";
@@ -389,7 +420,7 @@ export class Interest extends HTMLElement {
 
     SPAN_is_interested.addEventListener("click", (e) => {
       if (!e.target.classList.contains("selected")) {
-        parent.className = "interestee_interested"
+        parent.className = "interestee_interested";
         this.updateInterest(interestee.uuid, true);
         SECTION.querySelector(".selected").classList.remove("selected");
         SPAN_is_interested.classList.add("selected");
@@ -438,8 +469,8 @@ export class Interest extends HTMLElement {
   };
 
   connectedCallback() {
-    const SECTION = document.createElement("section")
-    SECTION.classList.add("interests")
+    const SECTION = document.createElement("section");
+    SECTION.classList.add("interests");
     if (this.getAttribute("logged_in_as")) {
       this.getInterestData(
         this.getAttribute("username"),
@@ -447,7 +478,7 @@ export class Interest extends HTMLElement {
           if (logged_in(this)) {
             this.displayInterests(interests, SECTION);
             this.displayInterestees(interestees, SECTION);
-            this.shadowRoot.append(SECTION)
+            this.shadowRoot.append(SECTION);
           } else {
             var is_already_interested = interestees.filter((e) => {
               return (

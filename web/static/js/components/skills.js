@@ -58,7 +58,6 @@ export class Skills extends HTMLElement {
         background-color: white;
       }
       span ul{
-        display:none;
         text-align: right;
         position: absolute;
         right: 0;
@@ -67,16 +66,16 @@ export class Skills extends HTMLElement {
 
       }
 
-      span:hover ul, span ul:hover{
-        display:block;
-      }
-
       span ul li{
         margin-bottom: 8px;
         background-color: rgb(250, 250, 250);
         border: 1px solid gray;
         padding: 8px;
         cursor: pointer;
+      }
+
+      .hidden{
+        display:none;
       }
     `;
     this.shadowRoot.append(STYLE);
@@ -93,6 +92,7 @@ export class Skills extends HTMLElement {
     SPAN.innerText = "...";
     SPAN.style = `
       position: absolute;
+      cursor:pointer;
       top: 0;
       right: 0;
       margin: 16px;
@@ -101,6 +101,7 @@ export class Skills extends HTMLElement {
       border-radius: 4px;
     `;
     const UL = document.createElement("ul");
+    UL.classList.add("hidden");
     const LI_edit = document.createElement("li");
     LI_edit.innerText = "Edit";
     LI_edit.addEventListener("click", (e) => {
@@ -114,6 +115,17 @@ export class Skills extends HTMLElement {
     UL.append(LI_edit, LI_delete);
     SPAN.append(UL);
 
+    const click_event_hide = (e) => {
+      if(!e.composedPath().includes(UL)){
+        UL.classList.add("hidden")
+        window.removeEventListener("mousedown", click_event_hide)
+      }
+    }
+    const click_event_show = (e) => {
+      window.addEventListener("mousedown", click_event_hide)
+      UL.classList.remove("hidden")
+    }
+    SPAN.addEventListener("mouseup", click_event_show)
     root.append(SPAN);
   };
 

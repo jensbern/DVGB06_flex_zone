@@ -25,13 +25,10 @@ export class Reference extends HTMLElement {
         text-decoration:none;
       }
       li span{
-        display:none;
         margin-left: 16px;
         cursor:pointer;
       }
-      li:hover span{
-        display:inline;
-      }
+
       form p{
         margin-left: 24px;
       }
@@ -71,13 +68,23 @@ export class Reference extends HTMLElement {
         background-color: lightgray;
         border-radius: 8px;
         padding: 0 8px;
+        transition: box-shadow 50ms ease-in-out;
+      }
+
+      .edit:hover, .delete:hover {
+        box-shadow: 3px 3px 3px gray;
       }
 
       .delete{
         background-color: lightgray;
+        transition: box-shadow 50ms ease-in-out;
         border: 1px solid black;
         border-radius: 8px;
         padding: 0 8px;
+      }
+
+      .hidden {
+        display:none;
       }
     `;
     this.shadowRoot.append(STYLE);
@@ -116,30 +123,36 @@ export class Reference extends HTMLElement {
     // console.log(data)
     var LI = document.createElement("li");
     LI.setAttribute("id", `reference${data.uuid}`);
-    var A = document.createElement("a");
-    A.target = "_blank";
-    switch (data.refType) {
-      case "user":
-        A.href = `/user/${data.link}`;
-        A.innerText = `User: ${data.link}`;
-        break;
-      case "phone":
-        A.href = "tel:" + data.link;
-        A.innerText = `Phone: ${data.link}`;
-        A.type = "tel";
-        break;
-      case "email":
-        A.href = "mailto:" + data.link;
-        A.innerText = `email: ${data.link}`;
-        A.type = "email";
-        break;
-      default:
-        A.href = data.link;
-        A.innerText = "External link";
-        A.title = data.link;
-        break;
+    if(!logged_in(this)){
+      var A = document.createElement("a");
+      A.target = "_blank";
+      switch (data.refType) {
+        case "user":
+          A.href = `/user/${data.link}`;
+          A.innerText = `User: ${data.link}`;
+          break;
+        case "phone":
+          A.href = "tel:" + data.link;
+          A.innerText = `Phone: ${data.link}`;
+          A.type = "tel";
+          break;
+        case "email":
+          A.href = "mailto:" + data.link;
+          A.innerText = `email: ${data.link}`;
+          A.type = "email";
+          break;
+        default:
+          A.href = data.link;
+          A.innerText = "External link";
+          A.title = data.link;
+          break;
+      }
+      LI.append(A);
     }
-
+    
+    const SPAN_settings = document.createElement("span");
+    SPAN_settings.classList.add("hidden");
+    
     const SPAN_edit = document.createElement("span");
     SPAN_edit.addEventListener("click", (e) => {
       this.displayEditReference(e, data);
@@ -159,10 +172,25 @@ export class Reference extends HTMLElement {
       });
     });
 
-    LI.append(A);
-    if (logged_in(this)) {
-      LI.append(SPAN_edit, SPAN_delete);
+    const click_event_hide = (e) => {
+      if(!e.composedPath().includes(SPAN_settings)){
+        SPAN_settings.classList.add("hidden")
+        window.removeEventListener("mousedown", click_event_hide)
+      }
     }
+    const click_event_show = (e) => {
+      window.addEventListener("mousedown", click_event_hide)
+      SPAN_settings.classList.remove("hidden")
+    }
+    
+    if (logged_in(this)) {
+      const SPAN = document.createElement("span");
+      SPAN.addEventListener("mouseup", click_event_show)
+      SPAN.innerText = data.link;
+      SPAN_settings.append(SPAN_edit, SPAN_delete);
+      LI.append(SPAN, SPAN_settings)
+    }
+
     return LI;
   };
 
