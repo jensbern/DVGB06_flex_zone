@@ -54,6 +54,10 @@ export class CreateUser extends HTMLElement {
       color: black;
       text-decoration: none;
     }
+
+    select {
+      text-transform: capitalize;
+    }
     
     .error:focus {
       border: 2px solid red;
@@ -176,7 +180,7 @@ export class CreateUser extends HTMLElement {
     OPTION_type.innerText = "Select contact type";
     OPTION_type.setAttribute("value", "");
     SELECT_contact_type.append(OPTION_type);
-    const options = ["Discord", "Email", "Phone", "Twitter", "Other"];
+    const options = ["discord", "email", "phone", "twitter", "other"];
     for (let i = 0; i < options.length; i++) {
       var OPTION_type = document.createElement("option");
       OPTION_type.innerText = options[i];
