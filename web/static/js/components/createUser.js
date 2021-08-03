@@ -39,7 +39,7 @@ export class CreateUser extends HTMLElement {
       font-size: 1.05em;
       background-color: white;
     }
-    legend{
+    legend, label{
       margin-left: 8px;
     }
     fieldset {
@@ -92,7 +92,7 @@ export class CreateUser extends HTMLElement {
     const LABEL_name = document.createElement("label");
     LABEL_name.innerText = "Name";
     LABEL_name.setAttribute("for", "user_name");
-    LABEL_name.style = "display:none;";
+    LABEL_name.style = "display:block;";
     const INPUT_name = document.createElement("input");
     INPUT_name.setAttribute("type", "text");
     INPUT_name.setAttribute("id", "user_name");
@@ -108,7 +108,7 @@ export class CreateUser extends HTMLElement {
     const LABEL_username = document.createElement("label");
     LABEL_username.innerText = "Username";
     LABEL_username.setAttribute("for", "username");
-    LABEL_username.style = "display:none;";
+    LABEL_username.style = "display:block;";
     const INPUT_username = document.createElement("input");
     INPUT_username.setAttribute("type", "text");
     INPUT_username.setAttribute("id", "username");
@@ -186,6 +186,7 @@ export class CreateUser extends HTMLElement {
       }
       SELECT_contact_type.append(OPTION_type);
     }
+    
     FIELDSET.append(
       LABEL_contact_type,
       SELECT_contact_type,
@@ -209,6 +210,13 @@ export class CreateUser extends HTMLElement {
     TEXTAREA_description.setAttribute("id", "contact_description");
     TEXTAREA_description.setAttribute("name", "contact_description");
     TEXTAREA_description.setAttribute("placeholder", "Contact description ...");
+
+    if(!options.includes(user.contactType) && user != null){
+      P_contact_description.style.display = "block";
+      TEXTAREA_description.innerText = user.contactType;
+      OPTION_type.selected = true; 
+    }
+
     P_contact_description.append(LABEL_description, TEXTAREA_description);
     FORM_createUser.append(P_contact_description);
 
@@ -377,7 +385,7 @@ export class CreateUser extends HTMLElement {
     const FORM = this.shadowRoot.querySelector("#update_user");
     const INPUT_username = this.shadowRoot.querySelector("#username");
     INPUT_username.classList.remove("error");
-
+    console.log(formData.get("contact_type"), formData.get("contact_type") === "other")
     var formData = new FormData(FORM);
     fetch("/graphql", {
       method: "POST",
@@ -404,7 +412,10 @@ export class CreateUser extends HTMLElement {
           name: formData.get("name"),
           password: formData.get("password"),
           contact_info: formData.get("contact_address"),
-          contact_type: formData.get("contact_type"),
+          contact_type:
+            formData.get("contact_type") === "other"
+              ? formData.get("contact_description")
+              : formData.get("contact_type"),
         },
       }),
     })
@@ -436,7 +447,7 @@ export class CreateUser extends HTMLElement {
           document.cookie = `access_token_cookie=${
             data.data.createStaff.tokens.accessToken
           }; expires=${d.toUTCString()}; path=/`;
-        window.location = `/user/${data.data.createStaff.staff.username}`;
+          window.location = `/user/${data.data.createStaff.staff.username}`;
         }
       });
   };
@@ -468,7 +479,10 @@ export class CreateUser extends HTMLElement {
           name: formData.get("name"),
           new_username: formData.get("username"),
           contact_info: formData.get("contact_address"),
-          contact_type: formData.get("contact_type"),
+          contact_type:
+            formData.get("contact_type") === "other"
+              ? formData.get("contact_description")
+              : formData.get("contact_type"),
         },
       }),
     })
