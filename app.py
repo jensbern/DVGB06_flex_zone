@@ -61,6 +61,12 @@ def createuser():
 def login():
     return render_template("login.html")
 
+@app.errorhandler(404)
+@jwt_required(optional=True, locations=['headers', 'cookies'])
+def page_not_found(error):
+    user = get_jwt_identity()
+    return render_template("not_found.html", message=error, logged_in_as=user)
+
 @app.route("/edituser/<string:username>")
 @jwt_required(locations=['headers', 'cookies'])
 def edituser(username=None):
@@ -78,7 +84,7 @@ def edituser(username=None):
             return render_template("createUser.html", username=username, logged_in_as=user)
         else:
             return render_template("login.html")
-    return render_template("not_found.html")
+    return render_template("not_found.html", message="User not found", logged_in_as=user)
 
 app.add_url_rule(
     '/graphql',
