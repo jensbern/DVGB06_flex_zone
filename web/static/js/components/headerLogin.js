@@ -159,6 +159,7 @@ export class HeaderLogin extends HTMLElement {
 
   logoutAccount = () => {
     window.sessionStorage.removeItem("accessToken");
+    window.localStorage.removeItem("refreshToken");
     document.cookie =
       "access_token_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     window.location = "/"
