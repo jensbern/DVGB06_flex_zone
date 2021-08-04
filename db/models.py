@@ -29,6 +29,27 @@ class Staff_password(Base):
     staff = relationship(Staff, backref=backref("password", cascade="delete,all"))
 
 
+interest_owner_association = Table(
+    "interest_owner_assoctaion",
+    Base.metadata, 
+    Column("owner_id", Integer, ForeignKey("staff.uuid")),
+    Column("interest_id", Integer, ForeignKey("interest.uuid"))
+)
+
+interest_to_association = Table(
+    "interest_to_association",
+    Base.metadata,
+    Column("to_id", Integer, ForeignKey("staff.uuid")),
+    Column("interest_id", Integer, ForeignKey("interest.uuid"))
+)
+
+class Interest(Base):
+    __tablename__ = "interest"
+    uuid = Column(Integer, primary_key=True)
+    owner = relationship(Staff, secondary=interest_owner_association, uselist=False, backref="interests")
+    to = relationship(Staff, secondary=interest_to_association, uselist=False, backref="interestees")
+    is_interested = Column(Boolean, default=None)
+
 skill_reference_association = Table(
     "skill_reference_association",
     Base.metadata,
@@ -51,26 +72,7 @@ class Reference(Base):
     link = Column(String)
     consent = Column(Boolean)
     
-interest_owner_association = Table(
-    "interest_owner_assoctaion",
-    Base.metadata, 
-    Column("owner_id", Integer, ForeignKey("staff.uuid")),
-    Column("interest_id", Integer, ForeignKey("interest.uuid"))
-)
 
-interest_to_association = Table(
-    "interest_to_association",
-    Base.metadata,
-    Column("to_id", Integer, ForeignKey("staff.uuid")),
-    Column("interest_id", Integer, ForeignKey("interest.uuid"))
-)
-
-class Interest(Base):
-    __tablename__ = "interest"
-    uuid = Column(Integer, primary_key=True)
-    owner = relationship(Staff, secondary=interest_owner_association, uselist=False, backref="interests")
-    to = relationship(Staff, secondary=interest_to_association, uselist=False, backref="interestees")
-    is_interested = Column(Boolean, default=None)
 
 class Experience(Base):
     __tablename__ = "experience"
@@ -84,7 +86,9 @@ class Experience(Base):
         Reference,
         # backref=backref("references", uselist=True, cascade="delete,all"),
         secondary=experience_reference_association,
-        cascade="all, delete"
+        cascade="all, delete",
+        backref="to_experience",
+        cascade_backrefs=False
     )
     # reference = relationship(
     #     Reference, backref=backref("references", uselist=True, cascade="delete,all")
@@ -107,7 +111,9 @@ class Skill(Base):
         Reference,
         # backref=backref("references", uselist=True, cascade="delete,all"),
         secondary=skill_reference_association,
-        cascade="all, delete"
+        cascade="all, delete", 
+        backref="to_skill",
+        cascade_backrefs=False
     )
     staff = relationship(
         Staff, backref=backref("skills", uselist=True, cascade="delete,all")
