@@ -405,6 +405,8 @@ class Query(graphene.ObjectType):
     skills = graphene.List(Skill, name=graphene.String(), id=graphene.ID())
     experiences = graphene.List(
         Experience, experience_type=graphene.String(), at=graphene.String(), id=graphene.ID())
+    
+    references = graphene.List(Reference, refType=graphene.String(), link=graphene.String())
     # Allows sorting over multiple columns, by default over the primary key
     all_staff = SQLAlchemyConnectionField(Staff.connection)
     all_experience = SQLAlchemyConnectionField(Experience.connection)
@@ -492,7 +494,13 @@ class Query(graphene.ObjectType):
                 ExperienceModel.at.contains(at)).all()
             return experiences
         
-
+    def resolve_references(self, info, **args):
+        reference_query = Reference.get_query(info)
+        refType = args.get("refType")
+        link = args.get("link")
+        if refType == "user":
+            references = reference_query.filter(ReferenceModel.link == link)
+            return references
 
 schema = graphene.Schema(query=Query, mutation=Mutations, types=[
                          Staff, Experience, Skill, Reference, SearchResult])

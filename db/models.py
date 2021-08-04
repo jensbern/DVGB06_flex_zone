@@ -49,6 +49,7 @@ class Reference(Base):
     uuid = Column(Integer, primary_key=True)
     ref_type = Column(String)
     link = Column(String)
+    consent = Column(Boolean)
     
 interest_owner_association = Table(
     "interest_owner_assoctaion",
