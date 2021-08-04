@@ -86,10 +86,50 @@ export class Reference extends HTMLElement {
       .hidden {
         display:none;
       }
+
+      .consent_yes{
+        color: darkgreen;
+        background-color: lightgreen;
+        border: 1px solid darkgreen;
+        border-radius: 50%;
+        padding: 2px 5px 2px 5px;
+      }
+      .consent_no{
+        color: darkred;
+        background-color: rgb(255, 216, 216);
+        border: 1px solid darkred;
+        border-radius: 50%;
+        padding: 2px 5px 2px 5px;
+      }
+      .consent_not_answered {
+        background-color: lightgray;
+        border: 1px solid darkgray;
+        border-radius: 50%;
+        padding: 2px 7px 2px 7px;
+      }
     `;
     this.shadowRoot.append(STYLE);
 
     this.suggested_users = [];
+  }
+
+  createConsentSPAN = (consent, name) => {
+    const SPAN = document.createElement("span")
+    if(consent === true){
+      SPAN.innerText = "✓"
+      SPAN.className = "consent_yes";
+      SPAN.setAttribute("title", name + " has approved this reference")
+    }else if (consent === false){
+      SPAN.innerText = "X"
+      SPAN.className = "consent_no";
+      SPAN.setAttribute("title", name + " has not approved this reference")
+    }else{
+      SPAN.innerText = "?"
+      SPAN.className = "consent_not_answered";
+      SPAN.setAttribute("title", name + " has not answered this reference request")
+
+    }
+    return SPAN
   }
 
   displayReferences = (data) => {
@@ -107,6 +147,11 @@ export class Reference extends HTMLElement {
         var LI = this.displayReferenceLI(data[i]);
       } else {
         var LI = this.editReferenceLI(data[i]);
+      }
+
+      if(data[i].refType === "user"){
+        const SPAN_consent = this.createConsentSPAN(data[i].consent, data[i].link)
+        LI.append(SPAN_consent)
       }
       REFERENCES.append(LI);
     }
@@ -374,6 +419,7 @@ export class Reference extends HTMLElement {
               refType
               link
               uuid
+              consent
             }
           }
         }
@@ -437,6 +483,7 @@ export class Reference extends HTMLElement {
               refType
               link
               uuid
+              consent
             }
           }
         }
