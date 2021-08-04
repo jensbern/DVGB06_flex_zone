@@ -339,12 +339,13 @@ class UpdateReference(graphene.Mutation):
         uuid = graphene.ID(required=True)
         type=graphene.String()
         link=graphene.String()
+        consent=graphene.Boolean()
     ok=graphene.Boolean()
     reference = graphene.Field(lambda:Reference)
     
     @jwt_required()
-    def mutate(root, info, uuid, type=None, link=None):
-        reference = update_reference(uuid, type, link)
+    def mutate(root, info, uuid, type=None, link=None, consent=None):
+        reference = update_reference(uuid, type, link, consent)
         ok=True
         return UpdateReference(ok=ok, reference=reference)
 

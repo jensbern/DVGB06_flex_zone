@@ -172,12 +172,14 @@ def update_skill(skill_id, name, description):
     db_session.commit()
     return skill
 
-def update_reference(ref_id, type, link):
+def update_reference(ref_id, type, link, consent):
     reference_update = {}
     if type != None:
         reference_update[Reference.ref_type] = type
     if link != None:
         reference_update[Reference.link] = link
+    if consent != None:
+        reference_update[Reference.consent] = consent
     reference_db = Reference.query.filter(Reference.uuid == ref_id)
     reference = reference_db.first()
     reference_db.update(reference_update, synchronize_session="fetch")
