@@ -169,7 +169,6 @@ export class Login extends HTMLElement {
         return resp.json();
       })
       .then((data) => {
-        console.log(data);
         if (data.data.loginUser.msg) {
           this.addToolTip(
             this.shadowRoot.querySelector("form button"),
