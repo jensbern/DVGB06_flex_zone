@@ -406,13 +406,14 @@ class Query(graphene.ObjectType):
     skills = graphene.List(Skill, name=graphene.String(), id=graphene.ID())
     experiences = graphene.List(
         Experience, experience_type=graphene.String(), at=graphene.String(), id=graphene.ID())
-    
-    references = graphene.List(Reference, refType=graphene.String(), link=graphene.String())
+    interests = graphene.List(Interest, uuid=graphene.ID())
+    references = graphene.List(Reference, refType=graphene.String(), link=graphene.String(), uuid=graphene.ID())
     # Allows sorting over multiple columns, by default over the primary key
     all_staff = SQLAlchemyConnectionField(Staff.connection)
     all_experience = SQLAlchemyConnectionField(Experience.connection)
     # Disable sorting over this field
     all_skills = SQLAlchemyConnectionField(Skill.connection)
+    all_references = SQLAlchemyConnectionField(Reference.connection)
 
     def resolve_search(self, info, **args):
         q = args.get("q")
@@ -495,13 +496,25 @@ class Query(graphene.ObjectType):
                 ExperienceModel.at.contains(at)).all()
             return experiences
         
+    def resolve_interests(self, info, **args):
+        interest_query = Interest.get_query(info)
+        uuid = args.get("uuid")
+        interest = interest_query.filter(InterestModel.uuid == uuid).all()
+        return interest
+
     def resolve_references(self, info, **args):
         reference_query = Reference.get_query(info)
         refType = args.get("refType")
+        uuid = args.get("uuid")
         link = args.get("link")
+        if uuid:
+            references = reference_query.filter(ReferenceModel.uuid == uuid)
+            return references
+
         if refType == "user":
             references = reference_query.filter(ReferenceModel.link == link)
             return references
+        
 
 schema = graphene.Schema(query=Query, mutation=Mutations, types=[
                          Staff, Experience, Skill, Reference, SearchResult])
