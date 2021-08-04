@@ -1,26 +1,39 @@
-{% extends "base.html" %}
-{% block title %}{{name}}{% endblock %}
-{% block username %}{{username}}{% endblock %}
-{% block logged_in_as%}{{logged_in_as}}{% endblock %}
-{% block head %}
-    {{ super() }}
-{% endblock %}
-{% block content %}
+{% extends "base.html" %} {% block title %}{{name}}{% endblock %} {% block
+username %}{{username}}{% endblock %} {% block logged_in_as%}{{logged_in_as}}{%
+endblock %} {% block head %} {{ super() }} {% endblock %} {% block content %}
 <section>
-  <user-element username="{{username}}">
-  </user-element>
-</section> 
+  <user-element username="{{username}}"> </user-element>
+</section>
 <article id="user_page">
   <section>
     <h2>Experiences</h2>
-    <experiences-element username="{{username}}" logged_in_as={{logged_in_as}}></experiences-element>
+    <experiences-element
+      username="{{username}}"
+      logged_in_as="{{logged_in_as}}"
+    ></experiences-element>
   </section>
   <section>
     <h2>Skills</h2>
-    <skills-element username="{{username}}" logged_in_as={{logged_in_as}}></skills-element>
+    <skills-element
+      username="{{username}}"
+      logged_in_as="{{logged_in_as}}"
+    ></skills-element>
+  </section>
+  {% if username == logged_in_as %}
+  <section>
+    <h2>Interest</h2>
+    <interest-element
+      username="{{username}}"
+      logged_in_as="{{logged_in_as}}"
+    ></interest-element>
   </section>
   <section>
-    <interest-element username="{{username}}" logged_in_as={{logged_in_as}}></interest-element>
+    <h2>Requests</h2>
+    <requests-element
+      username="{{username}}"
+      logged_in_as="{{logged_in_as}}"
+    ></requests-element>
   </section>
+  {% endif %}
 </article>
 {% endblock %}

@@ -99,14 +99,28 @@ headerlogin-element {
   border: 1px solid lightgrey;
 }
 
-#user_page section:last-child {
+#user_page section:nth-child(3) {
   -ms-grid-column: 1;
       grid-column-start: 1;
   grid-column-end: 4;
 }
 
 @media (max-width: 1010px) {
-  #user_page section:last-child {
+  #user_page section:nth-child(3) {
+    -ms-grid-column: initial;
+        grid-column-start: initial;
+    grid-column-end: initial;
+  }
+}
+
+#user_page section:nth-child(4) {
+  -ms-grid-column: 1;
+      grid-column-start: 1;
+  grid-column-end: 4;
+}
+
+@media (max-width: 1010px) {
+  #user_page section:nth-child(4) {
     -ms-grid-column: initial;
         grid-column-start: initial;
     grid-column-end: initial;
