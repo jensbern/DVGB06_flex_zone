@@ -58,7 +58,7 @@ skill1 = Skill(
 
 ref1 = Reference(ref_type="link", link="https://www.google.com/")
 ref2 = Reference(ref_type="link", link="https://www.twitch.com/")
-ref3 = Reference(ref_type="user", link="test")
+ref3 = Reference(ref_type="user", link="test", consent=True)
 
 skill1.references.append(ref1)
 skill1.references.append(ref2)
@@ -74,7 +74,7 @@ skill2 = Skill(
     description="Good at top lane matchups, tanks",
 )
 ref1 = Reference(ref_type="link", link="https://www.google.com/")
-ref3 = Reference(ref_type="user", link="test")
+ref3 = Reference(ref_type="user", link="test", consent=False)
 
 skill2.references.append(ref1)
 skill2.references.append(ref3)
