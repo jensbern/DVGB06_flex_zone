@@ -121,3 +121,5 @@ create_data_password.py
 delete_data.py
 database.sqlite3
 database_1.sqlite3
+alembic/
+alembic.*

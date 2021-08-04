@@ -17,6 +17,7 @@ Project in course DVGB06 TIllämpad Programmering
 
 ### For development
 * [virtualenv](https://pypi.org/project/virtualenv/)
+* [alembic](https://alembic.sqlalchemy.org/en/latest/)
 
 
 ### Setup:
@@ -51,6 +52,7 @@ pip install Flask-JWT-Extended
 pip install bcrypt
 pip install python-dotenv
 ```
+
 5. Create some dummy users:
 Run file [create_data.py](create_data.py)  e.g. 
 
