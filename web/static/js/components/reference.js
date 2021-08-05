@@ -133,15 +133,12 @@ export class Reference extends HTMLElement {
   }
 
   displayReferences = (data) => {
-    if (this.getAttribute("edit") === "true") {
-      var REFERENCES = document.createElement("form");
-    } else {
-      var REFERENCES = document.createElement("ul");
-    }
+    const REFERENCES = document.createElement("ul");
     REFERENCES.setAttribute(
       "id",
       `reference${this.getAttribute("for_type")}${this.getAttribute("for_id")}`
     );
+    
     for (let i = 0; i < data.length; i++) {
       if (!this.getAttribute("edit")) {
         var LI = this.displayReferenceLI(data[i]);
@@ -157,6 +154,12 @@ export class Reference extends HTMLElement {
         this.getAttribute("for_type"),
         this.getAttribute("for_id")
       );
+    }else {
+      if(!data.length) {
+        var LI = document.createElement("li")
+        LI.innerText = "No references added yet"
+        REFERENCES.append(LI);
+      }
     }
   };
 
@@ -166,13 +169,13 @@ export class Reference extends HTMLElement {
     LI.setAttribute("id", `reference${data.uuid}`);
     if(!logged_in(this)){
       var A = document.createElement("a");
-      A.target = "_blank";
       switch (data.refType) {
         case "user":
           A.href = `/user/${data.link}`;
           A.innerText = `User: ${data.link}`;
           break;
         case "phone":
+          A.target = "_blank";
           A.href = "tel:" + data.link;
           A.innerText = `Phone: ${data.link}`;
           A.type = "tel";
@@ -180,10 +183,12 @@ export class Reference extends HTMLElement {
         case "email":
           A.href = "mailto:" + data.link;
           A.innerText = `email: ${data.link}`;
+          A.target = "_blank";
           A.type = "email";
           break;
         default:
           A.href = data.link;
+          A.target = "_blank";
           A.innerText = "External link";
           A.title = data.link;
           break;

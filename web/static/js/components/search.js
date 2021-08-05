@@ -403,7 +403,7 @@ export class Search extends HTMLElement {
     const SECTION = document.createElement("section");
     const H4_name = document.createElement("h4");
     const A_name = document.createElement("a");
-    A_name.target = "_blank";
+    // A_name.target = "_blank";
     const P_type = document.createElement("p");
     const P_description = document.createElement("p");
     H4_name.append(A_name);

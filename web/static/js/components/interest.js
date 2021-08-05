@@ -313,7 +313,7 @@ export class Interest extends HTMLElement {
       var P = document.createElement("p");
       var A = document.createElement("a");
       A.href = "/user/" + interests[i].node.to.username;
-      A.target = "_blank";
+      // A.target = "_blank";
       A.innerText = `${interests[i].node.to.name} [${interests[i].node.to.username}]`;
       P.append(A);
 
@@ -389,7 +389,7 @@ export class Interest extends HTMLElement {
       var P_name = document.createElement("p");
       var A = document.createElement("a");
       A.href = "/user/" + interestees[i].node.owner.username;
-      A.target = "_blank";
+      // A.target = "_blank";
       A.innerText = `${interestees[i].node.owner.name} [${interestees[i].node.owner.username}]`;
 
       var SPAN_contact = document.createElement("span");
