@@ -374,6 +374,7 @@ export class Search extends HTMLElement {
         ARTICLE_current.append(this.createSearchDataElement(data[i]));
 
         SECTION_search.append(ARTICLE_current);
+        SECTION_search.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
       }
     }
   };
@@ -394,6 +395,8 @@ export class Search extends HTMLElement {
       ARTICLE_current.append(this.createSearchDataElement(data[i]));
     }
     SECTION_search.append(ARTICLE_current);
+    console.log("scroll");
+    SECTION_search.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
   };
 
   createSearchDataElement = (data) => {
