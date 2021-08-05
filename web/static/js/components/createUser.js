@@ -16,19 +16,24 @@ export class CreateUser extends HTMLElement {
 
     p {
       margin: 8px;
+      display: flex;
+      align-items:center;
+      flex-wrap: wrap;
+      // width: 100%;
+
     }
-    input[type="text"], input[type="password"], input[type="url"], textarea, select{
+    input[type="text"], input[type="email"], input[type="password"], input[type="url"], textarea, select{
       padding: 8px;
-      width: 90%;
+      flex: 1 auto;
       border: 1px solid darkgrey;
       font-size: 1.1em;
       font-family: Georgia, 'Times New Roman', Times, serif;
       box-sizing: border-box;
       }
+
+    
     input, button {
       border: 1px solid darkgrey;
-      // margin: 8px 0;
-      
       padding: 8px;
       font-size: 1.05em;
       background-color: white;
@@ -41,14 +46,15 @@ export class CreateUser extends HTMLElement {
     }
     legend, label{
       margin-left: 8px;
+      width: 100%;
     }
     fieldset {
       display:flex;
       align-items:center;
+      width: 100%;
     }
 
     a {
-      display:block;
       margin-top: 16px;
       font-size: 1.2em;
       color: black;
@@ -208,7 +214,6 @@ export class CreateUser extends HTMLElement {
     const LABEL_description = document.createElement("label");
     LABEL_description.innerText = "Description";
     LABEL_description.setAttribute("for", "contact_description");
-    LABEL_description.style = "display:none;";
     const TEXTAREA_description = document.createElement("textarea");
     TEXTAREA_description.style = "resize: none;";
     TEXTAREA_description.setAttribute("id", "contact_description");
@@ -216,12 +221,12 @@ export class CreateUser extends HTMLElement {
     TEXTAREA_description.setAttribute("placeholder", "Contact description ...");
 
     if(!options.includes(user.contactType) && user != null){
-      P_contact_description.style.display = "block";
+      P_contact_description.style.display = "flex";
       TEXTAREA_description.innerText = user.contactType;
       OPTION_type.selected = true; 
     }
 
-    P_contact_description.append(LABEL_description, TEXTAREA_description);
+    P_contact_description.append(LABEL_description, TEXTAREA_description, "*");
     FORM_createUser.append(P_contact_description);
 
     const P_submit = document.createElement("p");
@@ -246,7 +251,7 @@ export class CreateUser extends HTMLElement {
     const LABEL_password_old = document.createElement("label");
     LABEL_password_old.innerText = "Old password";
     LABEL_password_old.setAttribute("for", "password_old");
-    LABEL_password_old.style = "display:none;";
+    // LABEL_password_old.style = "display:none;";
     const INPUT_password_old = document.createElement("input");
     INPUT_password_old.setAttribute("type", "password");
     INPUT_password_old.setAttribute("id", "password_old");
@@ -260,7 +265,7 @@ export class CreateUser extends HTMLElement {
     const LABEL_password = document.createElement("label");
     LABEL_password.innerText = "Password";
     LABEL_password.setAttribute("for", "password");
-    LABEL_password.style = "display:none;";
+    // LABEL_password.style = "display:none;";
     const INPUT_password = document.createElement("input");
     INPUT_password.setAttribute("type", "password");
     INPUT_password.setAttribute("id", "password");
@@ -274,7 +279,7 @@ export class CreateUser extends HTMLElement {
     const LABEL_password_confirm = document.createElement("label");
     LABEL_password_confirm.innerText = "Confirm password";
     LABEL_password_confirm.setAttribute("for", "password_confirm");
-    LABEL_password_confirm.style = "display:none;";
+    // LABEL_password_confirm.style = "display:none;";
     const INPUT_password_confirm = document.createElement("input");
     INPUT_password_confirm.setAttribute("type", "password");
     INPUT_password_confirm.setAttribute("id", "password_confirm");
@@ -338,27 +343,33 @@ export class CreateUser extends HTMLElement {
   handleContactTypeChange = (e) => {
     const INPUT_contact_address =
       this.shadowRoot.querySelector("#contact_address");
+    const TEXTAREA_description = this.shadowRoot.querySelector("#contact_description")  
     const P_contact_description = this.shadowRoot.querySelector(
       "#contact_description_container"
     );
     switch (e.target.value) {
       case "email":
         INPUT_contact_address.setAttribute("type", "email");
+        TEXTAREA_description.required = false;
         P_contact_description.style.display = "none";
         break;
 
       case "phone":
         INPUT_contact_address.setAttribute("type", "tel");
+        TEXTAREA_description.required = false;
+
         P_contact_description.style.display = "none";
         break;
 
       case "other":
         INPUT_contact_address.setAttribute("type", "text");
-        P_contact_description.style.display = "block";
+        TEXTAREA_description.required = true;
+        P_contact_description.style.display = "flex";
         break;
 
       default:
         INPUT_contact_address.setAttribute("type", "text");
+        TEXTAREA_description.required = false;
         P_contact_description.style.display = "none";
         break;
     }
@@ -673,15 +684,18 @@ export class CreateUser extends HTMLElement {
     if (logged_in(this)) {
       const BUTTON_delete = this.addDeleteAccountLI(username);
       this.shadowRoot.append(BUTTON_delete);
+      const P = document.createElement("p")
       const A = document.createElement("a");
       A.href = "/user/" + username;
       A.innerText = " 👈 Back to userpage";
-      this.shadowRoot.append(A);
+      P.append(A)
+      this.shadowRoot.append(P);
     } else {
       const A = document.createElement("a");
       A.href = "/";
       A.innerText = "👈 Back to startpage";
-      this.shadowRoot.append(A);
+      P.append(A)
+      this.shadowRoot.append(P);
     }
   }
 
