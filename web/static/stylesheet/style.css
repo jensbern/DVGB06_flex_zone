@@ -4,6 +4,7 @@ body {
 
 main {
   padding: 32px;
+  padding-top: 7%;
 }
 
 header {
@@ -12,6 +13,10 @@ header {
   -ms-grid-columns: auto auto;
       grid-template-columns: auto auto;
   background-color: #f7f7f7;
+  position: fixed;
+  width: 100%;
+  z-index: 1;
+  border-bottom: 1px solid lightgray;
 }
 
 h1 {

@@ -5,12 +5,18 @@ body{
 }
 main {
   padding: 32px;
+  padding-top: 7%;
 }
 
 header{
   display: grid;
   grid-template-columns: auto auto;
   background-color: rgb(247, 247, 247);
+  // background: linear-gradient(0.25turn, #fff8c4, #ffffe9, #fffad2);
+  position: fixed;
+  width: 100%;
+  z-index: 1;
+  border-bottom: 1px solid lightgray;
 }
 
 h1 {
