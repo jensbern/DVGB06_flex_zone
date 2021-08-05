@@ -149,10 +149,6 @@ export class Reference extends HTMLElement {
         var LI = this.editReferenceLI(data[i]);
       }
 
-      if(data[i].refType === "user"){
-        const SPAN_consent = this.createConsentSPAN(data[i].consent, data[i].link)
-        LI.append(SPAN_consent)
-      }
       REFERENCES.append(LI);
     }
     this.shadowRoot.append(REFERENCES);
@@ -235,7 +231,10 @@ export class Reference extends HTMLElement {
       SPAN_settings.append(SPAN_edit, SPAN_delete);
       LI.append(SPAN, SPAN_settings)
     }
-
+    if(data.refType === "user"){
+      const SPAN = this.createConsentSPAN(data.consent, data.link)
+      LI.append(SPAN)
+    }
     return LI;
   };
 
