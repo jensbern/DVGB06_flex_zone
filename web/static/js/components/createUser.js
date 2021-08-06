@@ -263,7 +263,7 @@ export class CreateUser extends HTMLElement {
 
     const P_password = document.createElement("p");
     const LABEL_password = document.createElement("label");
-    LABEL_password.innerText = "Password";
+    LABEL_password.innerText = "New Password";
     LABEL_password.setAttribute("for", "password");
     // LABEL_password.style = "display:none;";
     const INPUT_password = document.createElement("input");
