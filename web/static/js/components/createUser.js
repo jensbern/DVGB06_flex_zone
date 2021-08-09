@@ -220,7 +220,7 @@ export class CreateUser extends HTMLElement {
     TEXTAREA_description.setAttribute("name", "contact_description");
     TEXTAREA_description.setAttribute("placeholder", "Contact description ...");
 
-    if(!options.includes(user.contactType) && user != null){
+    if(user != null && !options.includes(user.contactType)){
       P_contact_description.style.display = "flex";
       TEXTAREA_description.innerText = user.contactType;
       OPTION_type.selected = true; 
@@ -691,6 +691,7 @@ export class CreateUser extends HTMLElement {
       P.append(A)
       this.shadowRoot.append(P);
     } else {
+      const P = document.createElement("p")
       const A = document.createElement("a");
       A.href = "/";
       A.innerText = "👈 Back to startpage";
