@@ -383,7 +383,6 @@ export class Experiences extends HTMLElement {
   };
 
   handleSubmit = () => {
-    // console.log("TODO: Create Experience");
     const FORM = this.shadowRoot.querySelector("form");
     const username = this.getAttribute("username");
     var formData = new FormData(FORM);
@@ -423,7 +422,6 @@ export class Experiences extends HTMLElement {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
         this.handleCancelCreateExperience();
         this.addExperience(data.data.createExperience.experience);
       });
@@ -597,7 +595,6 @@ export class Experiences extends HTMLElement {
       })
       .then((data) => {
         if (data.errors) {
-          console.log(data);
           throw new Error("Error removing experience");
         }
         this.shadowRoot.querySelector(`#experience${experience_id}`).remove();

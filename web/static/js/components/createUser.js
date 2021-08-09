@@ -400,7 +400,6 @@ export class CreateUser extends HTMLElement {
     const FORM = this.shadowRoot.querySelector("#update_user");
     const INPUT_username = this.shadowRoot.querySelector("#username");
     INPUT_username.classList.remove("error");
-    console.log(formData.get("contact_type"), formData.get("contact_type") === "other")
     var formData = new FormData(FORM);
     fetch("/graphql", {
       method: "POST",
@@ -527,7 +526,6 @@ export class CreateUser extends HTMLElement {
       isValid = isValid && !!REQUIRED_ELEMENTS[i].value;
     }
     if (isValid) {
-      console.log(e);
       e.preventDefault();
       if (username) {
         this.updatePassword(userid);
@@ -654,7 +652,6 @@ export class CreateUser extends HTMLElement {
         }
       })
       .then((data) => {
-        console.log(data);
         if (data.errors) {
           console.log("Error while deleting");
         } else {

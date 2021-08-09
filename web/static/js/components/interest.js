@@ -211,7 +211,9 @@ export class Interest extends HTMLElement {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
+        if (data.error) {
+          console.log(data);
+        }
       });
   };
 
@@ -240,7 +242,9 @@ export class Interest extends HTMLElement {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
+        if (data.error) {
+          console.log(data);
+        }
       });
   };
 
@@ -351,13 +355,11 @@ export class Interest extends HTMLElement {
       }
       const click_event_hide = (e) => {
         if (!e.composedPath().includes(SPAN_delete)) {
-          console.log(SPAN_interested, SPAN_delete);
           SPAN_delete.classList.add("hidden");
           window.removeEventListener("mousedown", click_event_hide);
         }
       };
       const click_event_show = (e) => {
-        console.log(SPAN_interested, SPAN_delete);
         window.addEventListener("mousedown", click_event_hide);
         SPAN_delete.classList.remove("hidden");
       };

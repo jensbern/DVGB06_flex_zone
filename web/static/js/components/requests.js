@@ -96,7 +96,6 @@ export class Requests extends HTMLElement {
 
   updateConsent = (FORM, reference_uuid) => {
     const formData = new FormData(FORM)
-    console.log(formData.get("consent"))
     fetch("/graphql", {
       method: "POST",
       headers: {
@@ -121,7 +120,9 @@ export class Requests extends HTMLElement {
         return res.json();
       })
       .then((data) => {
-        console.log(data);
+        if (data.error) {
+          console.log(data);
+        }
       });
   }
 
@@ -174,8 +175,6 @@ export class Requests extends HTMLElement {
     
     const experience = reference.toExperience.edges;
     const skill = reference.toSkill.edges;
-    // console.log("experience", experience)
-    // console.log("skill", skill)
     if(experience.length){
       P_type.innerText = experience[0].node.type
       P_description.innerText = experience[0].node.description

@@ -459,7 +459,6 @@ export class Skills extends HTMLElement {
   };
 
   handleSubmit = () => {
-    // console.log("TODO: Create Experience");
     const FORM = this.shadowRoot.querySelector("form");
     const username = this.getAttribute("username");
     var formData = new FormData(FORM);

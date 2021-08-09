@@ -364,7 +364,6 @@ export class Search extends HTMLElement {
         if (data[i]["__typename"]) {
           currentType = data[i]["__typename"];
         } else {
-          console.log(data[i]);
           currentType = data[i].type;
         }
         ARTICLE_current = document.createElement("article");
@@ -395,7 +394,6 @@ export class Search extends HTMLElement {
       ARTICLE_current.append(this.createSearchDataElement(data[i]));
     }
     SECTION_search.append(ARTICLE_current);
-    console.log("scroll");
     SECTION_search.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
   };
 

@@ -241,7 +241,6 @@ export class HeaderLogin extends HTMLElement {
   }
   
   displayUnansweredInteresteed = (root, interestees_not_answered) => {
-    console.log(interestees_not_answered)
     const SPAN = document.createElement("span")
     SPAN.classList.add("interestees_not_answered")
     SPAN.innerText = interestees_not_answered

@@ -164,7 +164,6 @@ export class Reference extends HTMLElement {
   };
 
   displayReferenceLI = (data) => {
-    // console.log(data)
     var LI = document.createElement("li");
     LI.setAttribute("id", `reference${data.uuid}`);
     if(!logged_in(this)){
@@ -248,7 +247,6 @@ export class Reference extends HTMLElement {
       `#reference${reference.uuid}`
     );
     const LI_edit = this.editReferenceLI(reference);
-    // console.log(LI_display, LI_edit)
     LI_display.style = "display:none;";
     this.shadowRoot.querySelector("ul").insertBefore(LI_edit, LI_display);
   };
@@ -501,7 +499,6 @@ export class Reference extends HTMLElement {
         return response.json();
       })
       .then((data) => {
-        // console.log(this.getAttribute("for_type"), data)
         if (data.data.skills) {
           this.displayReferences(data.data.skills[0].references);
         }
@@ -744,21 +741,12 @@ export class Reference extends HTMLElement {
     const H4 = document.createElement("h4");
     H4.innerText = "References:";
     this.shadowRoot.append(H4);
-    // console.log(for_type, for_id)
     if (for_type === "experience") {
       this.getExperienceReferences(for_id);
     } else if (for_type === "skill") {
       this.getSkillReferences(for_id);
     }
   }
-
-  // static get observedAttributes() { return ['edit']; }
-
-  // attributeChangedCallback(name, oldValue, newValue) {
-  //   console.log("name:", name, "old value: ", oldValue, "new value:", newValue);
-  // }
-
-  // static get observedAttributes() { return ['edit']; }
 
   disconnectedCallback() {}
 }
