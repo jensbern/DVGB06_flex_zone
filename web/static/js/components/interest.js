@@ -382,6 +382,7 @@ export class Interest extends HTMLElement {
   };
 
   displayInterestees = (interestees, root) => {
+    console.log(interestees)
     if (!interestees.length) return;
     const ARTICLE = document.createElement("article");
     const H2 = document.createElement("h2");

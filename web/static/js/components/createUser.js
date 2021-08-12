@@ -385,8 +385,8 @@ export class CreateUser extends HTMLElement {
       border: 1px solid red;
       position: absolute;
       padding: 8px;
-      top: ${DOM_rect.y}px;
-      left: ${DOM_rect.x + DOM_rect.width + 32}px;
+      top: ${DOM_rect.y +2}px;
+      left: ${DOM_rect.x + DOM_rect.width * 0.5}px;
     `;
     DOM.parentElement.append(TOOLTIP);
     const keyup_func = (e) => {

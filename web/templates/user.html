@@ -19,7 +19,6 @@ endblock %} {% block head %} {{ super() }} {% endblock %} {% block content %}
       logged_in_as="{{logged_in_as}}"
     ></skills-element>
   </section>
-  {% if username == logged_in_as %}
   <section>
     <h2>Interest</h2>
     <interest-element
@@ -27,6 +26,7 @@ endblock %} {% block head %} {{ super() }} {% endblock %} {% block content %}
       logged_in_as="{{logged_in_as}}"
     ></interest-element>
   </section>
+  {% if username == logged_in_as %}
   <section>
     <h2>Requests</h2>
     <requests-element
